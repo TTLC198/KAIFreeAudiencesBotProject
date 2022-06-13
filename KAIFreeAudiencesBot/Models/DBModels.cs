@@ -104,13 +104,14 @@ public class Lesson
 /// <summary>
 /// Общий класс
 /// </summary>
-public class DBModels
+public class JsonProperties
 {
     [JsonPropertyName("buildNum")] public string building  { get; set; }
-    [JsonPropertyName("dayNum")] public int week_day { get; set; }
-    [JsonPropertyName("audNum")] public string classroom_num { get; set; }
-    [JsonPropertyName("dayTime")] public string start  { get; set; }
-    [JsonPropertyName("prepodName")] public string teacher_name  { get; set; }
-    [JsonPropertyName("dayDate")] public string parity { get; set; }
+    [JsonPropertyName("dayNum")] public int weekDay { get; set; }
+    [JsonPropertyName("audNum")] public string classroomNum { get; set; }
+    [JsonPropertyName("dayTime")] public string dayTime  { get; set; }
+    [JsonPropertyName("prepodName")] public string teacherName  { get; set; }
+    [JsonPropertyName("dayDate")] public string dayDate { get; set; }
     [JsonPropertyName("disciplType")] public string lessonType { get; set; }
+    [JsonPropertyName("disciplName")] public string lessonName { get; set; }
 }

@@ -1,0 +1,7 @@
+bin/
+obj/
+**/app*.json
+Web.config
+/packages/
+riderModule.iml
+/_ReSharper.Caches/

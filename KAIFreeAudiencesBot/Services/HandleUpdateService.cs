@@ -68,7 +68,8 @@ public class HandleUpdateService
             action = message.Text!.Split(' ')[0] switch
             {
                 "/start" or "Назад" => OnStart(_botClient, message),
-                _ => SendMessageAsync(_botClient, message)
+                "/sh" => Development(_botClient, message, message.Text!.Split(' ')),
+                _ => UnknownCommandMessageAsync(_botClient, message)
             };
 
             Message sentMessage = await action;
@@ -79,11 +80,33 @@ public class HandleUpdateService
             _logger.LogError($"Something went wrong:\n{e.Message}");
         }
     }
-    private async Task<Message> SendMessageAsync(ITelegramBotClient botClient, Message message)
+    private async Task<Message> UnknownCommandMessageAsync(ITelegramBotClient botClient, Message message)
     {
         return await botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Я не знаю такую команду"
+        );
+    }
+    
+    private async Task<Message> Development(ITelegramBotClient botClient, Message message, string[] args)
+    {
+        string text = String.Empty;
+
+        if (args[1] != String.Empty)
+        {
+            ScheduleParser parser = new ScheduleParser(new Logger<ScheduleParser>(new LoggerFactory()));
+
+            var groupIds = await parser.GetGroupsIdAsync(args[1]);
+            foreach (var groupId in groupIds)
+            {
+                //if ()
+            }
+        }
+        
+        return await botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            text: text,
+            cancellationToken: CancellationToken.None
         );
     }
 
