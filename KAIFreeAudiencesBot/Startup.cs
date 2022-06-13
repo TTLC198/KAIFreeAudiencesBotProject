@@ -2,6 +2,8 @@
 using KAIFreeAudiencesBot.Models;
 using KAIFreeAudiencesBot.Services;
 using KAIFreeAudiencesBot.Services.Database;
+using Microsoft.EntityFrameworkCore;
+using Ngrok.AspNetCore;
 
 namespace KAIFreeAudiencesBot;
 
@@ -25,14 +27,18 @@ public class Startup
         //httpClient.Timeout = new TimeSpan(0, 5, 0);
         services.AddHttpClient("kfab_webhook").AddTypedClient<ITelegramBotClient>(client =>
             new TelegramBotClient(BotConfiguration.BotApiKey, httpClient));
-        services.AddEntityFrameworkSqlite().AddDbContext<SchDbContext>();
+        services.AddEntityFrameworkSqlite().AddDbContext<SchDbContext>(options =>  
+            options.UseSqlite(Configuration.GetConnectionString("ScheduleConnectionSqlite")!));
         services.AddHostedService<ConfigureWebhook>();
         services.AddScoped<HandleUpdateService>();
         services.AddScoped<ScheduleParser>();
+        services.AddNgrok(options =>
+        {
+            options.NgrokPath = Configuration.GetSection("NgrokExecutionPath").Value;
+            options.DownloadNgrok = false;
+        });
         services.AddControllers();
     }
-
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())

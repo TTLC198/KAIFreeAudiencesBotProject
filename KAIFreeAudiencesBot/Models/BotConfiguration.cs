@@ -9,8 +9,4 @@ public class BotConfiguration
     /// Bot Api key from BotFather
     /// </summary>
     public string BotApiKey { get; init; }
-    /// <summary>
-    /// HostAddress from ngrok
-    /// </summary>
-    public string HostAddress { get; init; }
 }

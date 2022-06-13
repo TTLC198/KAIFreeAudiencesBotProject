@@ -77,22 +77,6 @@ public class HandleUpdateService
         catch (Exception e)
         {
             _logger.LogError($"Something went wrong:\n{e.Message}");
-            switch (e.Message)
-            {
-                case "Sunday":
-                    Message error1Message = await _botClient.SendTextMessageAsync(
-                        chatId: message.Chat.Id,
-                        text: "В воскресенье все аудитории свободны)");
-                    break;
-                case "OutOfTime":
-                    Message error2Message = await _botClient.SendTextMessageAsync(
-                        chatId: message.Chat.Id,
-                        text: "Вы пытаетесь посмотреть аудитории слишком поздно, все они уже свободны)");
-                    break;
-                default:
-                    await UnknownMessageHandlerAsync(_botClient, message);
-                    break;
-            }
         }
     }
     private async Task<Message> SendMessageAsync(ITelegramBotClient botClient, Message message)

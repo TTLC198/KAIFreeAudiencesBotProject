@@ -48,6 +48,10 @@
               "target": "Package",
               "version": "[7.0.0-preview.4.22229.2, )"
             },
+            "Ngrok.AspNetCore": {
+              "target": "Package",
+              "version": "[2.0.0-alpha1, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.2.3, )"
