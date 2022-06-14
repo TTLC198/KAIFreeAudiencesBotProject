@@ -1,8 +1,6 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using KAIFreeAudiencesBot.Models;
-using Ngrok.ApiClient;
-using Ngrok.AspNetCore;
 
 namespace KAIFreeAudiencesBot.Services;
 
@@ -11,15 +9,13 @@ public class ConfigureWebhook  : IHostedService
     private readonly ILogger<ConfigureWebhook> _logger;
     private readonly IServiceProvider _services;
     private readonly BotConfiguration _botConfig;
-    private readonly INgrokHostedService _ngrok;
-    
+
     public ConfigureWebhook(ILogger<ConfigureWebhook> logger,
         IServiceProvider serviceProvider,
         IConfiguration configuration)
     {
         _logger = logger;
         _services = serviceProvider;
-        _ngrok = _services.GetService<INgrokHostedService>()!;
         _botConfig = configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
     }
 
@@ -27,11 +23,8 @@ public class ConfigureWebhook  : IHostedService
     {
         using var scope = _services.CreateScope();
         var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
-        await _ngrok.StartAsync(cancellationToken);
-        
-        var hostAddress = await _ngrok.GetTunnelsAsync();
 
-        var webhookAddress = @$"{hostAddress.ToList()[0].PublicURL}/bot/{_botConfig.BotApiKey}";
+        var webhookAddress = @$"{_botConfig.HostAddress}/bot/{_botConfig.BotApiKey}";
         _logger.LogInformation("Setting webhook: {webhookAddress}", webhookAddress);
         await botClient.SetWebhookAsync(
             url: webhookAddress,

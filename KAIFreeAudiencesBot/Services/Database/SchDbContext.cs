@@ -1,4 +1,5 @@
 ﻿using KAIFreeAudiencesBot.Models;
+using KAIScheduler;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Sqlite;
 
@@ -21,10 +22,5 @@ public sealed class SchDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlite("Data Source=ScheduleDB.db;");
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        //modelBuilder.Entity<Customer>().ToTable("Customers");
     }
 }

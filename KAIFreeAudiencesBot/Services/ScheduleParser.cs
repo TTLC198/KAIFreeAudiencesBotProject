@@ -1,12 +1,14 @@
 ﻿using System.Net.Sockets;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using KAIFreeAudiencesBot.Models;
+using KAIScheduler;
 
 namespace KAIFreeAudiencesBot.Services;
 
 public class ScheduleParser
 {
-    private static readonly string kaiUrl = "https://kai.ru/raspisanie";
+    private static readonly string kaiUrl = "https://82.202.190.197:443/raspisanie";
     private readonly ILogger<ScheduleParser> _logger;
 
     public ScheduleParser(ILogger<ScheduleParser> logger)
@@ -21,50 +23,62 @@ public class ScheduleParser
         public string forma { get; set; }
     }
     
-    public async Task<List<string>> GetGroupsIdAsync(string groupNum)
+    private async Task<List<string>>? GetGroupsIdAsync(string groupNum)
     {
-        using var httpClient = new HttpClient();
-        string request = kaiUrl 
-                         + "?p_p_id=pubStudentSchedule_WAR_publicStudentSchedule10"
-                         + "&p_p_lifecycle=2"
-                         + "&p_p_resource_id=getGroupsURL"
-                         + "&query=" + groupNum;
+        try
+        {
+            using var httpClient = new HttpClient(
+                new HttpClientHandler 
+                { 
+                    AllowAutoRedirect = true,
+                    MaxAutomaticRedirections = 1,
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+                }, false) { DefaultRequestVersion = new Version(2, 0)};
+            string request = kaiUrl 
+                             + "?p_p_id=pubStudentSchedule_WAR_publicStudentSchedule10"
+                             + "&p_p_lifecycle=2"
+                             + "&p_p_resource_id=getGroupsURL"
+                             + "&query=" + groupNum;
+        
+            var response = await httpClient.GetAsync(request);
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"The requested feed returned an error: {response.StatusCode}");
 
-        string responseBody = await (await httpClient.GetAsync(request))
-            .EnsureSuccessStatusCode()
-            .Content.ReadAsStringAsync();
+            var responseBodyStream = await response.Content.ReadAsStreamAsync();
 
-        await using FileStream fs = new FileStream(responseBody, FileMode.OpenOrCreate);
-        var groups = await JsonSerializer.DeserializeAsync<List<GroupApi>>(fs);
+            var groups = await JsonSerializer.DeserializeAsync<List<GroupApi>>(responseBodyStream);
+            var temp = groups;
 
-        return groups!.Select(gr => gr.id.ToString()).ToList();
+            return groups!.Select(gr => gr.id.ToString()).ToList();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception.Message);
+            throw;
+        }
     }
     
-    public async Task<List<List<JsonProperties>>> GetScheduleByIdAsync(string groupId)
+    private async Task<List<List<JsonProperties>>>? GetScheduleByIdAsync(string groupId)
     {
         using var httpClient = new HttpClient();
+        
         string request = kaiUrl 
                          + "?p_p_id=pubStudentSchedule_WAR_publicStudentSchedule10"
                          + "&p_p_lifecycle=2"
                          + "&p_p_resource_id=schedule"
                          + "&groupId=" + groupId;
 
-        string responseBody = await (await httpClient.GetAsync(request))
-            .EnsureSuccessStatusCode()
-            .Content.ReadAsStringAsync();
-
-        if (responseBody == "{}") return null!;
-        
-        await using FileStream fs = new FileStream(responseBody, FileMode.OpenOrCreate);
-        return await JsonSerializer.DeserializeAsync<List<List<JsonProperties>>>(fs);
+        var responseBody = await httpClient.GetStreamAsync(request);
+        return await JsonSerializer.DeserializeAsync<List<List<JsonProperties>>>(responseBody);
     }
 
     public async Task ParseScheduleAsync()
     {
         Dictionary<string, List<List<JsonProperties>>> fullSchedule =
             new Dictionary<string, List<List<JsonProperties>>>();
-        for (int i = 0; i < 9; i++)
+        for (int i = 1; i < 9; i++)
         {
+            var temp1 = await GetGroupsIdAsync($"{i}");
             foreach (var groupId in await GetGroupsIdAsync($"{i}"))
             {
                 var schedule = await GetScheduleByIdAsync(groupId);

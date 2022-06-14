@@ -1,6 +1,6 @@
-﻿using KAIFreeAudiencesBot.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
+using KAIFreeAudiencesBot.Services;
 
 namespace KAIFreeAudiencesBot.Controllers;
 
