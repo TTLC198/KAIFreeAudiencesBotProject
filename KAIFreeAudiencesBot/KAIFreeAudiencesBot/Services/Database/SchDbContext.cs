@@ -1,7 +1,5 @@
-﻿using KAIFreeAudiencesBot.Models;
-using KAIScheduler;
+﻿using KAIScheduler;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Sqlite;
 
 namespace KAIFreeAudiencesBot.Services.Database;
 

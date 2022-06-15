@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KAIFreeAudiencesBot", "KAIFreeAudiencesBot\KAIFreeAudiencesBot.csproj", "{B19ADAEA-50D8-4857-9F83-345B2E39F17F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B19ADAEA-50D8-4857-9F83-345B2E39F17F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B19ADAEA-50D8-4857-9F83-345B2E39F17F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B19ADAEA-50D8-4857-9F83-345B2E39F17F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B19ADAEA-50D8-4857-9F83-345B2E39F17F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
