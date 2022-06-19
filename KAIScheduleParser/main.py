@@ -23,16 +23,15 @@ def getGroup(groupnum):
                   p_p_lifecycle='2',
                   p_p_resource_id='getGroupsURL',
                   query=groupnum)
-    responseJson = requests.get(kaiUrl, params=params).json()
-    groups = []
-    for i in responseJson:
-        groups.append(type('', (object,),
-                           {
-                               'id': str(i['id']),
-                               'group': i['group']
-                           })())
+    response = requests.get(kaiUrl, params=params)
 
-    return groups
+    if response.status_code == 200:
+        groups = []
+        for i in response.json():
+            groups.append(type('', (object,),
+                               dict(id=str(i['id']), group=i['group']))())
+
+        return groups
 
 
 def getScheduleById(groupid):
@@ -40,9 +39,9 @@ def getScheduleById(groupid):
                   p_p_lifecycle='2',
                   p_p_resource_id='schedule',
                   groupId=groupid)
-    responseJson = requests.get(kaiUrl, params=params).json()
-    return responseJson
-
+    response = requests.get(kaiUrl, params=params)
+    if response.status_code == 200:
+        return response.json()
 
 def main():
     schedules = []
@@ -52,18 +51,15 @@ def main():
     groups = []
     classrooms = []
 
-    db = sqlite3.connect(getConnectionString())
-    cur = db.cursor()
+    #db = sqlite3.connect(getConnectionString())
+    #cur = db.cursor()
 
-    for i in range(1, 2):
+    for i in range(1, 10):
         for j in getGroup(str(i)):
             schedule = getScheduleById(j.id)
             if len(schedule) != 0:
                 groups.append(type('', (object,),
-                                   {
-                                       'id': j.id,
-                                       'group_number': j.group
-                                   })())
+                                   dict(id=j.id, group_number=j.group))())
                 schedules.append(schedule)
 
     for schGroups in schedules:
@@ -107,8 +103,7 @@ def main():
                         teachers.append(type('', (object,),
                                              dict(full_name=full_name))())
 
-                # timeRanges sort
-                trSorted = sorted(timeRanges, key=lambda x: datetime.strptime(x.start_time, '%H:%M'))
+                timeRanges.sort(key=lambda x: datetime.strptime(x.start_time, '%H:%M'))
     print('123')
 
     # db.commit()

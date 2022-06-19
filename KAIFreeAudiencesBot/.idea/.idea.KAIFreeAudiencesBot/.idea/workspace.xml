@@ -6,24 +6,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources/115b37ff-e0cc-4b59-bcc0-53a32cb20dc2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/indexLayout.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/ScheduleDB.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/ScheduleDB.db-shm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/ScheduleDB.db-wal" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/ScheduleParser.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Startup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Startup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduler/.idea/.idea.KAIScheduler/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduler/.idea/.idea.KAIScheduler/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduler/.idea/.idea.KAIScheduler/.idea/projectSettingsUpdater.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduler/.idea/.idea.KAIScheduler/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduler/KAIScheduler.sln" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduler/KAIScheduler/KAIScheduler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduler/KAIScheduler/KAIScheduler.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/KAIScheduleParser.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/.idea/KAIScheduleParser.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,15 +20,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$/.." value="master" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
-  </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5aa59b5099e1401ab199da507e3699342200/aa/6d45c23c/Classroom.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -55,8 +36,6 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.45691383&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -100,19 +79,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1655274293092</updated>
-      <workItem from="1655274301768" duration="4689000" />
-      <workItem from="1655319202175" duration="827000" />
-      <workItem from="1655535182299" duration="8125000" />
-      <workItem from="1655573047376" duration="2378000" />
+      <workItem from="1655274301768" duration="499000" />
+      <workItem from="1655625006741" duration="632000" />
     </task>
-    <task id="LOCAL-00001" summary="Relocate files">
-      <created>1655274875925</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1655274875925</updated>
-    </task>
-    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -120,20 +89,7 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Relocate files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Relocate files" />
   </component>
 </project>
