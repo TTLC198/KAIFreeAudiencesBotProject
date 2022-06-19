@@ -2,6 +2,7 @@
 using KAIFreeAudiencesBot.Models;
 using KAIFreeAudiencesBot.Services;
 using KAIFreeAudiencesBot.Services.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace KAIFreeAudiencesBot;
 
@@ -26,10 +27,9 @@ public class Startup
             new TelegramBotClient(BotConfiguration.BotApiKey, httpClient));
         
         
-        services.AddEntityFrameworkSqlite().AddDbContext<SchDbContext>();
+        services.AddEntityFrameworkSqlite().AddDbContext<SchDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("ScheduleConnectionSqlite")));
         services.AddHostedService<ConfigureWebhook>();
         services.AddScoped<HandleUpdateService>();
-        services.AddScoped<ScheduleParser>();
         services.AddControllers().AddNewtonsoftJson();
         services.AddControllers();
     }

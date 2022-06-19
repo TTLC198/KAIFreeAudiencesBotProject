@@ -90,11 +90,6 @@ public class HandleUpdateService
     private async Task<Message> Development(Message message, string[] args)
     {
         string text = String.Empty;
-
-        ScheduleParser parser = new ScheduleParser(new Logger<ScheduleParser>(new LoggerFactory()));
-
-        await parser.ParseScheduleAsync();
-        
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: text,

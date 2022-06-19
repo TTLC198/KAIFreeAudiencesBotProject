@@ -1,6 +1,4 @@
-﻿namespace KAIScheduler;
-
-using System.Text.Json.Serialization;
+﻿namespace KAIFreeAudiencesBot.Models;
 
 public class Group
 {
@@ -14,7 +12,7 @@ public class Group
     public int group_number { get; set; }
 }
 
-public class GroupsWeekDay : Group
+public class GroupsWeekDay
 {
     /// <summary>
     /// id
@@ -100,18 +98,4 @@ public class Lesson
     /// id учителя
     /// </summary>
     public int teacher_id { get; set; }
-}
-/// <summary>
-/// Общий класс
-/// </summary>
-public class JsonProperties
-{
-    [JsonPropertyName("buildNum")] public string building  { get; set; }
-    [JsonPropertyName("dayNum")] public int weekDay { get; set; }
-    [JsonPropertyName("audNum")] public string classroomNum { get; set; }
-    [JsonPropertyName("dayTime")] public string dayTime  { get; set; }
-    [JsonPropertyName("prepodName")] public string teacherName  { get; set; }
-    [JsonPropertyName("dayDate")] public string dayDate { get; set; }
-    [JsonPropertyName("disciplType")] public string lessonType { get; set; }
-    [JsonPropertyName("disciplName")] public string lessonName { get; set; }
 }
