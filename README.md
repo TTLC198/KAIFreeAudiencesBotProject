@@ -6,9 +6,9 @@
 ## Stack
 * ASP.NET 6.0, C# 8.0
 * Telegram.Bot Webhook
-* MS SQL
+* sqlite3
+* python
 * ngrok(for debug only)
-* Azure
 ## Preview
 <img src="https://github.com/TTLC198/KAIFreeAudiencesBot/blob/master/preview.png" align="left" width="1100" />
 
