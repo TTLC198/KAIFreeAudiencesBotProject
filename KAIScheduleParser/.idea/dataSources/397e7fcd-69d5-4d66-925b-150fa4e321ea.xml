@@ -1297,125 +1297,116 @@
       <System>1</System>
     </table>
     <table id="481" parent="163" name="teachers"/>
-    <table id="482" parent="163" name="time_intervals"/>
-    <column id="483" parent="473" name="ct_id">
+    <table id="482" parent="163" name="temp_aud"/>
+    <table id="483" parent="163" name="temp_time"/>
+    <table id="484" parent="163" name="time_intervals"/>
+    <column id="485" parent="473" name="ct_id">
       <AutoIncrement>1</AutoIncrement>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="484" parent="473" name="ct_name">
+    <column id="486" parent="473" name="ct_name">
       <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <key id="485" parent="473" name="class_types_pk">
+    <key id="487" parent="473" name="class_types_pk">
       <ColNames>ct_id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="486" parent="474" name="cr_id">
+    <column id="488" parent="474" name="cr_id">
       <AutoIncrement>1</AutoIncrement>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="487" parent="474" name="cr_name">
+    <column id="489" parent="474" name="cr_name">
       <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <key id="488" parent="474" name="classrooms_pk">
+    <key id="490" parent="474" name="classrooms_pk">
       <ColNames>cr_id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="489" parent="475" name="g_id">
+    <column id="491" parent="475" name="g_id">
       <AutoIncrement>1</AutoIncrement>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="490" parent="475" name="g_name">
+    <column id="492" parent="475" name="g_name">
       <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <key id="491" parent="475" name="groups_pk">
+    <key id="493" parent="475" name="groups_pk">
       <ColNames>g_id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="492" parent="476" name="sod_id">
+    <column id="494" parent="476" name="sod_id">
       <AutoIncrement>1</AutoIncrement>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="493" parent="476" name="sod_g_id">
+    <column id="495" parent="476" name="sod_g_id">
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="494" parent="476" name="sod_day">
+    <column id="496" parent="476" name="sod_day">
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="495" parent="476" name="sod_week">
+    <column id="497" parent="476" name="sod_week">
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <foreign-key id="496" parent="476">
+    <foreign-key id="498" parent="476">
       <ColNames>sod_g_id</ColNames>
       <RefColNames>g_id</RefColNames>
       <RefKeyName>groups_pk</RefKeyName>
       <RefTableName>groups</RefTableName>
     </foreign-key>
-    <key id="497" parent="476" name="schedule_on_day_pk">
+    <key id="499" parent="476" name="schedule_on_day_pk">
       <ColNames>sod_id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="498" parent="477" name="ssd_id">
+    <column id="500" parent="477" name="ssd_id">
       <AutoIncrement>1</AutoIncrement>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="499" parent="477" name="ssd_sod_id">
+    <column id="501" parent="477" name="ssd_ti_id">
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="500" parent="477" name="ssd_ti_id">
+    <column id="502" parent="477" name="ssd_t_id">
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="501" parent="477" name="ssd_t_id">
+    <column id="503" parent="477" name="ssd_cr_id">
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="502" parent="477" name="ssd_cr_id">
+    <column id="504" parent="477" name="ssd_ct_id">
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="503" parent="477" name="ssd_ct_id">
-      <DataType>integer|0s</DataType>
+    <column id="505" parent="477" name="ssd_date">
+      <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="504" parent="477" name="ssd_date">
-      <DataType>text|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>7</Position>
-    </column>
-    <foreign-key id="505" parent="477">
-      <ColNames>ssd_sod_id</ColNames>
-      <RefColNames>sod_id</RefColNames>
-      <RefKeyName>schedule_on_day_pk</RefKeyName>
-      <RefTableName>schedule_on_day</RefTableName>
-    </foreign-key>
     <foreign-key id="506" parent="477">
       <ColNames>ssd_ti_id</ColNames>
       <RefColNames>ti_id</RefColNames>
@@ -1475,108 +1466,113 @@
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <column id="517" parent="478" name="ss_from">
+    <column id="517" parent="478" name="ss_until">
       <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="518" parent="478" name="ss_until">
-      <DataType>text|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>8</Position>
-    </column>
-    <foreign-key id="519" parent="478">
+    <foreign-key id="518" parent="478">
       <ColNames>ss_sod_id</ColNames>
       <RefColNames>sod_id</RefColNames>
       <RefKeyName>schedule_on_day_pk</RefKeyName>
       <RefTableName>schedule_on_day</RefTableName>
     </foreign-key>
-    <foreign-key id="520" parent="478">
+    <foreign-key id="519" parent="478">
       <ColNames>ss_ti_Id</ColNames>
       <RefColNames>ti_id</RefColNames>
       <RefKeyName>time_intervals_pk</RefKeyName>
       <RefTableName>time_intervals</RefTableName>
     </foreign-key>
-    <foreign-key id="521" parent="478">
+    <foreign-key id="520" parent="478">
       <ColNames>ss_t_id</ColNames>
       <RefColNames>t_id</RefColNames>
       <RefKeyName>teachers_pk</RefKeyName>
       <RefTableName>teachers</RefTableName>
     </foreign-key>
-    <foreign-key id="522" parent="478">
+    <foreign-key id="521" parent="478">
       <ColNames>ss_cr_id</ColNames>
       <RefColNames>cr_id</RefColNames>
       <RefKeyName>classrooms_pk</RefKeyName>
       <RefTableName>classrooms</RefTableName>
     </foreign-key>
-    <foreign-key id="523" parent="478">
+    <foreign-key id="522" parent="478">
       <ColNames>ss_ct_id</ColNames>
       <RefColNames>ct_id</RefColNames>
       <RefKeyName>class_types_pk</RefKeyName>
       <RefTableName>class_types</RefTableName>
     </foreign-key>
-    <key id="524" parent="478" name="schedule_subjects_pk">
+    <key id="523" parent="478" name="schedule_subjects_pk">
       <ColNames>ss_id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="525" parent="479" name="type">
+    <column id="524" parent="479" name="type">
       <DataType>text|0s</DataType>
       <Position>1</Position>
     </column>
-    <column id="526" parent="479" name="name">
+    <column id="525" parent="479" name="name">
       <DataType>text|0s</DataType>
       <Position>2</Position>
     </column>
-    <column id="527" parent="479" name="tbl_name">
+    <column id="526" parent="479" name="tbl_name">
       <DataType>text|0s</DataType>
       <Position>3</Position>
     </column>
-    <column id="528" parent="479" name="rootpage">
+    <column id="527" parent="479" name="rootpage">
       <DataType>int|0s</DataType>
       <Position>4</Position>
     </column>
-    <column id="529" parent="479" name="sql">
+    <column id="528" parent="479" name="sql">
       <DataType>text|0s</DataType>
       <Position>5</Position>
     </column>
-    <column id="530" parent="480" name="name">
+    <column id="529" parent="480" name="name">
       <Position>1</Position>
     </column>
-    <column id="531" parent="480" name="seq">
+    <column id="530" parent="480" name="seq">
       <Position>2</Position>
     </column>
-    <column id="532" parent="481" name="t_id">
+    <column id="531" parent="481" name="t_id">
       <AutoIncrement>1</AutoIncrement>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="533" parent="481" name="t_name">
+    <column id="532" parent="481" name="t_name">
       <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <key id="534" parent="481" name="teachers_pk">
+    <key id="533" parent="481" name="teachers_pk">
       <ColNames>t_id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="535" parent="482" name="ti_id">
+    <column id="534" parent="482" name="aud">
+      <DataType>text|0s</DataType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+    </column>
+    <column id="535" parent="483" name="t_name">
+      <DataType>text|0s</DataType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+    </column>
+    <column id="536" parent="484" name="ti_id">
       <AutoIncrement>1</AutoIncrement>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="536" parent="482" name="ti_start">
+    <column id="537" parent="484" name="ti_start">
       <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="537" parent="482" name="ti_end">
+    <column id="538" parent="484" name="ti_end">
       <DataType>text|0s</DataType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <key id="538" parent="482" name="time_intervals_pk">
+    <key id="539" parent="484" name="time_intervals_pk">
       <ColNames>ti_id</ColNames>
       <Primary>1</Primary>
     </key>
