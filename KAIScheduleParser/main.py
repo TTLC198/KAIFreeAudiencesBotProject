@@ -1,19 +1,21 @@
 import json
 from datetime import timedelta, datetime
+import numpy as np
+
 import requests
 import sqlite3
 
 kaiUrl = 'https://kai.ru/raspisanie'
 
+
 def normalizeString(string):
-    while "  " in string:
-        string = string.replace("  ", " ")
-    return string[:-1]
+    return " ".join(string.split())
 
 
 def getConnectionString():
     with open(
-            r'C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject\KAIFreeAudiencesBot\KAIFreeAudiencesBot\appsettings.Development.json') as file:
+            r'C:\Users\24122\Source\Repos\KAIFreeAudiencesBot\KAIFreeAudiencesBot\KAIFreeAudiencesBot'
+            r'\appsettings.Development.json') as file:
         config = json.load(file)
         return config['ConnectionStrings']['ScheduleConnectionSqlite'][12:]
 
@@ -23,15 +25,12 @@ def getGroup(groupnum):
                   p_p_lifecycle='2',
                   p_p_resource_id='getGroupsURL',
                   query=groupnum)
-    response = requests.get(kaiUrl, params=params)
+    response_json = requests.get(kaiUrl, params=params).json()
+    groups = dict()
+    for group in response_json:
+        groups[str(group['id'])] = group['group']
 
-    if response.status_code == 200:
-        groups = []
-        for i in response.json():
-            groups.append(type('', (object,),
-                               dict(id=str(i['id']), group=i['group']))())
-
-        return groups
+    return groups
 
 
 def getScheduleById(groupid):
@@ -39,76 +38,33 @@ def getScheduleById(groupid):
                   p_p_lifecycle='2',
                   p_p_resource_id='schedule',
                   groupId=groupid)
-    response = requests.get(kaiUrl, params=params)
-    if response.status_code == 200:
-        return response.json()
+    return requests.get(kaiUrl, params=params).json()
+
 
 def main():
-    schedules = []
-    timeRanges = []
-    teachers = []
-    lessons = []
-    groups = []
-    classrooms = []
+    try:
+        sqlite_connection = sqlite3.connect(getConnectionString())
+        cursor = sqlite_connection.cursor()
+        cursor.execute("delete from groups")
+        for i in range(1, 10):
+            groups = getGroup(i)
+            for groupId in groups:
+                cursor.execute("insert into groups values (?, ?)", (groupId, groups[groupId]))
+                schedule = getScheduleById(groupId)
+                if len(schedule) != 0:
+                    for day in schedule:
+                        for lesson in day:
+                            
+        sqlite_connection.commit()
 
-    #db = sqlite3.connect(getConnectionString())
-    #cur = db.cursor()
-
-    for i in range(1, 10):
-        for j in getGroup(str(i)):
-            schedule = getScheduleById(j.id)
-            if len(schedule) != 0:
-                groups.append(type('', (object,),
-                                   dict(id=j.id, group_number=j.group))())
-                schedules.append(schedule)
-
-    for schGroups in schedules:
-        for schDays in schGroups.values():
-            for schLessons in schDays:
-                dayTime = normalizeString(schLessons['dayTime'])
-                if dayTime != '':
-                    if len(timeRanges) > 0:
-                        if not any(dayTime == tr.start_time for tr in timeRanges):
-                            timeRanges.append(type('', (object,),
-                                                   dict(start_time=dayTime, end_time=datetime.strftime((
-                                                                                                                   datetime.strptime(
-                                                                                                                       dayTime,
-                                                                                                                       '%H:%M') + timedelta(
-                                                                                                               hours=1,
-                                                                                                               minutes=30)),
-                                                                                                       '%H:%M')))())
-                    else:
-                        timeRanges.append(type('', (object,),
-                                               dict(start_time=dayTime, end_time=datetime.strftime((datetime.strptime(
-                                                   dayTime, '%H:%M') + timedelta(hours=1, minutes=30)), '%H:%M')))())
-
-                audNum = normalizeString(schLessons['audNum'])
-                building = normalizeString(schLessons['buildNum'])
-                if audNum != '' and building != '':
-                    if len(classrooms) > 0:
-                        if not any(audNum == cr.classroom_number and building == cr.building for cr in classrooms):
-                            classrooms.append(type('', (object,),
-                                                   dict(classroom_number=audNum, building=building))())
-                    else:
-                        classrooms.append(type('', (object,),
-                                               dict(classroom_number=audNum, building=building))())
-
-                full_name = normalizeString(schLessons['prepodName'])
-                if full_name != '':
-                    if len(teachers) > 0:
-                        if not any(full_name == t.full_name for t in teachers):
-                            teachers.append(type('', (object,),
-                                                 dict(full_name=full_name))())
-                    else:
-                        teachers.append(type('', (object,),
-                                             dict(full_name=full_name))())
-
-                timeRanges.sort(key=lambda x: datetime.strptime(x.start_time, '%H:%M'))
-    print('123')
-
-    # db.commit()
-    # db.close()
+    except sqlite3.Error as error:
+        print(error)
+    finally:
+        if (sqlite_connection):
+            cursor.close()
+            sqlite_connection.close()
 
 
 if __name__ == '__main__':
     main()
+
