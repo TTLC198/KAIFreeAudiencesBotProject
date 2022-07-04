@@ -5,4 +5,5 @@ Web.config
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
-/KAIFreeAudiencesBot/.vs/KAIFreeAudiencesBot/FileContentIndex
+/KAIFreeAudiencesBot/.vs
+/KAIScheduleParser/.idea
