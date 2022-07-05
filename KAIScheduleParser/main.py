@@ -1,4 +1,5 @@
 import json
+import time
 from datetime import timedelta, datetime
 import numpy as np
 import random
@@ -27,13 +28,15 @@ def getConnectionString():
 
 
 def getGroup():
-	params = dict(p_p_id = 'pubStudentSchedule_WAR_publicStudentSchedule10',
-	              p_p_lifecycle = '2',
-	              p_p_resource_id = 'getGroupsURL')
-	response_json = requests.get(kaiUrl, params = params).json()
 	groups = dict()
-	for group in response_json:
-		groups[str(group['id'])] = group['group']
+	for n in range(1, 10):
+		params = dict(p_p_id = 'pubStudentSchedule_WAR_publicStudentSchedule10',
+		              p_p_lifecycle = '2',
+		              p_p_resource_id = 'getGroupsURL',
+		              query = n)
+		response_json = requests.get(kaiUrl, params = params).json()
+		for group in response_json:
+			groups[str(group['id'])] = group['group']
 
 	return groups
 
@@ -50,105 +53,25 @@ def main():
 	try:
 		sqlite_connection = sqlite3.connect(getConnectionString())
 		cursor = sqlite_connection.cursor()
-		cursor.execute("delete from temp_time")
 		cursor.execute("select * from groups")
 		groups = cursor.fetchall()
-		random.seed()
-		random.shuffle(groups)
-		# groups = getGroup()
-		temp_time = set()
-		for groupId in groups[:100]:
-			# cursor.execute("insert into groups values (?, ?)", (groupId, groups[groupId]))
+		cursor.execute("select * from default_values")
+		default = cursor.fetchall()
+		for groupId in groups[:20]:
+			time.sleep(10)
 			schedule = getScheduleById(groupId)
 			if len(schedule) != 0:
 				for day in schedule.values():
 					for lesson in day:
-						temp_t = normalize_string(lesson["dayDate"])
-						if temp_t != '':
-							temp_time.add((temp_t,))
-		cursor.executemany("insert into temp_time values (?)", temp_time)
-		sqlite_connection.commit()
-
-	except sqlite3.Error as error:
-		print(error)
-	finally:
-		if (sqlite_connection):
-			cursor.close()
-			sqlite_connection.close()
-
-
-def create_dates(interval: int, date_from: datetime, date_until: datetime, overall_number: int = -1):
-	date_list = list([date_from, ])
-	if overall_number != -1:
-		date_list.extend([date_from + timedelta(interval * idx) for idx in range(1, overall_number)])
-	else:
-		while date_from < date_until:
-			date_from += timedelta(interval)
-			date_list.append(date_from)
-	print("Hello")
-
-
-
-def parse_date():
-	create_dates(14, datetime.strptime("01/01/22", r"%x"), datetime.strptime("06/30/22", r"%x"))
-	try:
-		sqlite_connection = sqlite3.connect(getConnectionString())
-		cursor = sqlite_connection.cursor()
-		cursor.execute("select * from temp_time")
-		tempor_times = cursor.fetchall()
-		cursor.execute("select * from default_values")
-		default = cursor.fetchall()
-		Eachsq = list()
-		Each = list()
-		Oddsq = list()
-		Odd = list()
-		Evensq = list()
-		Even = list()
-		Datesq = list()
-		Date = list()
-		for tempor_time_tuple in tempor_times:
-			tempor_time = tempor_time_tuple[0].lower()
-			if re.search(r"неч|чет|ежен", tempor_time) and not (
-					not re.search(r"с|до", tempor_time) and re.search(r"\d\d[.-]*(?:\d\d[.-]*)+", tempor_time)):
-				if re.search(r"\(\d+\)", tempor_time):
-					if re.search(r"/", tempor_time) or re.search(r"ежен", tempor_time):
-						Eachsq.append((tempor_time, re.search(r"\d+", tempor_time)[0]))
-					elif re.search(r"[Нн]еч", tempor_time):
-						Oddsq.append((tempor_time, re.search(r"\d+", tempor_time)[0]))
-					elif re.search(r"[Чч]ет", tempor_time):
-						Evensq.append((tempor_time, re.search(r"\d+", tempor_time)[0]))
-				else:
-					fromD = re.search(r"с \d\d[.-]*(?:\d\d[.-]*)+", tempor_time)
-					untilD = re.search(r"(?:по|до) \d\d[.-]*(?:\d\d[.-]*)+", tempor_time)
-					if not fromD:
-						fromD = default[0]
-					if not untilD:
-						untilD = default[1]
-					if re.search(r"/", tempor_time) or re.search(r"ежен", tempor_time):
-						Each.append((tempor_time,
-						             re.search(r"\d\d[.]*(?:\d\d[.]*)+",
-						                       fromD[0])[0],
-						             re.search(r"\d\d[.]*(?:\d\d[.]*)+",
-						                       untilD[0])[0]))
-					elif re.search(r"[Нн]еч", tempor_time):
-						Odd.append((tempor_time,
-						            re.search(r"\d\d[.]*(?:\d\d[.]*)+",
-						                      fromD[0])[0],
-						            re.search(r"\d\d[.]*(?:\d\d[.]*)+",
-						                      untilD[0])[0]))
-					elif re.search(r"[Чч]ет", tempor_time):
-						Even.append((tempor_time,
-						             re.search(r"\d\d[.]*(?:\d\d[.]*)+",
-						                       fromD[0])[0],
-						             re.search(r"\d\d[.]*(?:\d\d[.]*)+",
-						                       untilD[0])[0]))
-			else:
-				if re.search(r"-", tempor_time):
-					Datesq.append((tempor_time, tempor_time.split("-")))
-				else:
-					Date.append((tempor_time, re.findall(r"\d\d[.]*(?:\d\d[.]*)+", tempor_time)))
-
-		print("123")
+						default_start = datetime.strptime(default[0][0], r"%d.%m.%Y")
+						default_end = datetime.strptime(default[1][0], r"%d.%m.%Y")
+						day_number = normalize_string(lesson['dayNum'])
+						default_start += timedelta(days = int(day_number))
+						dates = parse_date(normalize_string(lesson["dayDate"]), default_start, default_end)
+						auditory = normalize_string(lesson["audNum"])
+						class_type = normalize_string(lesson["disciplType"])
+						teacher = normalize_string(lesson["prepodName"]).capitalize()
+						time_interval = normalize_string(lesson["dayTime"])
 		sqlite_connection.commit()
 
 	except BaseException as error:
@@ -159,5 +82,99 @@ def parse_date():
 			sqlite_connection.close()
 
 
+def create_dates(interval: int, date_from: datetime, date_until: datetime, overall_number: int = -1) -> list:
+	date_list = list([date_from, ])
+	if overall_number != -1:
+		date_list.extend([date_from + timedelta(days = interval * idx) for idx in range(1, overall_number)])
+	else:
+		while date_from < date_until:
+			date_from += timedelta(interval)
+			date_list.append(date_from)
+		else:
+			date_list.pop()
+	return date_list
+
+
+def date_from_string(input_str: str, default_year: str) -> datetime:
+	input_str = re.search(r"\d\d[.]*(?:\d\d[.]*)+", input_str)[0]
+	if re.fullmatch(r"\d\d[.]\d\d[.]\d{4}", input_str) is None:
+		if re.fullmatch(r"\d\d[.]\d\d[.]", input_str) is not None:
+			input_str += default_year
+		else:
+			input_str += "." + default_year
+	return datetime.strptime(input_str, r"%d.%m.%Y")
+
+
+def parse_date(time_for_parse: str, default_start: datetime, default_end: datetime) -> list:
+	if re.search(r"неч|чет|ежен", time_for_parse) and not (
+			not re.search(r"с|до", time_for_parse) and re.search(r"\d\d[.-]*(?:\d\d[.-]*)+", time_for_parse)):
+		if re.search(r"\(\d+\)", time_for_parse):
+			if re.search(r"/", time_for_parse) or re.search(r"ежен", time_for_parse):
+				return list(create_dates(7, default_start, default_end, int(re.search(r"\d+", time_for_parse)[0])))
+			else:
+				return create_dates(14, default_start, default_end, int(re.search(r"\d+", time_for_parse)[0]))
+		else:
+			from_date = re.search(r"с \d\d[.-]*(?:\d\d[.-]*)+", time_for_parse)
+			until_date = re.search(r"(?:по|до) \d\d[.-]*(?:\d\d[.-]*)+", time_for_parse)
+			if from_date is None:
+				from_date = default_start
+			else:
+				from_date = date_from_string(from_date[0], str(default_start.year))
+			if until_date is None:
+				until_date = default_end
+			else:
+				until_date = date_from_string(until_date[0], str(default_start.year))
+			if re.search(r"/", time_for_parse) or re.search(r"ежен", time_for_parse):
+				return create_dates(7, from_date, until_date)
+			else:
+				return list(create_dates(14, from_date, until_date))
+	else:
+		if re.search(r"-", time_for_parse):
+			from_date, until_date = time_for_parse.split("-")
+			return create_dates(7, date_from_string(from_date, str(default_start.year)),
+			                    date_from_string(until_date, str(default_start.year)))
+		else:
+			date_list = list()
+			for date in re.findall(r"\d\d[.]*(?:\d\d[.]*)+", time_for_parse):
+				date_list.append(date_from_string(date, str(default_start.year)))
+			return date_list
+
+def cover_parser_date():
+	try:
+		sqlite_connection = sqlite3.connect(getConnectionString())
+		cursor = sqlite_connection.cursor()
+		cursor.execute("select * from temp_time")
+		tempor_times = cursor.fetchall()
+		cursor.execute("select * from default_values")
+		default = cursor.fetchall()
+		default_start = datetime.strptime(default[0][0], r"%d.%m.%Y")
+		default_end = datetime.strptime(default[1][0], r"%d.%m.%Y")
+		date_list = list()
+		for tempor_time_tuple in tempor_times:
+			tempor_time = tempor_time_tuple[0].lower()
+			date_list.extend(parse_date(tempor_time, default_start, default_end))
+
+		print("123")
+		sqlite_connection.commit()
+	except BaseException as error:
+		print(error)
+	finally:
+		if (sqlite_connection):
+			cursor.close()
+			sqlite_connection.close()
+
+
 if __name__ == '__main__':
-	parse_date()
+	main()
+
+
+"""
+
+		cursor.execute("delete from groups")
+		groups = getGroup()
+cursor.execute("insert into groups values (?, ?)", (groupId, groups[groupId]))
+
+
+groupId = 22108
+			
+"""
