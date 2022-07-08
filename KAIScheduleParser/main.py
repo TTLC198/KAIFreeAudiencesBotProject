@@ -9,6 +9,10 @@ import requests
 import sqlite3
 
 kaiUrl = 'https://kai.ru/raspisanie'
+aud_last_idx = 0
+clst_last_idx = 0
+teach_last_idx = 0
+begin_les_last_idx = 0
 
 
 def normalize_string(string):
@@ -49,37 +53,112 @@ def getScheduleById(groupid):
 	return requests.get(kaiUrl, params = params).json()
 
 
-def main():
-	try:
-		sqlite_connection = sqlite3.connect(getConnectionString())
-		cursor = sqlite_connection.cursor()
-		cursor.execute("select * from groups")
-		groups = cursor.fetchall()
-		cursor.execute("select * from default_values")
-		default = cursor.fetchall()
-		for groupId in groups[:20]:
-			time.sleep(10)
-			schedule = getScheduleById(groupId)
-			if len(schedule) != 0:
-				for day in schedule.values():
-					for lesson in day:
-						default_start = datetime.strptime(default[0][0], r"%d.%m.%Y")
-						default_end = datetime.strptime(default[1][0], r"%d.%m.%Y")
-						day_number = normalize_string(lesson['dayNum'])
-						default_start += timedelta(days = int(day_number))
-						dates = parse_date(normalize_string(lesson["dayDate"]), default_start, default_end)
-						auditory = normalize_string(lesson["audNum"])
-						class_type = normalize_string(lesson["disciplType"])
-						teacher = normalize_string(lesson["prepodName"]).capitalize()
-						time_interval = normalize_string(lesson["dayTime"])
-		sqlite_connection.commit()
+def create_lessons(dates: str, def_start: datetime, def_end: datetime, auditory: str, cls_type: str, teacher: str,
+                   begin_lesson: datetime, group_id, cursor):
+	global aud_last_idx, clst_last_idx, teach_last_idx, begin_les_last_idx
+	dates = parse_date(dates, def_start, def_end)
+	cursor.execute("select cr_id from classrooms where cr_name like ?", (auditory, ))
+	aud_id = cursor.fetchone()
+	if aud_id is None:
+		cursor.execute("insert into classrooms values (null, ?)", (auditory, ))
+		aud_last_idx += 1
+		aud_id = (aud_last_idx, )
+	aud_id = int(aud_id[0])
+	cursor.execute("select ct_id from class_types where ct_name like ?", (cls_type, ))
+	clst_id = cursor.fetchone()
+	if clst_id is None:
+		cursor.execute("insert into class_types values (null, ?)", (cls_type, ))
+		clst_last_idx += 1
+		clst_id = (clst_last_idx, )
+	clst_id = int(clst_id[0])
+	cursor.execute("select t_id from teachers where t_name like ?", (teacher, ))
+	teacher_id = cursor.fetchone()
+	if teacher_id is None:
+		cursor.execute("insert into teachers values (null, ?)", (teacher, ))
+		teach_last_idx += 1
+		teacher_id = (teach_last_idx, )
+	teacher_id = int(teacher_id[0])
+	cursor.execute("select ti_id from time_intervals where ti_start = ?", (begin_lesson.strftime(r"%H:%M"), ))
+	time_int_id = cursor.fetchone()
+	if time_int_id is None:
+		end_time = begin_lesson + timedelta(hours = 1, minutes = 30)
+		cursor.execute("insert into time_intervals values (null, ?, ?)", (begin_lesson.strftime(r"%H:%M"),
+		                                                                  end_time.strftime(r"%H:%M")))
+		begin_les_last_idx += 1
+		time_int_id = (begin_les_last_idx, )
+	time_int_id = int(time_int_id[0])
+	for date in dates:
+		cursor.execute("insert into schedule_subject_dates values (null, ?, ?, ?, ?, ?, ?)", (time_int_id,
+		                                                                                      teacher_id,
+		                                                                                      aud_id,
+		                                                                                      clst_id,
+		                                                                                      date.strftime(r"%d.%m.%Y"),
+		                                                                                      group_id[0]))
 
-	except BaseException as error:
+
+def main():
+	#try:
+	global aud_last_idx, clst_last_idx, teach_last_idx, begin_les_last_idx
+	sqlite_connection = sqlite3.connect(getConnectionString())
+	cursor = sqlite_connection.cursor()
+	cursor.execute("select * from groups")
+	groups = cursor.fetchall()
+	cursor.execute("select * from default_values")
+	default = cursor.fetchall()
+	cursor.execute("select cr_id from classrooms order by cr_id desc limit 1")
+	aud = cursor.fetchone()
+	aud_last_idx = 0 if aud is None else int(aud[0])
+	cursor.execute("select ct_id from class_types order by ct_id desc limit 1")
+	clst = cursor.fetchone()
+	clst_last_idx = 0 if clst is None else int(clst[0])
+	cursor.execute("select t_id from teachers order by t_id desc limit 1")
+	teacher = cursor.fetchone()
+	teach_last_idx = 0 if teacher is None else int(teacher[0])
+	cursor.execute("select ti_id from time_intervals order by ti_id desc limit 1")
+	begin_les = cursor.fetchone()
+	begin_les_last_idx = 0 if begin_les is None else int(begin_les[0])
+	for groupId in groups[10:50]:
+		time.sleep(10)
+		schedule = getScheduleById(groupId)
+		if len(schedule) != 0:
+			for day in schedule.values():
+				for lesson in day:
+					day_number = normalize_string(lesson['dayNum'])
+					dates = normalize_string(lesson["dayDate"])
+					if re.search(r"[Нн]еч", dates) is not None:
+						start_date = datetime.strptime(default[3][0],
+						                               r"%d.%m.%Y") + timedelta(days = int(day_number))
+					elif re.search(r"[Чч]ет", dates) is not None:
+						start_date = datetime.strptime(default[2][0],
+						                               r"%d.%m.%Y") + timedelta(days = int(day_number))
+					else:
+						start_date = datetime.strptime(default[0][0],
+						                               r"%d.%m.%Y") + timedelta(days = int(day_number))
+					default_end = datetime.strptime(default[1][0], r"%d.%m.%Y")
+					auditory = normalize_string(lesson["audNum"])
+					class_type = normalize_string(lesson["disciplType"])
+					teacher = " ".join([parte.capitalize() for parte in
+					                    normalize_string(lesson["prepodName"]).split()])
+					time_interval = datetime.strptime(normalize_string(lesson["dayTime"]), "%H:%M")
+					if re.search(r"л.*р.*", class_type) is not None:
+						create_lessons(dates, start_date, default_end, auditory, class_type, teacher,
+						               time_interval, groupId, cursor)
+						time_interval += timedelta(hours = 1, minutes = 40)
+						create_lessons(dates, start_date, default_end, auditory, class_type, teacher,
+						               time_interval, groupId, cursor)
+					else:
+						create_lessons(dates, start_date, default_end, auditory, class_type, teacher,
+						               time_interval, groupId, cursor)
+	sqlite_connection.commit()
+	if (sqlite_connection):
+		cursor.close()
+		sqlite_connection.close()
+	"""except BaseException as error:
 		print(error)
 	finally:
 		if (sqlite_connection):
 			cursor.close()
-			sqlite_connection.close()
+			sqlite_connection.close()"""
 
 
 def create_dates(interval: int, date_from: datetime, date_until: datetime, overall_number: int = -1) -> list:
@@ -139,36 +218,14 @@ def parse_date(time_for_parse: str, default_start: datetime, default_end: dateti
 				date_list.append(date_from_string(date, str(default_start.year)))
 			return date_list
 
-def cover_parser_date():
-	try:
-		sqlite_connection = sqlite3.connect(getConnectionString())
-		cursor = sqlite_connection.cursor()
-		cursor.execute("select * from temp_time")
-		tempor_times = cursor.fetchall()
-		cursor.execute("select * from default_values")
-		default = cursor.fetchall()
-		default_start = datetime.strptime(default[0][0], r"%d.%m.%Y")
-		default_end = datetime.strptime(default[1][0], r"%d.%m.%Y")
-		date_list = list()
-		for tempor_time_tuple in tempor_times:
-			tempor_time = tempor_time_tuple[0].lower()
-			date_list.extend(parse_date(tempor_time, default_start, default_end))
-
-		print("123")
-		sqlite_connection.commit()
-	except BaseException as error:
-		print(error)
-	finally:
-		if (sqlite_connection):
-			cursor.close()
-			sqlite_connection.close()
-
 
 if __name__ == '__main__':
 	main()
 
-
 """
+
+						default_start += timedelta(days = int(day_number))
+						dates = parse_date(normalize_string(lesson["dayDate"]), default_start, default_end)
 
 		cursor.execute("delete from groups")
 		groups = getGroup()
