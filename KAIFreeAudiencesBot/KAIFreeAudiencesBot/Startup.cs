@@ -16,8 +16,8 @@ public class Startup
         Configuration = configuration;
         BotConfiguration = Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
 
-        using var client = new SchDbContext();
-        client.Database.EnsureCreated();
+        /*using var client = new SchDbContext();
+        client.Database.EnsureCreated();*/
     }
 
     public void ConfigureServices(IServiceCollection services)

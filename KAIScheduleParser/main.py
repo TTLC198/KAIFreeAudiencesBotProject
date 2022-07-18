@@ -241,6 +241,10 @@ def update_lessons():
 
                     default_end = datetime.strptime(default[1][0], r"%d.%m.%Y")
                     auditory = normalize_string(lesson["audNum"])
+
+                    if "---" in auditory:
+                        continue
+
                     building = normalize_string(lesson["buildNum"])
 
                     if not building.isdigit():
