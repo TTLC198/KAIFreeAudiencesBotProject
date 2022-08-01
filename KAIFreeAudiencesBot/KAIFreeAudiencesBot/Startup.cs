@@ -15,9 +15,6 @@ public class Startup
     {
         Configuration = configuration;
         BotConfiguration = Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
-
-        /*using var client = new SchDbContext();
-        client.Database.EnsureCreated();*/
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -27,7 +24,7 @@ public class Startup
             new TelegramBotClient(BotConfiguration.BotApiKey, httpClient));
         
         
-        services.AddEntityFrameworkSqlite().AddDbContext<SchDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("ScheduleConnectionSqlite")));
+        services.AddDbContext<SchDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("ScheduleConnectionSqlite")!));
         services.AddHostedService<ConfigureWebhook>();
         services.AddScoped<HandleUpdateService>();
         services.AddControllers().AddNewtonsoftJson();
@@ -41,8 +38,6 @@ public class Startup
         }
 
         app.UseRouting();
-        //app.UseHttpsRedirection();
-
         app.UseEndpoints(endpoints =>
         {
             var token = BotConfiguration.BotApiKey;
