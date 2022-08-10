@@ -7,8 +7,10 @@ import argparse
 import requests
 from requests.adapters import HTTPAdapter, Retry
 import sqlite3
+from bs4 import BeautifulSoup
 
-kaiUrl = 'https://kai.ru/raspisanie'
+kaiUrl = 'https://kai.ru'
+kaiScheduleUrl = 'https://kai.ru/raspisanie'
 appsettingsJsonPath = r'C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject\KAIFreeAudiencesBot\KAIFreeAudiencesBot\appsettings.Development.json'
 aud_last_idx = 0
 clst_last_idx = 0
@@ -32,7 +34,8 @@ def main():
 
     parser = argparse.ArgumentParser('KAI schedule parser')
     parser.add_argument('-g', default=False, action='store_true', help='refresh groups information')
-    parser.add_argument('-l', default=True, action='store_true', help='add lessons')
+    parser.add_argument('-l', default=False, action='store_true', help='add lessons')
+    parser.add_argument('-p', default=True, action='store_true', help='get week parity')
 
     args = parser.parse_args()
 
@@ -44,6 +47,8 @@ def main():
         update_groups()
     elif args.l:
         update_lessons()
+    elif args.p:
+        get_week_parity()
 
     sqlite_connection.commit()
     requests.session().close()
@@ -96,6 +101,14 @@ def update_groups():
     print('groups is up-to-date')
 
 
+def get_week_parity():
+    response = requests.get(kaiUrl, headers=headers, proxies=proxies)
+    response.close()
+    soup = BeautifulSoup(response.content, "html.parser")
+    temp = soup.body.find_all('span', attrs={'id': 'weekParity'})
+    print(temp)
+
+
 def get_groups():
     """
     get groups dictionary from kai api
@@ -105,7 +118,7 @@ def get_groups():
     params = dict(p_p_id='pubStudentSchedule_WAR_publicStudentSchedule10',
                   p_p_lifecycle='2',
                   p_p_resource_id='getGroupsURL')
-    response = requests.get(kaiUrl, params=params, headers=headers, proxies=proxies)
+    response = requests.get(kaiScheduleUrl, params=params, headers=headers, proxies=proxies)
     response.close()
 
     for group in response.json():
@@ -125,7 +138,7 @@ def get_group_schedule(groupId: int, session: requests.Session):
                   p_p_lifecycle='2',
                   p_p_resource_id='schedule',
                   groupId=groupId)
-    response = session.get(kaiUrl, params=params, headers=headers, proxies=proxies)
+    response = session.get(kaiScheduleUrl, params=params, headers=headers, proxies=proxies)
     response.close()
     return response.json()
 

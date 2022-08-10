@@ -1,9 +1,47 @@
 ﻿namespace KAIFreeAudiencesBot.Models;
 
-public class ClassTypes
+public enum Parity
 {
-    public static readonly string Lection = "лек";
-    public static readonly string Practice = "пр";
-    public static readonly string LabWork = "л.р.";
-    public static readonly string Consultation = "конс";
+    Even,
+    NotEven
+}
+
+public enum Modes
+{
+    Auto,
+    Manual
+}
+
+public enum Buildings
+{
+    All,
+    First,
+    Second, 
+    Third,
+    Fourth,
+    Fifth,
+    Sixth,
+    Seventh,
+    Eighth
+}
+
+public enum ClientSteps
+{
+    Default,
+    ChooseParity,
+    ChooseBuilding,
+    ChooseDay,
+    ChooseTime,
+    ChooseCorrectTime,
+    ChooseAudience,
+}
+
+public enum Days
+{
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday
 }

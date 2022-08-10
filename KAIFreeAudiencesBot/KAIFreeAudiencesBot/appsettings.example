@@ -1,0 +1,15 @@
+﻿{
+  "ConnectionStrings": {
+    "ScheduleConnectionSqlite": "Data Source=path\\to\\your\\sqlite.db"
+  },
+  "BotConfiguration": {
+    "HostAddress": "https://host.address",
+    "BotApiKey": "bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
