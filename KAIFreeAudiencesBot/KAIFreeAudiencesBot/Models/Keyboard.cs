@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 
-namespace KAIFreeAudiencesBot.Services.Misc;
+namespace KAIFreeAudiencesBot.Models;
 
 public static class Keyboard
 {
@@ -20,9 +20,9 @@ public static class Keyboard
             InlineKeyboardButton.WithCallbackData(text: "Чет", callbackData: "1_e"),
             InlineKeyboardButton.WithCallbackData(text: "Нечет", callbackData: "1_n"),
         },
-        /*new [] {
+        new [] {
             InlineKeyboardButton.WithCallbackData(text: "Текущая", callbackData: "1_now")
-        }*/
+        }
     });
 
     public static InlineKeyboardMarkup inlineDayKeyboard = new(new[]
@@ -145,9 +145,17 @@ public static class Keyboard
     {
         new KeyboardButton[]
         {
-            char.ConvertFromUtf32(0x1F193) + " Узнать свободные аудитории", //FREE
-            char.ConvertFromUtf32(0x1F4C5) + " Расписание" //Calendar
-        }
+            char.ConvertFromUtf32(0x1F193) + " Cвободные аудитории", //FREE
+        },
+        new KeyboardButton[]
+        {
+            char.ConvertFromUtf32(0x1F4C5) + " Расписание", // Tear-off Calendar
+            char.ConvertFromUtf32(0x1F4D1) + " Четность", // bookmark tabs
+        },
+        new KeyboardButton[]
+        {
+        char.ConvertFromUtf32(0x1F3EB) + " Все аудитории", //FREE
+        },
     })
     {
         ResizeKeyboard = true,

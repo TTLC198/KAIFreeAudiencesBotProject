@@ -6,21 +6,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DB/sqlite_python.db" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/sqlite_python.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc/Keyboard.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Startup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Startup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/KAIScheduleParser.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/.idea/KAIScheduleParser.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/dataSources/397e7fcd-69d5-4d66-925b-150fa4e321ea.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -28,15 +19,40 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JSON File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--follow-tags" />
+        <option name="title" value="Current Branch" />
+      </GitPushTagMode>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="master" />
+      </list>
+    </option>
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/de87d0d6e60b4760b508cb761cdad0ba91db78/45/dcf0cccb/TaskCanceledException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1d1825edaa32eae8f34c0d4c1d7339da76b49bd313d63412aa44d18fcd5a4/MessageEntity.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/575c31ecc35a636b6f962cb71d53992552941a18982aae1c8e6c16305cc3761b/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6baa723996371c059e7bc78969f2f20741024ce6de0f080dcc5964225c3303a/ServiceProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c269bd4a989dea031277e5b6c4c53a6d2c1889fcf9883a7a5a1754033a57/EntityFrameworkServiceCollectionExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ce719136c12653cd464ae0b247771f618b92f8beec14c1010b5278a7d0fd1f/DbContextServices.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d2bc5a7ce9a5fc6f18c2bef1444e092e0496246f8a755bce46494f429fb86a9/DateTimeParse.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d6b4aefcd8a1389eac53f90b24090dea8ea6b3b6c8594585fbd790a8651ebd/Update.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/eec384c316ffd282b857f1fa5d5240aee4d304d9c1f3877b0db16c522f3/TimeOnly.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f4708639776589f5ac2739f6fcbfc67343b1f9dac51cc1dbfdb003eef77cc1c/Monitor.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Properties/launchSettings.json" root0="FORCE_HIGHLIGHTING" />
@@ -59,7 +75,8 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propDebugger&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.gutterIcons&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -118,7 +135,44 @@
       <workItem from="1657830862930" duration="17716000" />
       <workItem from="1657975088288" duration="1070000" />
       <workItem from="1658141732419" duration="11836000" />
+      <workItem from="1659226795292" duration="11911000" />
+      <workItem from="1659347392488" duration="15722000" />
+      <workItem from="1659870974783" duration="4317000" />
+      <workItem from="1659875383266" duration="2317000" />
+      <workItem from="1659963550689" duration="4021000" />
+      <workItem from="1659982096240" duration="679000" />
+      <workItem from="1660016861378" duration="11851000" />
+      <workItem from="1660121891112" duration="1840000" />
     </task>
+    <task id="LOCAL-00001" summary="Added appsettings.example.json">
+      <created>1659347509862</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1659347509862</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Added appsettings.example.json">
+      <created>1659347573098</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1659347573098</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Added appsettings.json example file">
+      <created>1659375736309</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1659375736309</updated>
+    </task>
+    <task id="LOCAL-00004" summary="main: the functionality of choosing the mode of operation of the search for free audiences has been implemented, the automatic mode of operation has been completed, and most of the manual mode has been released.&#10;misc: main code has been split into different files">
+      <created>1659376041586</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1659376041586</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -139,6 +193,41 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Added appsettings.example.json" />
+    <MESSAGE value="Added appsettings.json example file" />
+    <MESSAGE value="main: the functionality of choosing the mode of operation of the search for free audiences has been implemented, the automatic mode of operation has been completed, and most of the manual mode has been released.&#10;misc: main code has been split into different files" />
+    <option name="LAST_COMMIT_MESSAGE" value="main: the functionality of choosing the mode of operation of the search for free audiences has been implemented, the automatic mode of operation has been completed, and most of the manual mode has been released.&#10;misc: main code has been split into different files" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs</url>
+          <line>689</line>
+          <properties documentPath="C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject\KAIFreeAudiencesBot\KAIFreeAudiencesBot\Services\HandleUpdateService.cs" initialLine="566" containingFunctionPresentation="lambda expression inside method 'GetFreeAudiences'">
+            <startOffsets>
+              <option value="27089" />
+            </startOffsets>
+            <endOffsets>
+              <option value="27090" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="Type#KAIFreeAudiencesBot.Controllers.WebhookController" memberName="_clients" />
+        <PinnedItemInfo parentTag="Type#KAIFreeAudiencesBot.Controllers.WebhookController" memberName="_tasks" />
+      </pinned-members>
+    </pin-to-top-manager>
+    <watches-manager>
+      <configuration name="LaunchSettings">
+        <watch expression="currentClient" />
+        <watch expression="KAIFreeAudiencesBot.Services.HandleUpdateService.clients" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

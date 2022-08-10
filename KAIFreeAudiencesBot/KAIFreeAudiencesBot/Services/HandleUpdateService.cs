@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using KAIFreeAudiencesBot.Models;
 using KAIFreeAudiencesBot.Services.Database;
-using KAIFreeAudiencesBot.Services.Misc;
+using KAIFreeAudiencesBot.Services.Models;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -99,8 +99,17 @@ public class HandleUpdateService
                 '4' => Call(() => //Выбор аудитории
                 {
                     var args = callbackQuery.Data.Split('_');
-                    currentClient.step = ClientSteps.ChooseAudience;
-                    return ChooseAudience(callbackQuery.Message!, currentClient, args);
+                    if (args[1] == "all")
+                    {
+                        currentClient.step = ClientSteps.Default;
+                        return GetFreeAudiences(callbackQuery.Message!, currentClient.settings);
+                    }
+                    else
+                    {
+                        currentClient.step = ClientSteps.ChooseAudience;
+                        return ChooseAudience(callbackQuery.Message!, currentClient, args);
+                    }
+                    
                 }),
                 '5' => Call(() => //Все аудитории в виде таблицы
                 {
@@ -153,6 +162,7 @@ public class HandleUpdateService
             {
                 id = clientId
             });
+            currentClient = clients.Find(c => c.id == clientId)!;
         }
         
         try
@@ -170,11 +180,14 @@ public class HandleUpdateService
             }
             else
             {
+                var t1 = 
                 action = message.Text!.Split(' ')[0] switch
                 {
                     "/start" => OnStart(message, currentClient),
-                    var s when s[0] == char.ConvertFromUtf32(0x1F193)[0] || s == "/free" => ChooseMode(message), //Свободные аудитории
-                    var s when s[0] == char.ConvertFromUtf32(0x1F4C5)[0] || s == "/schedule" => NotRealized(message), //Расписание
+                    var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F193) || s == "/free" => ChooseMode(message), //Свободные аудитории
+                    var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4D1) || s == "/parity" => GetWeekParity(message), //Четность недели
+                    var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F3EB) || s == "/audiences" => GetAllAudiences(message), //Все аудитории
+                    var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4C5) || s == "/schedule" => NotRealized(message), //Расписание
                     _ => UnknownMessageAsync(message)
                 };
             }
@@ -203,7 +216,7 @@ public class HandleUpdateService
             cancellationToken: CancellationToken.None
         );
     }
-    
+
     private async Task<Message> OnRestart(Message message, Client client)
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
@@ -224,6 +237,17 @@ public class HandleUpdateService
             chatId: message.Chat.Id,
             text:
             "На данный момент эта функция не реализована.",
+            cancellationToken: CancellationToken.None
+        );
+    }
+    
+    private async Task<Message> GetWeekParity(Message message)
+    {
+        return await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            text: "Данная неделя " + (Misc.GetWeekParity(DateTime.Now) == Parity.NotEven ? "<i>нечетная</i>" : "<i>четная</i>") + ".",
+            replyMarkup: Keyboard.Back,
+            parseMode: ParseMode.Html,
             cancellationToken: CancellationToken.None
         );
     }
@@ -260,7 +284,12 @@ public class HandleUpdateService
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         clients[clientIndex].step = ClientSteps.ChooseDay;
-        clients[clientIndex].settings.Parity = args[1] == "e" ? Parity.Even : Parity.NotEven;
+        clients[clientIndex].settings.Parity = args[1] switch
+        {
+            "e" => Parity.Even,
+            "n" => Parity.NotEven,
+            "now" => Misc.GetWeekParity(DateTime.Now)
+        };
 
         return await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
@@ -321,7 +350,14 @@ public class HandleUpdateService
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         clients[clientIndex].step = ClientSteps.ChooseBuilding;
-        clients[clientIndex].settings.Mode = args[1] == "auto" ? Modes.Auto : Modes.Manual;
+        if (args[1] == "auto")
+        {
+            clients[clientIndex].settings.Mode = Modes.Auto;
+        }
+        else
+        {
+            clients[clientIndex].settings.TimeStart = TimeOnly.ParseExact(args[1], new[] {"HH:mm", "H:mm"}, new CultureInfo("ru-RU"));
+        }
 
         return await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
@@ -393,6 +429,16 @@ public class HandleUpdateService
                     current = DateTime.Now;
 #endif
                 }
+                else
+                {
+                    current = new DateTime(
+                        DateTime.Now.Year,
+                        DateTime.Now.Month,
+                        Misc.GetCurrentDay(DateTime.Now, settings.Parity)!.Value.Day,
+                        settings.TimeStart.Hour,
+                        settings.TimeStart.Minute,
+                        settings.TimeStart.Second);
+                }
             }
             
             var schedules = db.scheduleSubjectDates
@@ -410,12 +456,16 @@ public class HandleUpdateService
                 .AsEnumerable()
                 .Where(cr =>
                     !schedules.Any(s => s.Classroom.name == cr.name && s.Classroom.building == cr.building)
-                    && cr.name.Contains(settings.Audience))
+                    && String.Equals(cr.name, settings.Audience, StringComparison.OrdinalIgnoreCase))
                 .Select(cr => new { cr.building, cr.name })
                 .AsEnumerable()
                 .OrderBy(cr => cr.building)
                 .ThenBy(cr => cr.name)
                 .ToList();
+            
+            if (settings != null!) 
+                if (settings.Building != Buildings.All) 
+                    emptyClassrooms = emptyClassrooms.Where(cr => cr.building == Convert.ToString((int)settings.Building)).ToList();
 
             if (db.classrooms
                 .AsNoTracking()
@@ -467,6 +517,114 @@ public class HandleUpdateService
 
         return currentMessage;
     }
+    
+    private async Task<Message> GetAllAudiences(Message message)
+    {
+        List<string> FreeAudItems = new List<string>();
+
+        var loadingMessage = await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            text: "Получение данных",
+            cancellationToken: CancellationToken.None
+        );
+        var loadingTaskCts = new CancellationTokenSource();
+        var loadingTask = new Task(async () =>
+        {
+            while (!loadingTaskCts.Token.IsCancellationRequested)
+            {
+                for (int i = 1; i < 4; i++)
+                {
+                    if (loadingTaskCts.Token.IsCancellationRequested) return;
+                    await _botClient.EditMessageTextAsync(
+                        chatId: message.Chat.Id,
+                        messageId: loadingMessage.MessageId,
+                        text: "Получение данных" + "...".Substring(0, i),
+                        cancellationToken: CancellationToken.None
+                    );
+                    Thread.Sleep(300);
+                }
+            }
+        }, loadingTaskCts.Token);
+
+        var dbTask = new Task(async () =>
+        {
+            await using var db = _services.GetService<SchDbContext>();
+
+            var classrooms = db.classrooms
+                .AsNoTracking()
+                .AsEnumerable()
+                .OrderBy(cr => cr.building)
+                .ThenBy(cr => cr.name)
+                .ToList();
+
+            foreach (var classroom in classrooms)
+            {
+                FreeAudItems.Add($"{classroom.name};{classroom.building}");
+            }
+        });
+
+        try
+        {
+            loadingTask.Start();
+            dbTask.Start();
+            await Task.WhenAny(dbTask).ContinueWith(_ => { loadingTaskCts.Cancel(); });
+        }
+        catch (Exception e)
+        {
+            await HandleErrorAsync(e);
+        }
+        finally
+        {
+            loadingTask.Dispose();
+            dbTask.Dispose();
+        }
+
+        //Длина строки создаваемой таблицы = 99 символов
+        //tg позволяет отправлять сообщения длиной не более 4096 символов, следовательно количество строк в одном сообщении не должно превышать 40
+        const int maxRowCount = 40;
+        if (FreeAudItems.Count > maxRowCount)
+        {
+            int i = 0;
+            do
+            {
+                var text =
+                    BuildTelegramTable(
+                    FreeAudItems
+                        .Take(new Range(
+                            i,
+                            i += FreeAudItems.Count - i < maxRowCount ? FreeAudItems.Count - i : maxRowCount)).ToList(),
+                    fixedColumnWidth: true, maxColumnWidth: 14,
+                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1);
+                await _botClient.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: text,
+                    parseMode: ParseMode.Html,
+                    cancellationToken: CancellationToken.None
+                );
+            } while (i < FreeAudItems.Count);
+            return await _botClient.EditMessageTextAsync(
+                chatId: message.Chat.Id,
+                messageId: loadingMessage.MessageId,
+                text: "Таблица всех аудиторий" + BuildTelegramTable(FreeAudItems.Take(maxRowCount).ToList(),
+                    fixedColumnWidth: true, maxColumnWidth: 14,
+                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1),
+                parseMode: ParseMode.Html,
+                cancellationToken: CancellationToken.None
+            );
+        }
+        else
+        {
+            return await _botClient.EditMessageTextAsync(
+                chatId: message.Chat.Id,
+                messageId: loadingMessage.MessageId,
+                text: "Таблица всех аудиторий" + BuildTelegramTable(FreeAudItems, fixedColumnWidth: true, maxColumnWidth: 14,
+                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1),
+                parseMode: ParseMode.Html,
+                replyMarkup: Keyboard.Back,
+                cancellationToken: CancellationToken.None
+            );
+        }
+    }
 
     private async Task<Message> GetFreeAudiences(Message message, ClientSettings settings)
     {
@@ -510,7 +668,28 @@ public class HandleUpdateService
                     current = DateTime.Now;
 #endif
                 }
+                else
+                {
+#if DEBUG
+                    current = new DateTime(
+                        DateTime.Now.Year,
+                        5,
+                        Misc.GetCurrentDay(DateTime.Now, settings.Parity)!.Value.Day,
+                        settings.TimeStart.Hour,
+                        settings.TimeStart.Minute,
+                        settings.TimeStart.Second);
+#else
+                    current = new DateTime(
+                        DateTime.Now.Year,
+                        DateTime.Now.Month,
+                        Misc.GetCurrentDay(DateTime.Now, settings.Parity)!.Value.Day,
+                        settings.TimeStart.Hour,
+                        settings.TimeStart.Minute,
+                        settings.TimeStart.Second);
+#endif
+                }
             }
+
             
             var schedules = db.scheduleSubjectDates
                 .AsNoTracking()
@@ -543,8 +722,6 @@ public class HandleUpdateService
             }
         });
 
-        string tableName = settings.Building != Buildings.All ? "Таблица всех свободных аудиторий\n" : $"Таблица свободных аудиторий в {Convert.ToString((int)settings.Building)} здании\n";
-
         try
         {
             loadingTask.Start();
@@ -574,8 +751,9 @@ public class HandleUpdateService
                         .Take(new Range(
                             i,
                             i += FreeAudItems.Count - i < maxRowCount ? FreeAudItems.Count - i : maxRowCount))
-                        .Prepend(FreeAudItems[0]).ToList(), autoColumnWidth: true,
-                    minimumColumnWidth: 1, columnPadLeft: 1, columnPadRight: 1);
+                        .Prepend(FreeAudItems[0]).ToList(), 
+                    fixedColumnWidth: true, maxColumnWidth: 14,
+                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1);
                 await _botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
                     text: text,
@@ -583,14 +761,13 @@ public class HandleUpdateService
                     cancellationToken: CancellationToken.None
                 );
             } while (i < FreeAudItems.Count);
-
             return await _botClient.EditMessageTextAsync(
                 chatId: message.Chat.Id,
                 messageId: message.MessageId,
-                text: tableName + BuildTelegramTable(FreeAudItems.Take(maxRowCount).ToList(),
-                    autoColumnWidth: true, minimumColumnWidth: 1, columnPadLeft: 1, columnPadRight: 1),
+                text: "Таблица свободных аудиторий" + BuildTelegramTable(FreeAudItems.Take(maxRowCount).ToList(),
+                    fixedColumnWidth: true, maxColumnWidth: 14,
+                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1),
                 parseMode: ParseMode.Html,
-                replyMarkup: Keyboard.Back,
                 cancellationToken: CancellationToken.None
             );
         }
@@ -599,8 +776,9 @@ public class HandleUpdateService
             return await _botClient.EditMessageTextAsync(
                 chatId: message.Chat.Id,
                 messageId: message.MessageId,
-                text: tableName + BuildTelegramTable(FreeAudItems, autoColumnWidth: true,
-                    minimumColumnWidth: 1, columnPadLeft: 1, columnPadRight: 1),
+                text: "Таблица свободных аудиторий" + BuildTelegramTable(FreeAudItems, 
+                    fixedColumnWidth: true, maxColumnWidth: 14,
+                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1),
                 parseMode: ParseMode.Html,
                 replyMarkup: Keyboard.Back,
                 cancellationToken: CancellationToken.None
