@@ -7,7 +7,6 @@ import argparse
 import requests
 from requests.adapters import HTTPAdapter, Retry
 import sqlite3
-from bs4 import BeautifulSoup
 
 kaiUrl = 'https://kai.ru'
 kaiScheduleUrl = 'https://kai.ru/raspisanie'
@@ -35,42 +34,30 @@ def main():
     parser = argparse.ArgumentParser('KAI schedule parser')
     parser.add_argument('-g', default=False, action='store_true', help='refresh groups information')
     parser.add_argument('-l', default=False, action='store_true', help='add lessons')
-    parser.add_argument('-p', default=True, action='store_true', help='get week parity')
+    parser.add_argument('-v', default=True, action='store_true', help='verbose logging')
 
-    args = parser.parse_args()
+    try:
+        sqlite_connection = sqlite3.connect(get_connection_string(appsettingsJsonPath))
+        cursor = sqlite_connection.cursor()
+        args = parser.parse_args()
 
-    logging.basicConfig(level=logging.DEBUG)
-    sqlite_connection = sqlite3.connect(get_connection_string(appsettingsJsonPath))
-    cursor = sqlite_connection.cursor()
+        if args.v:
+            logging.basicConfig(level=logging.DEBUG)
 
-    if args.g:
-        update_groups()
-    elif args.l:
-        update_lessons()
-    elif args.p:
-        get_week_parity()
-
-    sqlite_connection.commit()
-    requests.session().close()
-    cursor.close()
-    sqlite_connection.close()
-
-    # try:
-    #     sqlite_connection = sqlite3.connect(get_connection_string(appsettingsJsonPath))
-    #     cursor = sqlite_connection.cursor()
-    #
-    #     if args.g:
-    #         update_groups()
-    #     elif args.l:
-    #         update_lessons()
-    # except BaseException as error:
-    #     print(error)
-    # else:
-    #     sqlite_connection.commit()
-    # finally:
-    #     requests.session().close()
-    #     cursor.close()
-    #     sqlite_connection.close()
+        if args.g:
+            print('updating groups')
+            update_groups()
+        elif args.l:
+            print('updating lessons')
+            update_lessons()
+    except BaseException as error:
+        print(error)
+    else:
+        sqlite_connection.commit()
+    finally:
+        requests.session().close()
+        cursor.close()
+        sqlite_connection.close()
 
 
 def normalize_string(string):
@@ -99,14 +86,6 @@ def update_groups():
     for group in groups:
         cursor.execute("insert into groups values (?, ?)", (group, groups[group]))
     print('groups is up-to-date')
-
-
-def get_week_parity():
-    response = requests.get(kaiUrl, headers=headers, proxies=proxies)
-    response.close()
-    soup = BeautifulSoup(response.content, "html.parser")
-    temp = soup.body.find_all('span', attrs={'id': 'weekParity'})
-    print(temp)
 
 
 def get_groups():
