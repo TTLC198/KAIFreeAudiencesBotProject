@@ -1,7 +1,10 @@
 bin/
 obj/
-**/app*.json
+**/appsettings.json
+**/appsettings.Development.json
 Web.config
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+/KAIFreeAudiencesBot/.vs
+/KAIScheduleParser/.idea
