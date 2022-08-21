@@ -1,0 +1,60 @@
+﻿version: "3.9"
+services:
+  db:
+    build: DB
+    container_name: db
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    volumes:
+      - db-data:/db
+        
+  ngrok:
+    image: ngrok/ngrok:alpine
+    container_name: ngrok
+    command: 'http --authtoken ${ngrokAuthToken} host.docker.internal:5000'
+    ports:
+      - '4040:4040'
+    expose:
+      - '4040'
+    healthcheck:
+      test: curl -sS http://host.docker.internal:4040 || echo 1
+      interval: 3s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+  web:
+    build: KAIFreeAudiencesBot
+    container_name: web
+    restart: on-failure
+    volumes:
+      - db-data:/db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Release
+    ports:
+      - "5000:5000"
+    depends_on:
+      ngrok:
+        condition: service_healthy
+      db:
+        condition: service_started
+      parser:
+        condition: service_started
+      
+        
+  parser:
+    build: KAIScheduleParser
+    container_name: parser
+    tty: true
+    volumes:
+      - db-data:/db
+    command: python ./parser.py -g -l -c /db/schedule.db
+    depends_on:
+      db:
+        condition: service_started
+        
+volumes:
+  db-data:
+    
+    

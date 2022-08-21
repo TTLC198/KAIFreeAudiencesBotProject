@@ -14,6 +14,8 @@ FROM build AS publish
 RUN dotnet publish "KAIFreeAudiencesBot.csproj" -c Release -o /app/publish
 
 FROM base AS final
+
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "KAIFreeAudiencesBot.dll"]
+
+ENTRYPOINT dotnet KAIFreeAudiencesBot.dll --urls http://0.0.0.0:5000
