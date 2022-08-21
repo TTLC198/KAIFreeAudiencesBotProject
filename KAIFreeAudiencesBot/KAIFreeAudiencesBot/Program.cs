@@ -1,3 +1,5 @@
+using KAIFreeAudiencesBot.Services;
+
 namespace KAIFreeAudiencesBot;
 
 public class Program

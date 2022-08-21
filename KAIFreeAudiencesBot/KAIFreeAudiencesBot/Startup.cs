@@ -8,7 +8,7 @@ namespace KAIFreeAudiencesBot;
 
 public class Startup
 {
-    public IConfiguration Configuration { get; }
+    private IConfiguration Configuration { get; }
     private BotConfiguration BotConfiguration { get; }
 
     public Startup(IConfiguration configuration)
@@ -25,6 +25,7 @@ public class Startup
         
         
         services.AddDbContext<SchDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("ScheduleConnectionSqlite")!));
+        services.AddSingleton<NgrokService>();
         services.AddHostedService<ConfigureWebhook>();
         services.AddScoped<HandleUpdateService>();
         services.AddControllers().AddNewtonsoftJson();
