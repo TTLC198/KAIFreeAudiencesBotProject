@@ -11,6 +11,7 @@
 * docker-compose
 ## Preview
 <img src="https://github.com/TTLC198/KAIFreeAudiencesBot/blob/master/preview.png" align="left" width="1100" />
+
 ## Usage
 ### Building
 ```sh
