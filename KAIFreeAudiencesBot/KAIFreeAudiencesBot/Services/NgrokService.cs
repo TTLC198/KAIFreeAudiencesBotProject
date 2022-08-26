@@ -18,7 +18,7 @@ public class NgrokService
     public async Task<string> GetNgrokPublicUrl()
     {
         using var httpClient = new HttpClient();
-        for (var ngrokRetryCount = 0; ngrokRetryCount < 10; ngrokRetryCount++)
+        for (var ngrokRetryCount = 0; ngrokRetryCount < 20; ngrokRetryCount++)
         {
             Logger.LogDebug("Get ngrok tunnels attempt: {RetryCount}", ngrokRetryCount + 1);
 
@@ -38,6 +38,6 @@ public class NgrokService
             await Task.Delay(200);
         }
 
-        throw new Exception("Ngrok dashboard did not start in 10 tries");
+        throw new Exception("Ngrok dashboard did not start in 20 tries");
     }
 }

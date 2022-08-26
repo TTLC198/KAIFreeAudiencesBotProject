@@ -13,6 +13,7 @@ services:
     image: ngrok/ngrok:alpine
     container_name: ngrok
     command: 'http --authtoken ${ngrokAuthToken} host.docker.internal:5000'
+    restart: on-failure
     ports:
       - '4040:4040'
     expose:
@@ -22,7 +23,7 @@ services:
       interval: 3s
       timeout: 5s
       retries: 30
-      start_period: 15s
+      start_period: 60s
 
   web:
     build: KAIFreeAudiencesBot
@@ -39,8 +40,6 @@ services:
         condition: service_healthy
       db:
         condition: service_started
-      parser:
-        condition: service_started
       
         
   parser:
@@ -56,5 +55,6 @@ services:
         
 volumes:
   db-data:
+    name: db-data
     
     
