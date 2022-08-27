@@ -13,6 +13,10 @@
 <img src="https://github.com/TTLC198/KAIFreeAudiencesBot/blob/master/preview.png" align="left" width="1100" />
 
 ## Usage
+### Generate .env file 
+```sh
+echo ngrokAuthToken="your-auth-token" > .env 
+```
 ### Building
 ```sh
 docker compose build 
