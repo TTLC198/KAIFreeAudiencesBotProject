@@ -14,4 +14,4 @@ COPY --from=builder /root/.local /root/.local
 COPY ./src .
 
 # update PATH environment variable
-ENV PATH=/root/.local:$PATH
+ENV PATH=/root/.local:$PATH 

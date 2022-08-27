@@ -13,16 +13,20 @@ services:
     image: ngrok/ngrok:alpine
     container_name: ngrok
     command: 'http --authtoken ${ngrokAuthToken} host.docker.internal:5000'
+    restart: on-failure
     ports:
       - '4040:4040'
     expose:
       - '4040'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    network_mode: "host"
     healthcheck:
       test: curl -sS http://host.docker.internal:4040 || echo 1
       interval: 3s
       timeout: 5s
       retries: 30
-      start_period: 15s
+      start_period: 60s
 
   web:
     build: KAIFreeAudiencesBot
@@ -34,12 +38,13 @@ services:
       - ASPNETCORE_ENVIRONMENT=Release
     ports:
       - "5000:5000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    network_mode: "host"
     depends_on:
       ngrok:
         condition: service_healthy
       db:
-        condition: service_started
-      parser:
         condition: service_started
       
         
@@ -56,5 +61,6 @@ services:
         
 volumes:
   db-data:
+    name: db-data
     
     
