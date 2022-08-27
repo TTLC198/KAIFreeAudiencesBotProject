@@ -18,6 +18,9 @@ services:
       - '4040:4040'
     expose:
       - '4040'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    network_mode: "host"
     healthcheck:
       test: curl -sS http://host.docker.internal:4040 || echo 1
       interval: 3s
@@ -35,6 +38,9 @@ services:
       - ASPNETCORE_ENVIRONMENT=Release
     ports:
       - "5000:5000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    network_mode: "host"
     depends_on:
       ngrok:
         condition: service_healthy
