@@ -8,8 +8,10 @@ public enum Parity
 
 public enum Modes
 {
-    Auto,
-    Manual
+    General,
+    Specific,
+    SpecificDais,
+    SpecificIntervals
 }
 
 public enum Buildings

@@ -8,4 +8,5 @@ riderModule.iml
 /_ReSharper.Caches/
 /KAIFreeAudiencesBot/.vs
 /KAIScheduleParser/.idea
+/KAIScheduleParser/venv
 /Secrets/

@@ -8,8 +8,8 @@ public static class Keyboard
     {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "Автоматический ввод", callbackData: "0_auto"),
-            InlineKeyboardButton.WithCallbackData(text: "Ручной ввод", callbackData: "0_manual"),
+            InlineKeyboardButton.WithCallbackData(text: "Дни недели", callbackData: "0_general"),
+            InlineKeyboardButton.WithCallbackData(text: "Дата", callbackData: "0_specific"),
         }
     });
 
@@ -17,11 +17,11 @@ public static class Keyboard
     {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "Чет", callbackData: "1_e"),
-            InlineKeyboardButton.WithCallbackData(text: "Нечет", callbackData: "1_n"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Чет", callbackData: "1_e"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Нечет", callbackData: "1_n"),
         },
         new [] {
-            InlineKeyboardButton.WithCallbackData(text: "Текущая", callbackData: "1_now")
+            InlineKeyboardButton.WithCallbackData(text: "Submit", callbackData: "2_submit")
         }
     });
 

@@ -12,7 +12,7 @@ public class Client
 public class ClientSettings
 {
     public string Audience { get; set; }
-    public Parity Parity { get; set; }
+    public List<Parity> Parity { get; set; }
     
     public Buildings Building { get; set; }
     public Days Day { get; set; }
