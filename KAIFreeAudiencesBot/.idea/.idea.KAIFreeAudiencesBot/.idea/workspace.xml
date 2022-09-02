@@ -10,23 +10,14 @@
     <projectFile profileName="Local-Development">KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="Begin to rebuild chat steps. Created a multivariant choice of week parity">
-      <change beforePath="$PROJECT_DIR$/../.env-example" beforeDir="false" afterPath="$PROJECT_DIR$/../.env-example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.xml" afterDir="false" />
+    <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/appsettings.example" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/KAIScheduleParser.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/.idea/KAIScheduleParser.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/appsettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,21 +70,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.KAIFreeAudiencesBot">
     <configuration name="KAIFreeAudiencesBot" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" />
@@ -245,7 +236,8 @@
       <workItem from="1661787025040" duration="405000" />
       <workItem from="1661787791987" duration="5702000" />
       <workItem from="1662021712822" duration="6795000" />
-      <workItem from="1662057010161" duration="7204000" />
+      <workItem from="1662057010161" duration="7330000" />
+      <workItem from="1662110769295" duration="8646000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
@@ -324,7 +316,14 @@
       <option name="project" value="LOCAL" />
       <updated>1661070270790</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Begin to rebuild chat steps. Created a multivariant choice of week parity">
+      <created>1662064322909</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1662064322909</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

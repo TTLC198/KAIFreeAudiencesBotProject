@@ -29,16 +29,20 @@ public static class Keyboard
     {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "Пн", callbackData: "2_0"),
-            InlineKeyboardButton.WithCallbackData(text: "Вт", callbackData: "2_1"),
-            InlineKeyboardButton.WithCallbackData(text: "Ср", callbackData: "2_2")
+            InlineKeyboardButton.WithCallbackData(text: "☑ Пн", callbackData: "1_0"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Вт", callbackData: "1_1"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Ср", callbackData: "1_2")
             
         },
         new[] {
-            InlineKeyboardButton.WithCallbackData(text: "Чт", callbackData: "2_3"),
-            InlineKeyboardButton.WithCallbackData(text: "Пт", callbackData: "2_4"),
-            InlineKeyboardButton.WithCallbackData(text: "Сб", callbackData: "2_5")
+            InlineKeyboardButton.WithCallbackData(text: "☑ Чт", callbackData: "1_3"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Пт", callbackData: "1_4"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Сб", callbackData: "1_5")
         },
+        new []
+        {
+            InlineKeyboardButton.WithCallbackData(text:"Submit", callbackData: "3_submit")
+        }
     });
 
     public static InlineKeyboardMarkup inlineTimeKeyboard = new(new[]

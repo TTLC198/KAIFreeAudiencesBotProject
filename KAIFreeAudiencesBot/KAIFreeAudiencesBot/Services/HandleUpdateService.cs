@@ -19,7 +19,7 @@ public class HandleUpdateService
     private readonly IServiceProvider _services;
 
     private static List<Client> clients = new List<Client>();
-    
+
     TRes Call<TRes>(Func<TRes> f) => f(); // Для удобства
 
     public HandleUpdateService(ITelegramBotClient botClient, ILogger<HandleUpdateService> logger,
@@ -68,7 +68,7 @@ public class HandleUpdateService
         _logger.LogInformation("Receive callback query with data: {0}", callbackQuery.Data);
 
         long clientId = callbackQuery.From.Id;
-        Client currentClient = new Client() { id = clientId};
+        Client currentClient = new Client() { id = clientId };
         if (clients.Any(c => c.id == clientId))
         {
             currentClient = clients.Find(c => c.id == clientId)!;
@@ -80,7 +80,7 @@ public class HandleUpdateService
                 id = clientId
             });
         }
-            
+
         try
         {
             Task<Message> action = callbackQuery.Data![0] switch
@@ -88,14 +88,15 @@ public class HandleUpdateService
                 'b' => OnRestart(callbackQuery.Message!, currentClient),
                 '0' => Call(() => callbackQuery.Data!.Split('_')[1] == "general"
                     ? ChooseParity(callbackQuery.Message!, currentClient)
-                    : ErrorMessageAsync(callbackQuery.Message!)), 
-                '1' => SwitchKey(callbackQuery.Message!, callbackQuery.Data),
+                    : ErrorMessageAsync(callbackQuery.Message!)),
+                '1' => SwitchKey(callbackQuery.Message!, currentClient, callbackQuery.Data),
                 '2' => ChooseDay(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
+                '3' => ChooseTime(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')), 
                 _ => ErrorMessageAsync(callbackQuery.Message!)
             };
             Message sentMessage = await action;
             clients[clients.FindIndex(c => c.id == clientId)] = currentClient;
-            
+
             _logger.LogInformation("The message was sent with id: {sentMessageId}", sentMessage.MessageId);
         }
         catch (Exception exception)
@@ -122,22 +123,26 @@ public class HandleUpdateService
             });
             currentClient = clients.Find(c => c.id == clientId)!;
         }
-        
+
         try
         {
             Task<Message>? action;
             action = message.Text!.Split(' ')[0] switch
             {
                 "/start" => OnStart(message, currentClient),
-                var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F193) || s == "/free" => ChooseMode(message), //Свободные аудитории
-                var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4D1) || s == "/parity" => GetWeekParity(message), //Четность недели
-                var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F3EB) || s == "/audiences" => NotRealized(message), //Все аудитории
-                var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4C5) || s == "/schedule" => NotRealized(message), //Расписание
+                var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F193) ||
+                           s == "/free" => ChooseMode(message), //Свободные аудитории
+                var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4D1) || s == "/parity" =>
+                    GetWeekParity(message), //Четность недели
+                var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F3EB) || s == "/audiences" => NotRealized(
+                    message), //Все аудитории
+                var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4C5) || s == "/schedule" =>
+                    NotRealized(message), //Расписание
                 _ => UnknownMessageAsync(message)
             };
             Message sentMessage = await action;
             clients[clients.FindIndex(c => c.id == clientId)] = currentClient;
-            
+
             _logger.LogInformation("The message was sent with id: {sentMessageId}", sentMessage.MessageId);
         }
         catch (Exception exception)
@@ -145,13 +150,13 @@ public class HandleUpdateService
             await HandleErrorAsync(exception);
         }
     }
-    
+
     private async Task<Message> OnStart(Message message, Client client)
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         clients[clientIndex].step = ClientSteps.Default;
         clients[clientIndex].settings = new ClientSettings();
-        
+
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             replyMarkup: Keyboard.firstChoice,
@@ -166,7 +171,7 @@ public class HandleUpdateService
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         clients[clientIndex].step = ClientSteps.Default;
         clients[clientIndex].settings = new ClientSettings();
-        
+
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             replyMarkup: Keyboard.firstChoice,
@@ -184,7 +189,7 @@ public class HandleUpdateService
             cancellationToken: CancellationToken.None
         );
     }
-    
+
     private async Task<Message> GetWeekParity(Message message)
     {
         return await _botClient.SendTextMessageAsync(
@@ -206,7 +211,7 @@ public class HandleUpdateService
             cancellationToken: CancellationToken.None
         );
     }
-    
+
     private async Task<Message> ChooseParity(Message message, Client client)
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
@@ -225,64 +230,73 @@ public class HandleUpdateService
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         clients[clientIndex].step = ClientSteps.ChooseDay;
-        var parities = new List<Parity>();
-        var buttons = message.ReplyMarkup!.InlineKeyboard.ToList()[0].ToList();
-        if (buttons[0].Text.Split(' ')[0] == "✅")
-        {
-            parities.Add(Parity.Even);
-        }
-        if (buttons[1].Text.Split(' ')[0] == "✅")
-        {
-            parities.Add(Parity.NotEven);
-        }
-
-        clients[clientIndex].settings.Parity = parities;
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Выберите день недели",
             replyMarkup: Keyboard.inlineDayKeyboard
         );
     }
-    
-    private static int[] GetIndexes(InlineKeyboardMarkup keyboardMarkup, string match)
+
+    private async Task<Message> ChooseTime(Message message, Client client, string[] args)
     {
-        var i = 0;
-        var j = 0;
-        foreach (var arrayOfButtons in keyboardMarkup!.InlineKeyboard.ToList())
+        if (client.step == ClientSteps.ChooseTime)
         {
-            foreach (var button in arrayOfButtons.ToList())
+            var clientIndex = clients.FindIndex(cl => cl.id == client.id);
+            if (int.TryParse(message.Text, out var inputHour))
             {
-                if (button.CallbackData == match)
-                {
-                    return new[] { j, i };
-                }
-                i++;
+                clients[clientIndex].step = ClientSteps.ChooseCorrectTime;
+                var choices = Keyboard.inlineTimeKeyboard.InlineKeyboard
+                    .Where(k => TimeOnly.ParseExact(k.First().CallbackData!.Split('_')[1], new[] {"HH:mm", "H:mm"}).Hour == inputHour);
+                var enumerable = choices as IEnumerable<InlineKeyboardButton>[] ?? choices.ToArray();
+                if (!enumerable.Any())
+                    return await _botClient.SendTextMessageAsync(
+                        chatId: message.Chat.Id,
+                        text: "Введенного временого промежутка не существует!",
+                        replyMarkup: Keyboard.inlineRestartKeyboard
+                    );  
+                else
+                    return await _botClient.SendTextMessageAsync(
+                        chatId: message.Chat.Id,
+                        text: "Выберите один из предложенных ниже вариантов",
+                        replyMarkup: new InlineKeyboardMarkup(enumerable)
+                    );
             }
-
-            i = 0;
-            j++;
+            else
+            {
+                clients[clientIndex].step = ClientSteps.ChooseDay;
+                return await _botClient.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: "Вы ввели некоректное значение!",
+                    replyMarkup: Keyboard.inlineRestartKeyboard
+                );
+            }
         }
+        else
+        {
+            var clientIndex = clients.FindIndex(cl => cl.id == client.id);
+            clients[clientIndex].step = ClientSteps.ChooseTime;
 
-        return new[] { -1, -1 };
+            return await _botClient.EditMessageTextAsync(
+                chatId: message.Chat.Id,
+                messageId: message.MessageId,
+                text: "Введите час начала занятия"
+            );
+        }
     }
     
-    private async Task<Message> SwitchKey(Message message, string args)
+    private async Task<Message> SwitchKey(Message message, Client client, string args)
     {
+        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         var keyboard = message.ReplyMarkup;
-        var indexes = GetIndexes(keyboard, args);
-        var text = keyboard!.InlineKeyboard.ToList()[indexes[0]].ToList()[indexes[1]].Text;
-        text = text.Split(' ')[0] switch
-        {
-            "☑" => text.Replace("☑", "✅"),
-            "✅" => text.Replace("✅", "☑"),
-            _ => text
-        };
-        keyboard!.InlineKeyboard.ToList()[indexes[0]].ToList()[indexes[1]].Text = text;
+        var indexes = Misc.GetIndexes(keyboard!, args);
+        Misc.ChangeValue(clients[clientIndex].step, clients[clientIndex].settings,
+            keyboard!.InlineKeyboard.ToList()[indexes[0]].ToList()[indexes[1]]);
+        keyboard = Misc.UpdateKeyboardMarkup(clients[clientIndex].step, clients[clientIndex].settings, keyboard);
         return await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
             messageId: message.MessageId,
             replyMarkup: keyboard,
-            text: "Выберите чётность недели",
+            text: message.Text!,
             cancellationToken: CancellationToken.None
         );
     }
@@ -308,7 +322,7 @@ public class HandleUpdateService
         int minimumColumnWidth = 4, int columnPadRight = 0, int columnPadLeft = 0,
         bool beginEndBorders = true)
     {
-        var prereadyTable = new List<string>() {"<pre>"};
+        var prereadyTable = new List<string>() { "<pre>" };
         var columnsWidth = new List<int>();
         var firstLine = tableLines[0];
         var lineVector = firstLine.Split(inputArraySeparator);
@@ -343,6 +357,7 @@ public class HandleUpdateService
                 columnsWidth.Add(columnWidth);
             }
         }
+
         foreach (var line in tableLines)
         {
             lineVector = line.Split(inputArraySeparator);
