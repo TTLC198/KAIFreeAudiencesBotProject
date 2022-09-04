@@ -85,3 +85,10 @@ public class TimeInterval
     [Column("ti_end")]
     public TimeSpan end { get; set; }
 }
+
+[Table("default_values")]
+public class DefaultValues
+{
+    [Column("values")]
+    public DateOnly values { get; set; }
+}

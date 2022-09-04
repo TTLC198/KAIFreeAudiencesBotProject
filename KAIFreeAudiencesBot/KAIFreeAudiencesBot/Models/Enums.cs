@@ -9,6 +9,7 @@ public enum Parity
 public enum Modes
 {
     General,
+    GeneralAuto,
     Specific,
     SpecificDais,
     SpecificIntervals
