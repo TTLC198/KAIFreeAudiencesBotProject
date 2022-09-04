@@ -16,6 +16,39 @@ public static class Misc
             : Parity.NotEven;
     }
 
+    public static List<DateOnly> GetDates(List<DaysOfWeek> daysOfWeeks, DateOnly? starts, DateOnly? ends,
+        List<Parity> parities)
+    {
+        var dates = new List<DateOnly>();
+        var start = starts ?? DateOnly.MaxValue;// HEEEELP
+        var end = ends ?? DateOnly.MaxValue;// HEEEELP
+        foreach (var parity in parities)
+        {
+            while ((DaysOfWeek)(Enum.Parse(typeof(DaysOfWeek), start.DayOfWeek.ToString())) != daysOfWeeks[0] ||
+                   GetWeekParity(start.ToDateTime(TimeOnly.MinValue)) != parity)
+            {
+                start.AddDays(1);
+            }
+
+            dates.Add(start);
+        }
+
+        start = dates.Min();
+        var resultDates = new List<DateOnly>();
+        while (start <= end)
+        {
+            if (daysOfWeeks.Contains((DaysOfWeek)(Enum.Parse(typeof(DaysOfWeek), start.DayOfWeek.ToString()))) &&
+                parities.Contains(GetWeekParity(start.ToDateTime(TimeOnly.MinValue))))
+            {
+                resultDates.Add(start);
+            }
+
+            start.AddDays(1);
+        }
+
+        return resultDates;
+    }
+
     public static DateTime? GetCurrentDay(DateTime? time, Parity parity)
     {
         time ??= DateTime.Now;
@@ -103,6 +136,7 @@ public static class Misc
                 {
                     clientSettings.DaysOfWeek.Remove(dayOfWeek);
                 }
+
                 break;
             case ClientSteps.ChooseBuilding:
                 break;
@@ -142,11 +176,12 @@ public static class Misc
                     for (var j = 0; j < buttons[i].ToArray().Length; j++)
                     {
                         keyboard.InlineKeyboard.ToArray()[i].ToArray()[j].Text =
-                            clientSettings.DaysOfWeek.IndexOf(days[i*3+j]) != -1
+                            clientSettings.DaysOfWeek.IndexOf(days[i * 3 + j]) != -1
                                 ? keyboard.InlineKeyboard.ToArray()[i].ToArray()[j].Text.Replace("☑", "✅")
                                 : keyboard.InlineKeyboard.ToArray()[i].ToArray()[j].Text.Replace("✅", "☑");
                     }
                 }
+
                 break;
             case ClientSteps.ChooseBuilding:
                 break;
