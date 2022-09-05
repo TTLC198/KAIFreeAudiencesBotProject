@@ -13,12 +13,8 @@
     <projectFile profileName="Local-Development">KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../DB/schedule.db" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/schedule.db" afterDir="false" />
+    <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="Fixed multichoice(added more checks), added parser for audience, added first version of result computation(need check), added connection to table default_values (doesn't work, need to add FK), added date generator for result computation">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/appsettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -246,7 +242,7 @@
       <workItem from="1662110769295" duration="8646000" />
       <workItem from="1662132233711" duration="898000" />
       <workItem from="1662285769526" duration="19456000" />
-      <workItem from="1662372823183" duration="1370000" />
+      <workItem from="1662372823183" duration="1693000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
@@ -346,7 +342,14 @@
       <option name="project" value="LOCAL" />
       <updated>1662318554752</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Fixed multichoice(added more checks), added parser for audience, added first version of result computation(need check), added connection to table default_values (doesn't work, need to add FK), added date generator for result computation">
+      <created>1662374342830</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1662374342830</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

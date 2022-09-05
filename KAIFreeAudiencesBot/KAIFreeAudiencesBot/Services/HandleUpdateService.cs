@@ -483,59 +483,57 @@ public class HandleUpdateService
         };
         var dbTask = new Task(async () =>
         {
-            await using (var db = _services.GetService<SchDbContext>())
+            await using var db = _services.GetService<SchDbContext>();
+            var first = db.defaultVales.Select(values => values.values).ToList()[0];
+            var tempDate = new List<DateOnly>();
+            if (settings != null!)
             {
-                var first = db.defaultVales.Select(values => values.values).ToList()[0];
-                var tempDate = new List<DateOnly>();
-                if (settings != null!)
-                {
-                    tempDate = Misc.GetDates(
-                        settings.DaysOfWeek,
-                        settings.DateStart ?? db!.defaultVales.Select(values => values.values).ToList()[0],
-                        settings.DateEnd ?? db!.defaultVales.Select(v => v.values).ToList()[1],
-                        settings.Parity);
-                }
-
-                var schedules = db!.scheduleSubjectDates
-                    .AsNoTracking()
-                    .Select(s => new { s.TimeInterval, s.date, s.Classroom, s.Group })
-                    .AsEnumerable()
-                    .Where(s =>
-                        TimeOnly.FromTimeSpan(s.TimeInterval.start) < settings.TimeStart
-                        && settings.TimeStart < TimeOnly.FromTimeSpan(s.TimeInterval.end)
-                        && tempDate.Contains(s.date))
-                    .ToList();
-
-                if (schedules == null!)
-                {
-                    currentMessage = await _botClient.EditMessageTextAsync(
-                        chatId: message.Chat.Id,
-                        messageId: message.MessageId,
-                        text:
-                        "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий.",
-                        cancellationToken: CancellationToken.None
-                    );
-                    return;
-                }
-
-                var emptyClassrooms = db.classrooms
-                    .AsNoTracking()
-                    .AsEnumerable()
-                    .Where(cr =>
-                        !schedules.Any(s => s.Classroom.name == cr.name && s.Classroom.building == cr.building)
-                        && settings.Audience.Contains(cr.name))
-                    .Select(cr => new { cr.building, cr.name })
-                    .AsEnumerable()
-                    .OrderBy(cr => cr.building)
-                    .ThenBy(cr => cr.name)
-                    .ToList();
-
-                if (settings != null!)
-                    if (settings.Building != Buildings.All)
-                        emptyClassrooms = emptyClassrooms
-                            .Where(cr => cr.building == Convert.ToString((int)settings.Building)).ToList();
-                freeAudItems.AddRange(emptyClassrooms.Select(classroom => classroom.name + ";" + classroom.building));
+                tempDate = Misc.GetDates(
+                    settings.DaysOfWeek,
+                    settings.DateStart ?? db!.defaultVales.Select(values => values.values).ToList()[0],
+                    settings.DateEnd ?? db!.defaultVales.Select(v => v.values).ToList()[1],
+                    settings.Parity);
             }
+
+            var schedules = db!.scheduleSubjectDates
+                .AsNoTracking()
+                .Select(s => new { s.TimeInterval, s.date, s.Classroom, s.Group })
+                .AsEnumerable()
+                .Where(s =>
+                    TimeOnly.FromTimeSpan(s.TimeInterval.start) < settings.TimeStart
+                    && settings.TimeStart < TimeOnly.FromTimeSpan(s.TimeInterval.end)
+                    && tempDate.Contains(s.date))
+                .ToList();
+
+            if (schedules == null!)
+            {
+                currentMessage = await _botClient.EditMessageTextAsync(
+                    chatId: message.Chat.Id,
+                    messageId: message.MessageId,
+                    text:
+                    "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий.",
+                    cancellationToken: CancellationToken.None
+                );
+                return;
+            }
+
+            var emptyClassrooms = db.classrooms
+                .AsNoTracking()
+                .AsEnumerable()
+                .Where(cr =>
+                    !schedules.Any(s => s.Classroom.name == cr.name && s.Classroom.building == cr.building)
+                    && settings.Audience.Contains(cr.name))
+                .Select(cr => new { cr.building, cr.name })
+                .AsEnumerable()
+                .OrderBy(cr => cr.building)
+                .ThenBy(cr => cr.name)
+                .ToList();
+
+            if (settings != null!)
+                if (settings.Building != Buildings.All)
+                    emptyClassrooms = emptyClassrooms
+                        .Where(cr => cr.building == Convert.ToString((int)settings.Building)).ToList();
+            freeAudItems.AddRange(emptyClassrooms.Select(classroom => classroom.name + ";" + classroom.building));
         });
 
         try
