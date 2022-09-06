@@ -7,6 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 
@@ -528,7 +529,7 @@ public class HandleUpdateService
     
     private async Task<Message> GetAllAudiences(Message message)
     {
-        List<string> freeAudItems = new List<string>();
+        IEnumerable<Tuple<string, string>> freeAudItems = new List<Tuple<string, string>>();
 
         var loadingMessage = await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
@@ -567,7 +568,7 @@ public class HandleUpdateService
 
             foreach (var classroom in classrooms)
             {
-                freeAudItems.Add($"{classroom.name};{classroom.building}");
+                freeAudItems.Append(new Tuple<string, string>($"{classroom.name}", $"{classroom.building}"));
             }
             
         });
@@ -588,9 +589,20 @@ public class HandleUpdateService
             dbTask.Dispose();
         }
 
+        return await _botClient.SendPhotoAsync(
+            chatId: message.Chat.Id,
+            photo: Misc.ConvertHtmlToImage(TableParser.ToStringTable(new []
+            {
+                "Аудитория", "Здание"
+            })), 
+            parseMode: ParseMode.Html,
+            replyMarkup: Keyboard.Back,
+            cancellationToken: CancellationToken.None
+        );
+        
         //Длина строки создаваемой таблицы = 99 символов
         //tg позволяет отправлять сообщения длиной не более 4096 символов, следовательно количество строк в одном сообщении не должно превышать 40
-        const int maxRowCount = 40;
+        /*const int maxRowCount = 40;
         if (freeAudItems.Count > maxRowCount)
         {
             int i = maxRowCount;
@@ -632,7 +644,7 @@ public class HandleUpdateService
                 replyMarkup: Keyboard.Back,
                 cancellationToken: CancellationToken.None
             );
-        }
+        }*/
     }
 
     private async Task<Message> GetFreeAudiences(Message message, ClientSettings settings)

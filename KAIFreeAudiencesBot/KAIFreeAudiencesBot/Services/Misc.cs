@@ -1,4 +1,7 @@
-﻿using KAIFreeAudiencesBot.Models;
+﻿using System.Drawing;
+using CoreHtmlToImage;
+using KAIFreeAudiencesBot.Models;
+using Telegram.Bot.Types.InputFiles;
 
 namespace KAIFreeAudiencesBot.Services;
 
@@ -30,5 +33,15 @@ public static class Misc
     {
         DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         return (long)((dateTime - epoch).TotalMilliseconds);
+    }
+    
+    public static InputOnlineFile ConvertHtmlToImage(string html)
+    {
+        var converter = new HtmlConverter();
+        var bytes = converter.FromHtmlString(
+            html,
+            format: ImageFormat.Png,
+            width: 2048);
+        return new InputOnlineFile(new MemoryStream(bytes));
     }
 }

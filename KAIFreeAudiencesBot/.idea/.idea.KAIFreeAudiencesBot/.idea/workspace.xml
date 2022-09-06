@@ -11,14 +11,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../DB/ScheduleDB.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DB/ScheduleDB.db;" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DB/sqlite_python.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/TableParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +38,7 @@
     </option>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$/.." value="development" />
+        <entry key="$PROJECT_DIR$/.." value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -71,7 +68,6 @@
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Startup.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/appsettings.Development.json" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -97,7 +93,7 @@
     ]
   }
 }</component>
-  <component name="RunManager" selected=".NET Launch Settings Profile.KAIFreeAudiencesBot">
+  <component name="RunManager" selected=".NET Launch Settings Profile.KAIFreeAudiencesBot: Local-Development">
     <configuration name="KAIFreeAudiencesBot" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net6.0" />
@@ -242,6 +238,7 @@
       <workItem from="1661321522053" duration="1648000" />
       <workItem from="1661501546438" duration="1763000" />
       <workItem from="1661506174266" duration="1919000" />
+      <workItem from="1662380782588" duration="3284000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
