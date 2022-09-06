@@ -105,7 +105,6 @@ public class HandleUpdateService
                     }
                     else
                     {
-                        currentClient.step = ClientSteps.ChooseAudience;
                         return ChooseAudience(callbackQuery.Message!, currentClient, args);
                     }
                 }),
@@ -395,13 +394,11 @@ public class HandleUpdateService
     private async Task<Message> ChooseAudience(Message message, Client client, string[] args)
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
+        if (clients[clientIndex].step == ClientSteps.ChooseBuilding)
+        {
+            clients[clientIndex].settings.Building = args[1] != "all" ? Enum.GetValues(typeof(Buildings)).Cast<Buildings>().ToList()[int.Parse(args[1])] : Buildings.All;
+        }
         clients[clientIndex].step = ClientSteps.ChooseAudience;
-        if (args[1] != "all")
-            clients[clientIndex].settings.Building =
-                Enum.GetValues(typeof(Buildings)).Cast<Buildings>().ToList()[int.Parse(args[1])];
-        else
-            clients[clientIndex].settings.Building = Buildings.All;
-
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Отправьте номера аудиториq через запятую для проверки их занятости",
@@ -435,12 +432,12 @@ public class HandleUpdateService
                     .Where(classroom => newAudience.Contains(classroom.name) && classroom.building == building)
                     .Select(classroom => classroom.name).ToList();
             var notExistingAud = newAudience.Except(existingAudience).ToList();
-            if (notExistingAud.Count == 0)
+            if (notExistingAud.Count != 0)
             {
                 clients[clientIndex].settings.Audience = newAudience.Intersect(existingAudience).ToList();
                 return await _botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    text: "Аудитории" + string.Join(", ", notExistingAud) + "не сущществуют",
+                    text: "Аудитории " + string.Join(", ", notExistingAud) + " не сущществуют",
                     replyMarkup: Keyboard.InlineChangeAudKeyboard
                 );
             }
@@ -452,39 +449,13 @@ public class HandleUpdateService
 
     private async Task<Message> CheckAudience(Message message, ClientSettings settings)
     {
-        var loadingMessage = await _botClient.SendTextMessageAsync(
-            chatId: message.Chat.Id,
-            text: "Получение данных",
-            cancellationToken: CancellationToken.None
-        );
-        var loadingTaskCts = new CancellationTokenSource();
-        var loadingTask = new Task(async () =>
-        {
-            while (!loadingTaskCts.Token.IsCancellationRequested)
-            {
-                for (int i = 1; i < 4; i++)
-                {
-                    if (loadingTaskCts.Token.IsCancellationRequested) return;
-                    await _botClient.EditMessageTextAsync(
-                        chatId: message.Chat.Id,
-                        messageId: loadingMessage.MessageId,
-                        text: "Получение данных" + "...".Substring(0, i),
-                        cancellationToken: CancellationToken.None
-                    );
-                    Thread.Sleep(300);
-                }
-            }
-        }, loadingTaskCts.Token);
-
-        Message? currentMessage = null;
         var freeAudItems = new List<string>()
         {
             "Аудитория;Здание"
         };
-        var dbTask = new Task(async () =>
+
+        await using (var db = _services.GetService<SchDbContext>())
         {
-            await using var db = _services.GetService<SchDbContext>();
-            var first = db.defaultVales.Select(values => values.values).ToList()[0];
             var tempDate = new List<DateOnly>();
             if (settings != null!)
             {
@@ -500,21 +471,20 @@ public class HandleUpdateService
                 .Select(s => new { s.TimeInterval, s.date, s.Classroom, s.Group })
                 .AsEnumerable()
                 .Where(s =>
-                    TimeOnly.FromTimeSpan(s.TimeInterval.start) < settings.TimeStart
+                    TimeOnly.FromTimeSpan(s.TimeInterval.start) < settings!.TimeStart
                     && settings.TimeStart < TimeOnly.FromTimeSpan(s.TimeInterval.end)
                     && tempDate.Contains(s.date))
                 .ToList();
 
             if (schedules == null!)
             {
-                currentMessage = await _botClient.EditMessageTextAsync(
+                return await _botClient.EditMessageTextAsync(
                     chatId: message.Chat.Id,
                     messageId: message.MessageId,
                     text:
                     "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий.",
                     cancellationToken: CancellationToken.None
                 );
-                return;
             }
 
             var emptyClassrooms = db.classrooms
@@ -534,27 +504,6 @@ public class HandleUpdateService
                     emptyClassrooms = emptyClassrooms
                         .Where(cr => cr.building == Convert.ToString((int)settings.Building)).ToList();
             freeAudItems.AddRange(emptyClassrooms.Select(classroom => classroom.name + ";" + classroom.building));
-        });
-
-        try
-        {
-            loadingTask.Start();
-            dbTask.Start();
-            await Task.WhenAny(dbTask).ContinueWith(_ => { loadingTaskCts.Cancel(); });
-        }
-        catch (Exception e)
-        {
-            await HandleErrorAsync(e);
-        }
-        finally
-        {
-            loadingTask.Dispose();
-            dbTask.Dispose();
-        }
-
-        if (currentMessage != null)
-        {
-            return currentMessage;
         }
         
         switch (freeAudItems.Count)

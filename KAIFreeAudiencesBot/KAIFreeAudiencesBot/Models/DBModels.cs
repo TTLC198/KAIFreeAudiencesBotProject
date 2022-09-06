@@ -89,8 +89,8 @@ public class TimeInterval
 [Table("default_values")]
 public class DefaultValues
 {
-    [Column("id")]
-    public int id { get; set; }
     [Column("values")]
     public DateOnly values { get; set; }
+    [Column("id")]
+    public int id { get; set; }
 }

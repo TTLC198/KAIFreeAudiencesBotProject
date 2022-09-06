@@ -13,8 +13,12 @@
     <projectFile profileName="Local-Development">KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="Fixed multichoice(added more checks), added parser for audience, added first version of result computation(need check), added connection to table default_values (doesn't work, need to add FK), added date generator for result computation">
+    <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/appsettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,13 +45,6 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
-  </component>
-  <component name="GithubProjectSettings">
-    <option name="branchProtectionPatterns">
-      <list>
-        <option value="master" />
-      </list>
-    </option>
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/23ac3741ace945aa8fb09ed04ff9815e83498/b0/ccb2c971/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
@@ -242,7 +239,8 @@
       <workItem from="1662110769295" duration="8646000" />
       <workItem from="1662132233711" duration="898000" />
       <workItem from="1662285769526" duration="19456000" />
-      <workItem from="1662372823183" duration="1693000" />
+      <workItem from="1662372823183" duration="5842000" />
+      <workItem from="1662450506759" duration="548000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
@@ -349,7 +347,14 @@
       <option name="project" value="LOCAL" />
       <updated>1662374342830</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Some Error">
+      <created>1662374615912</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1662374615912</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -688,7 +693,8 @@
     <MESSAGE value="Begin to rebuild chat steps. Created a multivariant choice of week parity" />
     <MESSAGE value="Reworked the button toggle. Added multivariant days of the week" />
     <MESSAGE value="Fixed multichoice(added more checks), added parser for audience, added first version of result computation(need check), added connection to table default_values (doesn't work, need to add FK), added date generator for result computation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed multichoice(added more checks), added parser for audience, added first version of result computation(need check), added connection to table default_values (doesn't work, need to add FK), added date generator for result computation" />
+    <MESSAGE value="Some Error" />
+    <option name="LAST_COMMIT_MESSAGE" value="Some Error" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -698,6 +704,21 @@
           <line>53</line>
           <properties documentPath="C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject\KAIFreeAudiencesBot\KAIFreeAudiencesBot\Services\ScheduleParser.cs" initialLine="51" containingFunctionPresentation="method 'GetGroupsIdAsync'" />
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs</url>
+          <line>395</line>
+          <properties documentPath="C:\Users\24122\RiderProjects\KAIFreeAudiencesBotProject\KAIFreeAudiencesBot\KAIFreeAudiencesBot\Services\HandleUpdateService.cs" initialLine="396" containingFunctionPresentation="method 'ChooseAudience'">
+            <startOffsets>
+              <option value="15828" />
+              <option value="15870" />
+            </startOffsets>
+            <endOffsets>
+              <option value="15890" />
+              <option value="15888" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

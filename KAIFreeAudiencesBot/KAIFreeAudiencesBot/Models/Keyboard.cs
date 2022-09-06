@@ -112,7 +112,7 @@ public static class Keyboard
             {
                 InlineKeyboardButton.WithCallbackData(text: "7", callbackData: "5_7_auto"),
                 InlineKeyboardButton.WithCallbackData(text: "8", callbackData: "5_8_auto"),
-                InlineKeyboardButton.WithCallbackData(text: "Все", callbackData: "5_8_auto_all"),
+                InlineKeyboardButton.WithCallbackData(text: "Все", callbackData: "5_all"),
             }
         });
     
@@ -167,10 +167,10 @@ public static class Keyboard
     
     public static InlineKeyboardMarkup InlineChangeAudKeyboard = new(new[]
     {
-        new[]
-        {
-            InlineKeyboardButton.WithCallbackData(text: "Продолжить без них", callbackData: "8_continue"),
-        },
+        //new[]
+        //{
+        //    InlineKeyboardButton.WithCallbackData(text: "Продолжить без них", callbackData: "8_continue"),
+        //},
         new[]
         {
             InlineKeyboardButton.WithCallbackData(text: "Изменить", callbackData: "8_change"),
