@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using System.Text;
+using System.Text.Encodings.Web;
 using KAIFreeAudiencesBot.Models;
 using KAIFreeAudiencesBot.Services.Database;
 using KAIFreeAudiencesBot.Services.Models;
@@ -529,7 +531,7 @@ public class HandleUpdateService
     
     private async Task<Message> GetAllAudiences(Message message)
     {
-        IEnumerable<Tuple<string, string>> freeAudItems = new List<Tuple<string, string>>();
+        Stream tableImageStream = new MemoryStream();
 
         var loadingMessage = await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
@@ -557,6 +559,7 @@ public class HandleUpdateService
 
         var dbTask = new Task(async () =>
         {
+            StringBuilder tableStringBuilder = new StringBuilder();
             await using var db = _services.GetService<SchDbContext>();
 
             var classrooms = db!.classrooms
@@ -565,12 +568,23 @@ public class HandleUpdateService
                 .OrderBy(cr => cr.building)
                 .ThenBy(cr => cr.name)
                 .ToList();
-
-            foreach (var classroom in classrooms)
+            using (var table = new Table(tableStringBuilder))
             {
-                freeAudItems.Append(new Tuple<string, string>($"{classroom.name}", $"{classroom.building}"));
+                using var headerRow = table.AddHeaderRow();
+                headerRow.AddCell("Аудитория");
+                headerRow.AddCell("Здание");
+                foreach (var classroom in classrooms)
+                {
+                    using var row = table.AddRow();
+                    row.AddCell(classroom.name);
+                    row.AddCell(classroom.building);
+                }        
             }
-            
+
+            tableImageStream = Misc.HtmlToImageStreamConverter(
+                "<style>table, th, td { border: 1px solid black; margin: 0 auto; font-size: 36px; }</style>" +
+                tableStringBuilder
+            )!;
         });
 
         try
@@ -589,62 +603,19 @@ public class HandleUpdateService
             dbTask.Dispose();
         }
 
-        return await _botClient.SendPhotoAsync(
+        await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
-            photo: Misc.ConvertHtmlToImage(TableParser.ToStringTable(new []
-            {
-                "Аудитория", "Здание"
-            })), 
+            messageId: loadingMessage.MessageId,
+            text: "Таблица аудиторий: "
+        );
+
+        return await _botClient.SendPhotoAsync(
+            chatId: message.Chat.Id, 
+            photo: tableImageStream!,
             parseMode: ParseMode.Html,
             replyMarkup: Keyboard.Back,
             cancellationToken: CancellationToken.None
         );
-        
-        //Длина строки создаваемой таблицы = 99 символов
-        //tg позволяет отправлять сообщения длиной не более 4096 символов, следовательно количество строк в одном сообщении не должно превышать 40
-        /*const int maxRowCount = 40;
-        if (freeAudItems.Count > maxRowCount)
-        {
-            int i = maxRowCount;
-            do
-            {
-                var text =
-                    BuildTelegramTable(
-                    freeAudItems
-                        .Take(new Range(
-                            i,
-                            i += freeAudItems.Count - i < maxRowCount ? freeAudItems.Count - i : maxRowCount)).ToList(),
-                    fixedColumnWidth: true, maxColumnWidth: 14,
-                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1);
-                await _botClient.SendTextMessageAsync(
-                    chatId: message.Chat.Id,
-                    text: text,
-                    parseMode: ParseMode.Html,
-                    cancellationToken: CancellationToken.None
-                );
-            } while (i < freeAudItems.Count);
-            return await _botClient.EditMessageTextAsync(
-                chatId: message.Chat.Id,
-                messageId: loadingMessage.MessageId,
-                text: "Таблица всех аудиторий" + BuildTelegramTable(freeAudItems.Take(maxRowCount).ToList(),
-                    fixedColumnWidth: true, maxColumnWidth: 14,
-                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1),
-                parseMode: ParseMode.Html,
-                cancellationToken: CancellationToken.None
-            );
-        }
-        else
-        {
-            return await _botClient.EditMessageTextAsync(
-                chatId: message.Chat.Id,
-                messageId: loadingMessage.MessageId,
-                text: "Таблица всех аудиторий" + BuildTelegramTable(freeAudItems, fixedColumnWidth: true, maxColumnWidth: 14,
-                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1),
-                parseMode: ParseMode.Html,
-                replyMarkup: Keyboard.Back,
-                cancellationToken: CancellationToken.None
-            );
-        }*/
     }
 
     private async Task<Message> GetFreeAudiences(Message message, ClientSettings settings)

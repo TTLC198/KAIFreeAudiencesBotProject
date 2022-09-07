@@ -1,5 +1,7 @@
 ﻿using System.Drawing;
-using CoreHtmlToImage;
+using System.Globalization;
+using System.Text;
+using GrapeCity.Documents.Html;
 using KAIFreeAudiencesBot.Models;
 using Telegram.Bot.Types.InputFiles;
 
@@ -9,12 +11,11 @@ public static class Misc
 {
     public static Parity GetWeekParity(DateTime? time)
     {
-        time ??= DateTime.Now;
-        var d0 = time.Value.ToUniversalTime().GetTime();
-        var d = new DateTime(DateTime.Now.Year, 1, 1);
-        var dd = (int) d.DayOfWeek;
-        var re = Math.Floor((d0 - d.GetTime()) / 8.64e7) + (dd != 0 ? dd - 1 : 6);
-        return (Math.Floor(re / 7) % 2 != 0) ? Parity.NotEven : Parity.Even;
+        var myCI = new CultureInfo("ru-RU");
+        var myCal = myCI.Calendar;
+        return myCal.GetWeekOfYear(time ??= DateTime.Now, CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday) % 2 == 0
+            ? Parity.Even
+            : Parity.NotEven;
     }
     
     public static DateTime? GetCurrentDay(DateTime? time, Parity parity)
@@ -34,14 +35,26 @@ public static class Misc
         DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         return (long)((dateTime - epoch).TotalMilliseconds);
     }
-    
-    public static InputOnlineFile ConvertHtmlToImage(string html)
+
+    public static Stream? HtmlToImageStreamConverter(string html)
     {
-        var converter = new HtmlConverter();
-        var bytes = converter.FromHtmlString(
-            html,
-            format: ImageFormat.Png,
-            width: 2048);
-        return new InputOnlineFile(new MemoryStream(bytes));
+        return HtmlToImageStreamConverter(html, new Size(460, 1000));
+    }
+    
+    public static Stream? HtmlToImageStreamConverter(string html, Size imageSize)
+    {
+        Stream? imageStream = new MemoryStream();
+        
+        using (var re1 = new GcHtmlRenderer(html))
+        {
+            PngSettings imageSettings = new PngSettings();
+            imageSettings.DefaultBackgroundColor = Color.Transparent;
+            imageSettings.WindowSize = imageSize;
+            imageSettings.FullPage = false;
+            re1.RenderToPng(imageStream, imageSettings);
+        }
+
+        imageStream.Position = 0;
+        return imageStream;
     }
 }
