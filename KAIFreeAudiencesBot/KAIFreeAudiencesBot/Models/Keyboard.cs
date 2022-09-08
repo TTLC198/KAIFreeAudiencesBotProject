@@ -8,8 +8,8 @@ public static class Keyboard
     {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "Автоматический ввод", callbackData: "0_auto"),
-            InlineKeyboardButton.WithCallbackData(text: "Ручной ввод", callbackData: "0_manual"),
+            InlineKeyboardButton.WithCallbackData(text: "Дни недели", callbackData: "0_days"),
+            InlineKeyboardButton.WithCallbackData(text: "Дата", callbackData: "0_dates"),
         }
     });
 
@@ -17,11 +17,11 @@ public static class Keyboard
     {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "Чет", callbackData: "1_e"),
-            InlineKeyboardButton.WithCallbackData(text: "Нечет", callbackData: "1_n"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Чет", callbackData: "1_e"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Нечет", callbackData: "1_n"),
         },
         new [] {
-            InlineKeyboardButton.WithCallbackData(text: "Текущая", callbackData: "1_now")
+            InlineKeyboardButton.WithCallbackData(text: "Submit", callbackData: "2_submit")
         }
     });
 
@@ -29,64 +29,67 @@ public static class Keyboard
     {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "Пн", callbackData: "2_0"),
-            InlineKeyboardButton.WithCallbackData(text: "Вт", callbackData: "2_1"),
-            InlineKeyboardButton.WithCallbackData(text: "Ср", callbackData: "2_2")
+            InlineKeyboardButton.WithCallbackData(text: "☑ Пн", callbackData: "1_0"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Вт", callbackData: "1_1"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Ср", callbackData: "1_2")
             
         },
         new[] {
-            InlineKeyboardButton.WithCallbackData(text: "Чт", callbackData: "2_3"),
-            InlineKeyboardButton.WithCallbackData(text: "Пт", callbackData: "2_4"),
-            InlineKeyboardButton.WithCallbackData(text: "Сб", callbackData: "2_5")
+            InlineKeyboardButton.WithCallbackData(text: "☑ Чт", callbackData: "1_3"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Пт", callbackData: "1_4"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Сб", callbackData: "1_5")
         },
+        new []
+        {
+            InlineKeyboardButton.WithCallbackData(text:"Submit", callbackData: "3_submit")
+        }
     });
 
     public static InlineKeyboardMarkup inlineTimeKeyboard = new(new[]
     {
-        new[] {InlineKeyboardButton.WithCallbackData(text: "8:00 - 9:30", callbackData: "3_8:00")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "8:15 - 9:45", callbackData: "3_8:15")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "9:40 - 11:10", callbackData: "3_9:40")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "9:55 - 11:25", callbackData: "3_9:55")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "11:20 - 12:50", callbackData: "3_11:20")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "11:35 - 13:05", callbackData: "3_11:35")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "12:10 - 13:40", callbackData: "3_12:10")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "13:00 - 14:30", callbackData: "3_13:00")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "13:30 - 15:00", callbackData: "3_13:30")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "13:50 - 15:20", callbackData: "3_13:50")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "15:10 - 16:40", callbackData: "3_15:10")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "15:30 - 17:00", callbackData: "3_15:30")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "16:50 - 18:20", callbackData: "3_16:50")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "17:05 - 18:35", callbackData: "3_17:05")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "17:10 - 18:40", callbackData: "3_17:10")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "18:00 - 19:30", callbackData: "3_18:00")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "18:25 - 19:55", callbackData: "3_18:25")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "18:30 - 20:00", callbackData: "3_18:30")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "18:45 - 20:15", callbackData: "3_18:45")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "19:40 - 21:10", callbackData: "3_19:40")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "20:00 - 21:30", callbackData: "3_20:00")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "20:05 - 21:35", callbackData: "3_20:05")},
-        new[] {InlineKeyboardButton.WithCallbackData(text: "21:40 - 23:10", callbackData: "3_21:40")}
+        new[] {InlineKeyboardButton.WithCallbackData(text: "8:00 - 9:30", callbackData: "4_8:00")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "8:15 - 9:45", callbackData: "4_8:15")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "9:40 - 11:10", callbackData: "4_9:40")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "9:55 - 11:25", callbackData: "4_9:55")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "11:20 - 12:50", callbackData: "4_11:20")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "11:35 - 13:05", callbackData: "4_11:35")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "12:10 - 13:40", callbackData: "4_12:10")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "13:00 - 14:30", callbackData: "4_13:00")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "13:30 - 15:00", callbackData: "4_13:30")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "13:50 - 15:20", callbackData: "4_13:50")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "15:10 - 16:40", callbackData: "4_15:10")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "15:30 - 17:00", callbackData: "4_15:30")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "16:50 - 18:20", callbackData: "4_16:50")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "17:05 - 18:35", callbackData: "4_17:05")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "17:10 - 18:40", callbackData: "4_17:10")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "18:00 - 19:30", callbackData: "4_18:00")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "18:25 - 19:55", callbackData: "4_18:25")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "18:30 - 20:00", callbackData: "4_18:30")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "18:45 - 20:15", callbackData: "4_18:45")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "19:40 - 21:10", callbackData: "4_19:40")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "20:00 - 21:30", callbackData: "4_20:00")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "20:05 - 21:35", callbackData: "4_20:05")},
+        new[] {InlineKeyboardButton.WithCallbackData(text: "21:40 - 23:10", callbackData: "4_21:40")}
     });
 
     public static InlineKeyboardMarkup inlineBuildingKeyboard = new(new[]
     {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "1", callbackData: "4_1"),
-            InlineKeyboardButton.WithCallbackData(text: "2", callbackData: "4_2"),
-            InlineKeyboardButton.WithCallbackData(text: "3", callbackData: "4_3"),
+            InlineKeyboardButton.WithCallbackData(text: "1", callbackData: "5_1"),
+            InlineKeyboardButton.WithCallbackData(text: "2", callbackData: "5_2"),
+            InlineKeyboardButton.WithCallbackData(text: "3", callbackData: "5_3"),
         },
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "4", callbackData: "4_4"),
-            InlineKeyboardButton.WithCallbackData(text: "5", callbackData: "4_5"),
-            InlineKeyboardButton.WithCallbackData(text: "6", callbackData: "4_6"),
+            InlineKeyboardButton.WithCallbackData(text: "4", callbackData: "5_4"),
+            InlineKeyboardButton.WithCallbackData(text: "5", callbackData: "5_5"),
+            InlineKeyboardButton.WithCallbackData(text: "6", callbackData: "5_6"),
         },
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "7", callbackData: "4_7"),
-            InlineKeyboardButton.WithCallbackData(text: "8", callbackData: "4_8"),
-            InlineKeyboardButton.WithCallbackData(text: "Все", callbackData: "4_all"),
+            InlineKeyboardButton.WithCallbackData(text: "7", callbackData: "5_7"),
+            InlineKeyboardButton.WithCallbackData(text: "8", callbackData: "5_8"),
         }
     });
 
@@ -95,21 +98,21 @@ public static class Keyboard
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "1", callbackData: "4_1_auto"),
-                InlineKeyboardButton.WithCallbackData(text: "2", callbackData: "4_2_auto"),
-                InlineKeyboardButton.WithCallbackData(text: "3", callbackData: "4_3_auto"),
+                InlineKeyboardButton.WithCallbackData(text: "1", callbackData: "5_1_auto"),
+                InlineKeyboardButton.WithCallbackData(text: "2", callbackData: "5_2_auto"),
+                InlineKeyboardButton.WithCallbackData(text: "3", callbackData: "5_3_auto"),
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "4", callbackData: "4_4_auto"),
-                InlineKeyboardButton.WithCallbackData(text: "5", callbackData: "4_5_auto"),
-                InlineKeyboardButton.WithCallbackData(text: "6", callbackData: "4_6_auto"),
+                InlineKeyboardButton.WithCallbackData(text: "4", callbackData: "5_4_auto"),
+                InlineKeyboardButton.WithCallbackData(text: "5", callbackData: "5_5_auto"),
+                InlineKeyboardButton.WithCallbackData(text: "6", callbackData: "5_6_auto"),
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "7", callbackData: "4_7_auto"),
-                InlineKeyboardButton.WithCallbackData(text: "8", callbackData: "4_8_auto"),
-                InlineKeyboardButton.WithCallbackData(text: "Все", callbackData: "4_all_auto"),
+                InlineKeyboardButton.WithCallbackData(text: "7", callbackData: "5_7_auto"),
+                InlineKeyboardButton.WithCallbackData(text: "8", callbackData: "5_8_auto"),
+                InlineKeyboardButton.WithCallbackData(text: "Все", callbackData: "5_all"),
             }
         });
     
@@ -161,4 +164,16 @@ public static class Keyboard
         ResizeKeyboard = true,
         OneTimeKeyboard = true
     };
+    
+    public static InlineKeyboardMarkup InlineChangeAudKeyboard = new(new[]
+    {
+        //new[]
+        //{
+        //    InlineKeyboardButton.WithCallbackData(text: "Продолжить без них", callbackData: "8_continue"),
+        //},
+        new[]
+        {
+            InlineKeyboardButton.WithCallbackData(text: "Изменить", callbackData: "8_change"),
+        }
+    });
 }

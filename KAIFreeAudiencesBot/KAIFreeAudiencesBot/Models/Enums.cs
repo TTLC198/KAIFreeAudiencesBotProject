@@ -8,8 +8,9 @@ public enum Parity
 
 public enum Modes
 {
-    Auto,
-    Manual
+    Default,
+    SpecificDates,
+    SpecificDaysOfWeek
 }
 
 public enum Buildings
@@ -36,12 +37,13 @@ public enum ClientSteps
     ChooseAudience,
 }
 
-public enum Days
+public enum DaysOfWeek
 {
     Monday,
     Tuesday,
     Wednesday,
     Thursday,
     Friday,
-    Saturday
+    Saturday,
+    Sunday
 }

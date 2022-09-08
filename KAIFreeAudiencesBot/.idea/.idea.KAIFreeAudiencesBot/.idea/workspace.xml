@@ -11,9 +11,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/TableParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" afterDir="false" />
     </list>
@@ -54,6 +57,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/de87d0d6e60b4760b508cb761cdad0ba91db78/45/dcf0cccb/TaskCanceledException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1d1825edaa32eae8f34c0d4c1d7339da76b49bd313d63412aa44d18fcd5a4/MessageEntity.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/575c31ecc35a636b6f962cb71d53992552941a18982aae1c8e6c16305cc3761b/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5df7d5d8e6f2e03621186ae5a075dd9e99bebdc0e45bfc6a1948a5a677263b59/DebugProvider.Windows.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6baa723996371c059e7bc78969f2f20741024ce6de0f080dcc5964225c3303a/ServiceProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c269bd4a989dea031277e5b6c4c53a6d2c1889fcf9883a7a5a1754033a57/EntityFrameworkServiceCollectionExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ce719136c12653cd464ae0b247771f618b92f8beec14c1010b5278a7d0fd1f/DbContextServices.cs" root0="SKIP_HIGHLIGHTING" />
@@ -83,6 +87,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.49312377&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.gutterIcons&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
@@ -239,6 +244,10 @@
       <workItem from="1661501546438" duration="1763000" />
       <workItem from="1661506174266" duration="1919000" />
       <workItem from="1662380782588" duration="3284000" />
+      <workItem from="1662429804371" duration="666000" />
+      <workItem from="1662474471151" duration="3858000" />
+      <workItem from="1662487498435" duration="9376000" />
+      <workItem from="1662564165218" duration="7881000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
@@ -317,7 +326,14 @@
       <option name="project" value="LOCAL" />
       <updated>1661070270790</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Reworked BuildTable method, add TableParser.cs">
+      <created>1662429872390</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1662429872390</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -348,7 +364,8 @@
     <MESSAGE value="docker-compose support added" />
     <MESSAGE value="dpcker-compose support added" />
     <MESSAGE value="Update README.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update README.md" />
+    <MESSAGE value="Reworked BuildTable method, add TableParser.cs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Reworked BuildTable method, add TableParser.cs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -358,6 +375,32 @@
           <line>53</line>
           <properties documentPath="C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject\KAIFreeAudiencesBot\KAIFreeAudiencesBot\Services\ScheduleParser.cs" initialLine="51" containingFunctionPresentation="method 'GetGroupsIdAsync'" />
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs</url>
+          <line>442</line>
+          <properties documentPath="C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject-Development\KAIFreeAudiencesBot\KAIFreeAudiencesBot\Services\HandleUpdateService.cs" initialLine="445" containingFunctionPresentation="method 'ParseAudience'">
+            <startOffsets>
+              <option value="18309" />
+            </startOffsets>
+            <endOffsets>
+              <option value="18406" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs</url>
+          <line>465</line>
+          <properties documentPath="C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject-Development\KAIFreeAudiencesBot\KAIFreeAudiencesBot\Services\HandleUpdateService.cs" initialLine="467" containingFunctionPresentation="method 'ParseAudience'">
+            <startOffsets>
+              <option value="19574" />
+            </startOffsets>
+            <endOffsets>
+              <option value="19641" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
