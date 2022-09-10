@@ -10,12 +10,8 @@
     <projectFile profileName="Docker-Production">KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
+    <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="Change models, now currently using System.DayOfWeek enumeration">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" afterDir="false" />
@@ -63,14 +59,22 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ce719136c12653cd464ae0b247771f618b92f8beec14c1010b5278a7d0fd1f/DbContextServices.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d2bc5a7ce9a5fc6f18c2bef1444e092e0496246f8a755bce46494f429fb86a9/DateTimeParse.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d6b4aefcd8a1389eac53f90b24090dea8ea6b3b6c8594585fbd790a8651ebd/Update.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/dbb9b76d07e4477885c165cd6116d8cca23898/_dd720/DayOfWeek.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e0b1a6d8edffe3d1c23bdcf77ea3b29dbe71c12dde7bd03a7fd516a2c94a82/ServiceProviderServiceExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/eec384c316ffd282b857f1fa5d5240aee4d304d9c1f3877b0db16c522f3/TimeOnly.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f4708639776589f5ac2739f6fcbfc67343b1f9dac51cc1dbfdb003eef77cc1c/Monitor.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject-Development/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Models/Client.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject-Development/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Models/DBModels.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Models/DBModels.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject-Development/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Models/Enums.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject-Development/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Models/Keyboard.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Properties/launchSettings.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject-Development/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject-Development/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject-Development/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/Misc.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Startup.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -89,7 +93,7 @@
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.49312377&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.gutterIcons&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CodeLensConfigurable&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -248,6 +252,8 @@
       <workItem from="1662474471151" duration="3858000" />
       <workItem from="1662487498435" duration="9376000" />
       <workItem from="1662564165218" duration="7881000" />
+      <workItem from="1662708337735" duration="5941000" />
+      <workItem from="1662786709829" duration="4899000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
@@ -333,7 +339,14 @@
       <option name="project" value="LOCAL" />
       <updated>1662429872390</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Change models, now currently using System.DayOfWeek enumeration">
+      <created>1662823911992</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1662823911992</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -365,7 +378,8 @@
     <MESSAGE value="dpcker-compose support added" />
     <MESSAGE value="Update README.md" />
     <MESSAGE value="Reworked BuildTable method, add TableParser.cs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reworked BuildTable method, add TableParser.cs" />
+    <MESSAGE value="Change models, now currently using System.DayOfWeek enumeration" />
+    <option name="LAST_COMMIT_MESSAGE" value="Change models, now currently using System.DayOfWeek enumeration" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -375,32 +389,6 @@
           <line>53</line>
           <properties documentPath="C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject\KAIFreeAudiencesBot\KAIFreeAudiencesBot\Services\ScheduleParser.cs" initialLine="51" containingFunctionPresentation="method 'GetGroupsIdAsync'" />
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs</url>
-          <line>442</line>
-          <properties documentPath="C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject-Development\KAIFreeAudiencesBot\KAIFreeAudiencesBot\Services\HandleUpdateService.cs" initialLine="445" containingFunctionPresentation="method 'ParseAudience'">
-            <startOffsets>
-              <option value="18309" />
-            </startOffsets>
-            <endOffsets>
-              <option value="18406" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs</url>
-          <line>465</line>
-          <properties documentPath="C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject-Development\KAIFreeAudiencesBot\KAIFreeAudiencesBot\Services\HandleUpdateService.cs" initialLine="467" containingFunctionPresentation="method 'ParseAudience'">
-            <startOffsets>
-              <option value="19574" />
-            </startOffsets>
-            <endOffsets>
-              <option value="19641" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

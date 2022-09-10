@@ -13,7 +13,7 @@ public sealed class SchDbContext : DbContext
     public DbSet<ScheduleSubjectDate> scheduleSubjectDates { get; set; }
     public DbSet<Teacher> teachers { get; set; }
     public DbSet<TimeInterval> timeIntervals { get; set; }
-    public DbSet<DefaultValues> defaultVales { get; set; }
+    public DbSet<DefaultValues> defaultValues { get; set; }
 
     public SchDbContext(DbContextOptions<SchDbContext> options) : base(options)
     {
@@ -34,7 +34,7 @@ public sealed class SchDbContext : DbContext
         
         modelBuilder
             .Entity<DefaultValues>()
-            .Property(ssd => ssd.values)
+            .Property(ssd => ssd.value)
             .HasConversion(converter);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Drawing;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using KAIFreeAudiencesBot.Models;
@@ -214,9 +215,17 @@ public class HandleUpdateService
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         var keyboard = message.ReplyMarkup;
         var indexes = Misc.GetIndexes(keyboard!, args);
-        Misc.ChangeValue(clients[clientIndex].step, clients[clientIndex].settings,
+        
+        Misc.ChangeValue(
+            clients[clientIndex].step,
+            clients[clientIndex].settings,
             keyboard!.InlineKeyboard.ToList()[indexes[0]].ToList()[indexes[1]]);
-        keyboard = Misc.UpdateKeyboardMarkup(clients[clientIndex].step, clients[clientIndex].settings, keyboard);
+        
+        keyboard = Misc.UpdateKeyboardMarkup(
+            clients[clientIndex].step,
+            clients[clientIndex].settings,
+            keyboard);
+        
         return await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
             messageId: message.MessageId,
@@ -381,7 +390,7 @@ public class HandleUpdateService
 
             clients[clientIndex].step = ClientSteps.ChooseTime;
             clients[clientIndex].settings.DaysOfWeek = clients[clientIndex].settings.DaysOfWeek
-                .OrderBy(day => int.Parse(Enum.Format(typeof(DaysOfWeek), day, "d"))).ToList();
+                .OrderBy(day => int.Parse(Enum.Format(typeof(DayOfWeek), day, "d"))).ToList();
             return await _botClient.EditMessageTextAsync(
                 chatId: message.Chat.Id,
                 messageId: message.MessageId,
@@ -507,9 +516,16 @@ public class HandleUpdateService
                 {
                     tempDates = Misc.GetDates(
                         settings.DaysOfWeek,
-                        settings.DateStart ?? db!.defaultVales.Select(values => values.values).ToList()[0],
-                        settings.DateEnd ?? db!.defaultVales.Select(values => values.values).ToList()[1],
-                        settings.Parity);
+                        settings.DateStart ?? db!.defaultValues
+                            .AsNoTracking()
+                            .ToList()[0]
+                            .value,
+                        settings.DateEnd ?? db!.defaultValues
+                            .AsNoTracking()
+                            .ToList()[1]
+                            .value,
+                        settings.Parity
+                        );
                 }
 
                 var schedules = db!.scheduleSubjectDates
@@ -555,7 +571,7 @@ public class HandleUpdateService
                     case 1:
                         currentMessage = await _botClient.EditMessageTextAsync(
                             chatId: message.Chat.Id,
-                            messageId: message.MessageId,
+                            messageId: loadingMessage.MessageId,
                             replyMarkup: Keyboard.Back,
                             text: char.ConvertFromUtf32(0x274c) + "Введенные аудитории заняты"
                         );
@@ -563,7 +579,7 @@ public class HandleUpdateService
                     case 2:
                         currentMessage = await _botClient.EditMessageTextAsync(
                             chatId: message.Chat.Id,
-                            messageId: message.MessageId,
+                            messageId: loadingMessage.MessageId,
                             replyMarkup: Keyboard.Back,
                             text: char.ConvertFromUtf32(0x2714) + "Введенная аудитория свободна"
                         );
@@ -585,7 +601,7 @@ public class HandleUpdateService
                         
                         currentMessage = await _botClient.EditMessageTextAsync(
                             chatId: message.Chat.Id,
-                            messageId: message.MessageId,
+                            messageId: loadingMessage.MessageId,
                             text: "Таблица свободных аудиторий:"
                         );
                         await _botClient.SendPhotoAsync(
@@ -673,7 +689,8 @@ public class HandleUpdateService
 
             tableImageStream = Misc.HtmlToImageStreamConverter(
                 "<style>table, th, td { border: 1px solid black; margin: 0 auto; font-size: 36px; }</style>" +
-                tableStringBuilder
+                tableStringBuilder,
+                new Size()
             )!;
         });
 
