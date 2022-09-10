@@ -29,15 +29,15 @@ public static class Keyboard
     {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "☑ Пн", callbackData: "1_0"),
-            InlineKeyboardButton.WithCallbackData(text: "☑ Вт", callbackData: "1_1"),
-            InlineKeyboardButton.WithCallbackData(text: "☑ Ср", callbackData: "1_2")
+            InlineKeyboardButton.WithCallbackData(text: "☑ Пн", callbackData: "1_1"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Вт", callbackData: "1_2"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Ср", callbackData: "1_3")
             
         },
         new[] {
-            InlineKeyboardButton.WithCallbackData(text: "☑ Чт", callbackData: "1_3"),
-            InlineKeyboardButton.WithCallbackData(text: "☑ Пт", callbackData: "1_4"),
-            InlineKeyboardButton.WithCallbackData(text: "☑ Сб", callbackData: "1_5")
+            InlineKeyboardButton.WithCallbackData(text: "☑ Чт", callbackData: "1_4"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Пт", callbackData: "1_5"),
+            InlineKeyboardButton.WithCallbackData(text: "☑ Сб", callbackData: "1_6")
         },
         new []
         {
