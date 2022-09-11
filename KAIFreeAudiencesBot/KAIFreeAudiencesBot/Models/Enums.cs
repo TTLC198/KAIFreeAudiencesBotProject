@@ -8,11 +8,9 @@ public enum Parity
 
 public enum Modes
 {
-    General,
-    GeneralAuto,
-    Specific,
-    SpecificDais,
-    SpecificIntervals
+    Default,
+    SpecificDates,
+    SpecificDaysOfWeek
 }
 
 public enum Buildings
@@ -37,14 +35,4 @@ public enum ClientSteps
     ChooseTime,
     ChooseCorrectTime,
     ChooseAudience,
-}
-
-public enum DaysOfWeek
-{
-    Monday = 0,
-    Tuesday = 1,
-    Wednesday = 2,
-    Thursday = 3,
-    Friday = 4,
-    Saturday = 5,
 }

@@ -1,4 +1,5 @@
-﻿using KAIFreeAudiencesBot.Models;
+﻿using System.Globalization;
+using KAIFreeAudiencesBot.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -12,7 +13,8 @@ public sealed class SchDbContext : DbContext
     public DbSet<ScheduleSubjectDate> scheduleSubjectDates { get; set; }
     public DbSet<Teacher> teachers { get; set; }
     public DbSet<TimeInterval> timeIntervals { get; set; }
-    public DbSet<DefaultValues> defaultVales { get; set; }
+    public DbSet<DefaultValues> defaultValues { get; set; }
+
 
     public SchDbContext(DbContextOptions<SchDbContext> options) : base(options)
     {
@@ -29,6 +31,11 @@ public sealed class SchDbContext : DbContext
         modelBuilder
             .Entity<ScheduleSubjectDate>()
             .Property(ssd => ssd.date)
+            .HasConversion(converter);
+        
+        modelBuilder
+            .Entity<DefaultValues>()
+            .Property(ssd => ssd.value)
             .HasConversion(converter);
     }
 }
