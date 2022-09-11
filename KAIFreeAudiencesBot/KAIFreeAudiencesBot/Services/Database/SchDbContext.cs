@@ -15,6 +15,7 @@ public sealed class SchDbContext : DbContext
     public DbSet<TimeInterval> timeIntervals { get; set; }
     public DbSet<DefaultValues> defaultValues { get; set; }
 
+
     public SchDbContext(DbContextOptions<SchDbContext> options) : base(options)
     {
         Database.EnsureCreated();

@@ -12,7 +12,7 @@ services:
   ngrok:
     image: ngrok/ngrok:alpine
     container_name: ngrok
-    command: 'http --authtoken ${ngrokAuthToken} host.docker.internal:5000'
+    command: 'http --authtoken "2DygsclpejAh3Qw4Q62cPqPgJQA_5MgjxhAiW1VizPHDtY5Cz" host.docker.internal:5000'
     restart: on-failure
     ports:
       - '4040:4040'
@@ -62,5 +62,3 @@ services:
 volumes:
   db-data:
     name: db-data
-    
-    

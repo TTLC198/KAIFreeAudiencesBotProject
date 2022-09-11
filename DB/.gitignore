@@ -1,0 +1,12 @@
+bin/
+obj/
+**/appsettings.json
+**/appsettings.Development.json
+Web.config
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+/KAIFreeAudiencesBot/.vs
+/KAIScheduleParser/.idea
+/KAIScheduleParser/venv
+/Secrets/

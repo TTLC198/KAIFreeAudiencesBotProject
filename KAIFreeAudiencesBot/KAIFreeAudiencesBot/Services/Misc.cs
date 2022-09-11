@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Globalization;
 using GrapeCity.Documents.Html;
 using KAIFreeAudiencesBot.Models;
@@ -49,7 +49,40 @@ public static class Misc
 
         return resultDates;
     }
-    
+
+    public static List<DateOnly> GetDates(List<DaysOfWeek> daysOfWeeks, DateOnly? starts, DateOnly? ends,
+        List<Parity> parities)
+    {
+        var dates = new List<DateOnly>();
+        var start = starts ?? DateOnly.MaxValue;// HEEEELP
+        var end = ends ?? DateOnly.MaxValue;// HEEEELP
+        foreach (var parity in parities)
+        {
+            while ((DaysOfWeek)(Enum.Parse(typeof(DaysOfWeek), start.DayOfWeek.ToString())) != daysOfWeeks[0] ||
+                   GetWeekParity(start.ToDateTime(TimeOnly.MinValue)) != parity)
+            {
+                start.AddDays(1);
+            }
+
+            dates.Add(start);
+        }
+
+        start = dates.Min();
+        var resultDates = new List<DateOnly>();
+        while (start <= end)
+        {
+            if (daysOfWeeks.Contains((DaysOfWeek)(Enum.Parse(typeof(DaysOfWeek), start.DayOfWeek.ToString()))) &&
+                parities.Contains(GetWeekParity(start.ToDateTime(TimeOnly.MinValue))))
+            {
+                resultDates.Add(start);
+            }
+
+            start.AddDays(1);
+        }
+
+        return resultDates;
+    }
+
     public static DateTime? GetCurrentDay(DateTime? time, Parity parity)
     {
         time ??= DateTime.Now;
@@ -61,7 +94,7 @@ public static class Misc
 
         return null;
     }
-    
+
     private static long GetTime(this DateTime dateTime)
     {
         DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -71,6 +104,7 @@ public static class Misc
     public static int[] GetIndexes(InlineKeyboardMarkup keyboardMarkup, string match)
     {
         int i = 0, j = 0;
+
         foreach (var arrayOfButtons in keyboardMarkup!.InlineKeyboard.ToList())
         {
             foreach (var button in arrayOfButtons.ToList())
@@ -127,6 +161,7 @@ public static class Misc
             case ClientSteps.ChooseDay:
                 var dayOfWeek =
                     Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().ToList()[
+
                         int.Parse(button.CallbackData!.Split('_')[1])];
                 if (clientSettings.DaysOfWeek.IndexOf(dayOfWeek) == -1)
                 {
@@ -170,6 +205,7 @@ public static class Misc
                 break;
             case ClientSteps.ChooseDay:
                 var days = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().ToList();
+
                 var buttons = keyboard.InlineKeyboard!.ToArray();
                 for (var i = 0; i < buttons.Length - 1; i++)
                 {
@@ -177,6 +213,7 @@ public static class Misc
                     {
                         keyboard.InlineKeyboard.ToArray()[i].ToArray()[j].Text =
                             clientSettings.DaysOfWeek.IndexOf(days[i * 3 + j + 1]) != -1
+
                                 ? keyboard.InlineKeyboard.ToArray()[i].ToArray()[j].Text.Replace("☑", "✅")
                                 : keyboard.InlineKeyboard.ToArray()[i].ToArray()[j].Text.Replace("✅", "☑");
                     }
@@ -197,7 +234,6 @@ public static class Misc
 
         return keyboard;
     }
-
     public static Stream? HtmlToImageStreamConverter(string html)
     {
         return HtmlToImageStreamConverter(html, new Size(460, 1000));
