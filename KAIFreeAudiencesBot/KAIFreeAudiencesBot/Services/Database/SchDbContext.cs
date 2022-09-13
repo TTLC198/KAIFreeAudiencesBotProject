@@ -23,19 +23,34 @@ public sealed class SchDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var converter = new ValueConverter<DateOnly, string>(
+        var converterDate = new ValueConverter<DateOnly, string>(
             v => v.ToString(),
             v => DateOnly.ParseExact(v, "dd.MM.yyyy")
+        );
+
+        var converterTime = new ValueConverter<TimeOnly, string>(
+            v => v.ToString(),
+            v => TimeOnly.ParseExact(v, "hh:mm")
         );
 
         modelBuilder
             .Entity<ScheduleSubjectDate>()
             .Property(ssd => ssd.date)
-            .HasConversion(converter);
+            .HasConversion(converterDate);
         
         modelBuilder
             .Entity<DefaultValues>()
             .Property(ssd => ssd.value)
-            .HasConversion(converter);
+            .HasConversion(converterDate);
+        
+        modelBuilder
+            .Entity<TimeInterval>()
+            .Property(ti => ti.start)
+            .HasConversion(converterTime);
+        
+        modelBuilder
+            .Entity<TimeInterval>()
+            .Property(ti => ti.end)
+            .HasConversion(converterTime);
     }
 }

@@ -16,18 +16,19 @@ public static class Misc
             ? Parity.Even
             : Parity.NotEven;
     }
-    
-    public static List<DateOnly> GetDates(List<DayOfWeek> daysOfWeeks, DateOnly? starts, DateOnly? ends, List<Parity> parities)
+
+    public static List<DateOnly> GetDates(List<DayOfWeek> daysOfWeeks, DateOnly? starts, DateOnly? ends,
+        List<Parity> parities)
     {
         var dates = new List<DateOnly>();
-        var start = starts ?? DateOnly.MaxValue;// HEEEELP
-        var end = ends ?? DateOnly.MaxValue;// HEEEELP
+        var start = starts ?? DateOnly.MaxValue; // HEEEELP
+        var end = ends ?? DateOnly.MaxValue; // HEEEELP
         foreach (var parity in parities)
         {
             while ((DayOfWeek)(Enum.Parse(typeof(DayOfWeek), start.DayOfWeek.ToString())) != daysOfWeeks[0] ||
                    GetWeekParity(start.ToDateTime(TimeOnly.MinValue)) != parity)
             {
-                var temp = (DayOfWeek) (Enum.Parse(typeof(DayOfWeek), start.DayOfWeek.ToString()));
+                var temp = (DayOfWeek)(Enum.Parse(typeof(DayOfWeek), start.DayOfWeek.ToString()));
                 start = start.AddDays(1);
             }
 
@@ -50,39 +51,6 @@ public static class Misc
         return resultDates;
     }
 
-    public static List<DateOnly> GetDates(List<DaysOfWeek> daysOfWeeks, DateOnly? starts, DateOnly? ends,
-        List<Parity> parities)
-    {
-        var dates = new List<DateOnly>();
-        var start = starts ?? DateOnly.MaxValue;// HEEEELP
-        var end = ends ?? DateOnly.MaxValue;// HEEEELP
-        foreach (var parity in parities)
-        {
-            while ((DaysOfWeek)(Enum.Parse(typeof(DaysOfWeek), start.DayOfWeek.ToString())) != daysOfWeeks[0] ||
-                   GetWeekParity(start.ToDateTime(TimeOnly.MinValue)) != parity)
-            {
-                start.AddDays(1);
-            }
-
-            dates.Add(start);
-        }
-
-        start = dates.Min();
-        var resultDates = new List<DateOnly>();
-        while (start <= end)
-        {
-            if (daysOfWeeks.Contains((DaysOfWeek)(Enum.Parse(typeof(DaysOfWeek), start.DayOfWeek.ToString()))) &&
-                parities.Contains(GetWeekParity(start.ToDateTime(TimeOnly.MinValue))))
-            {
-                resultDates.Add(start);
-            }
-
-            start.AddDays(1);
-        }
-
-        return resultDates;
-    }
-
     public static DateTime? GetCurrentDay(DateTime? time, Parity parity)
     {
         time ??= DateTime.Now;
@@ -100,7 +68,7 @@ public static class Misc
         DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         return (long)((dateTime - epoch).TotalMilliseconds);
     }
-    
+
     public static int[] GetIndexes(InlineKeyboardMarkup keyboardMarkup, string match)
     {
         int i = 0, j = 0;
@@ -161,7 +129,6 @@ public static class Misc
             case ClientSteps.ChooseDay:
                 var dayOfWeek =
                     Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().ToList()[
-
                         int.Parse(button.CallbackData!.Split('_')[1])];
                 if (clientSettings.DaysOfWeek.IndexOf(dayOfWeek) == -1)
                 {
@@ -213,7 +180,6 @@ public static class Misc
                     {
                         keyboard.InlineKeyboard.ToArray()[i].ToArray()[j].Text =
                             clientSettings.DaysOfWeek.IndexOf(days[i * 3 + j + 1]) != -1
-
                                 ? keyboard.InlineKeyboard.ToArray()[i].ToArray()[j].Text.Replace("☑", "✅")
                                 : keyboard.InlineKeyboard.ToArray()[i].ToArray()[j].Text.Replace("✅", "☑");
                     }
@@ -234,15 +200,16 @@ public static class Misc
 
         return keyboard;
     }
+
     public static Stream? HtmlToImageStreamConverter(string html)
     {
         return HtmlToImageStreamConverter(html, new Size(460, 1000));
     }
-    
+
     public static Stream? HtmlToImageStreamConverter(string html, Size imageSize)
     {
         Stream? imageStream = new MemoryStream();
-        
+
         using (var re1 = new GcHtmlRenderer(html))
         {
             PngSettings imageSettings = new PngSettings();
@@ -254,5 +221,37 @@ public static class Misc
 
         imageStream.Position = 0;
         return imageStream;
+    }
+
+    public static List<(string audience, string building, string date, string timeInterval)> SmashDates(
+        List<ScheduleSubjectDate> schedules)
+    {
+        var resultSchedule = new List<(string audience, string building, List<DateOnly> dates)> { };
+        foreach (var schedule in schedules)
+        {
+            if (!resultSchedule.Select(r => (r.building, r.audience))
+                    .Contains(new ValueTuple<string, string>(schedule.Classroom.building, schedule.Classroom.name)))
+            {
+                resultSchedule.Add(new ValueTuple<string, string, List<DateOnly>>(schedule.Classroom.name, schedule.Classroom.building,
+                    new List<DateOnly> { schedule.date, schedule.date }));
+                continue;
+            }
+
+            var lastSchedule = resultSchedule.LastOrDefault(
+                rs => 
+                    rs.audience == schedule.Classroom.name 
+                    && rs.building == schedule.Classroom.building);
+            if (lastSchedule.dates[1] == schedule.date.AddDays(schedule.date.DayOfWeek == DayOfWeek.Monday ? -2 : -1))
+            {
+                lastSchedule.dates[1] = schedule.date;
+            }
+            else
+            {
+                resultSchedule.Add(new ValueTuple<string, string, List<DateOnly>>(schedule.Classroom.name, schedule.Classroom.building,
+                    new List<DateOnly> { schedule.date, schedule.date }));
+            }
+        }
+
+        return resultSchedule.Select(rs => (rs.audience, rs.building, string.Join('-', rs.dates), schedules[0].TimeInterval.start.ToString("c"))).ToList();
     }
 }

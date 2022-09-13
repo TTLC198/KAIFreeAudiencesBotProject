@@ -81,9 +81,9 @@ public class TimeInterval
     [Column("ti_id")]
     public int id { get; set; }
     [Column("ti_start")]
-    public TimeSpan start { get; set; }
+    public TimeOnly start { get; set; }
     [Column("ti_end")]
-    public TimeSpan end { get; set; }
+    public TimeOnly end { get; set; }
 }
 
 [Table("default_values")]
