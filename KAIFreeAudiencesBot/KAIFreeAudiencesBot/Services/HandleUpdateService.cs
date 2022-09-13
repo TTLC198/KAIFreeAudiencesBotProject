@@ -556,6 +556,8 @@ public class HandleUpdateService
 
                 var schedules = db!.scheduleSubjectDates
                     .AsNoTracking()
+                    .Include(s => s.TimeInterval)
+                    .Include(s => s.Classroom)
                     .AsEnumerable()
                     .Where(s =>
                         s.TimeInterval.start == settings.TimeStart

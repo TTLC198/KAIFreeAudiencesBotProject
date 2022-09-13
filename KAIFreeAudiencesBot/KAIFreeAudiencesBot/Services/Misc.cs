@@ -252,6 +252,6 @@ public static class Misc
             }
         }
 
-        return resultSchedule.Select(rs => (rs.audience, rs.building, string.Join('-', rs.dates), schedules[0].TimeInterval.start.ToString("c"))).ToList();
+        return resultSchedule.Select(rs => (rs.audience, rs.building, string.Join('-', rs.dates), schedules[0].TimeInterval.start.ToString("HH:mm"))).ToList();
     }
 }

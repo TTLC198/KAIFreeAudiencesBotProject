@@ -30,7 +30,7 @@ public sealed class SchDbContext : DbContext
 
         var converterTime = new ValueConverter<TimeOnly, string>(
             v => v.ToString(),
-            v => TimeOnly.ParseExact(v, "hh:mm")
+            v => TimeOnly.ParseExact(v, new[] {"HH:mm", "H:mm"})
         );
 
         modelBuilder
