@@ -51,7 +51,10 @@ create table teachers
 
 create table default_values
 (
-    "values" varchar not null
+    dv_value varchar not null,
+    dv_id    INTEGER
+        constraint default_values_pk
+            primary key autoincrement
 );
 
 create table time_intervals
@@ -92,7 +95,7 @@ INSERT INTO class_types (ct_id, ct_name) VALUES (2, 'пр');
 INSERT INTO class_types (ct_id, ct_name) VALUES (3, 'л.р.');
 INSERT INTO class_types (ct_id, ct_name) VALUES (4, 'конс');
 
-INSERT INTO default_values ("values") VALUES ('09.01.2022');
-INSERT INTO default_values ("values") VALUES ('30.06.2022');
-INSERT INTO default_values ("values") VALUES ('09.01.2022');
-INSERT INTO default_values ("values") VALUES ('16.01.2022');
+INSERT INTO default_values (dv_value, dv_id) VALUES ('09.01.2022', 1);
+INSERT INTO default_values (dv_value, dv_id) VALUES ('30.06.2022', 2);
+INSERT INTO default_values (dv_value, dv_id) VALUES ('09.01.2022', 3);
+INSERT INTO default_values (dv_value, dv_id) VALUES ('16.01.2022', 4);
