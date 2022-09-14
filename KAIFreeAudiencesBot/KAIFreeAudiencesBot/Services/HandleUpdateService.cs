@@ -101,8 +101,8 @@ public class HandleUpdateService
                     if (args[1] == "all")
                     {
                         currentClient.step = ClientSteps.Default;
-                        return NotRealized(callbackQuery.Message!);
-                        //return GetFreeAudiences(callbackQuery.Message!, currentClient.settings);
+                        currentClient.settings.Mode = Modes.SpecificDaysAllAudiences;
+                        return CheckAudience(callbackQuery.Message!, currentClient.settings);
                     }
                     else
                     {
@@ -305,9 +305,14 @@ public class HandleUpdateService
         clients[clientIndex].step = ClientSteps.ChooseParity;
         clients[clientIndex].settings.Mode = Modes.SpecificDaysOfWeek;
 
-        return await _botClient.EditMessageTextAsync(
+        await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
             messageId: message.MessageId,
+            text: "Выбран режим " + clients[clientIndex].settings.Mode
+        );
+
+        return await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
             replyMarkup: Keyboard.inlineWeekKeyboard,
             text: "Выберите чётность недели",
             cancellationToken: CancellationToken.None
@@ -331,9 +336,15 @@ public class HandleUpdateService
         clients[clientIndex].step = ClientSteps.ChooseDay;
         clients[clientIndex].settings.Parity = clients[clientIndex].settings.Parity
             .OrderBy(parity => int.Parse(Enum.Format(typeof(Parity), parity, "d"))).ToList();
-        return await _botClient.EditMessageTextAsync(
+
+        await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
             messageId: message.MessageId,
+            text: "Выбранные четности: " + string.Join(' ', clients[clientIndex].settings.Parity)
+        );
+
+        return await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
             text: "Выберите день недели",
             replyMarkup: Keyboard.inlineDayKeyboard
         );
@@ -391,9 +402,15 @@ public class HandleUpdateService
             clients[clientIndex].step = ClientSteps.ChooseTime;
             clients[clientIndex].settings.DaysOfWeek = clients[clientIndex].settings.DaysOfWeek
                 .OrderBy(day => int.Parse(Enum.Format(typeof(DayOfWeek), day, "d"))).ToList();
-            return await _botClient.EditMessageTextAsync(
+
+            await _botClient.EditMessageTextAsync(
                 chatId: message.Chat.Id,
                 messageId: message.MessageId,
+                text: "Выбранные дни недели: " + string.Join(' ', clients[clientIndex].settings.DaysOfWeek)
+            );
+
+            return await _botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
                 text: "Введите час начала занятия"
             );
         }
@@ -403,11 +420,18 @@ public class HandleUpdateService
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         clients[clientIndex].step = ClientSteps.ChooseBuilding;
-        clients[clientIndex].settings.TimeStart = TimeOnly.ParseExact(args[1], new[] {"HH:mm", "H:mm"}, new CultureInfo("ru-RU"));
+        clients[clientIndex].settings.TimeStart =
+            TimeOnly.ParseExact(args[1], new[] { "HH:mm", "H:mm" }, new CultureInfo("ru-RU"));
 
-        return await _botClient.EditMessageTextAsync(
+        await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
             messageId: message.MessageId,
+            text: "Вы выбрали временной промежуток: " + clients[clientIndex].settings.TimeStart + "-" +
+                  clients[clientIndex].settings.TimeStart.AddMinutes(90).ToString()
+        );
+
+        return await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
             replyMarkup: Keyboard.inlineAutoBuildingKeyboard,
             text: "Выберите здание",
             cancellationToken: CancellationToken.None
@@ -419,12 +443,19 @@ public class HandleUpdateService
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         if (clients[clientIndex].step == ClientSteps.ChooseBuilding)
         {
-            clients[clientIndex].settings.Building = args[1] != "all" ? Enum.GetValues(typeof(Buildings)).Cast<Buildings>().ToList()[int.Parse(args[1])] : Buildings.All;
+            clients[clientIndex].settings.Building = args[1] != "all"
+                ? Enum.GetValues(typeof(Buildings)).Cast<Buildings>().ToList()[int.Parse(args[1])]
+                : Buildings.All;
+            await _botClient.EditMessageTextAsync(
+                chatId: message.Chat.Id,
+                messageId: message.MessageId,
+                text: "Вы выбрали здания: " + clients[clientIndex].settings.Building
+            );
         }
+
         clients[clientIndex].step = ClientSteps.ChooseAudience;
-        return await _botClient.EditMessageTextAsync(
+        return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            messageId: message.MessageId,
             text: "Отправьте номера аудитории через запятую для проверки их занятости",
             replyMarkup: Keyboard.inlineAllAudiences
         );
@@ -477,7 +508,7 @@ public class HandleUpdateService
 
     private async Task<Message> CheckAudience(Message message, ClientSettings settings)
     {
-        var freeAudItems = new List<(string audience, string building)>();
+        var freeAudItems = new List<(string audience, string building, string date, string timeInterval)>();
         
         var loadingMessage = await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
@@ -530,11 +561,11 @@ public class HandleUpdateService
 
                 var schedules = db!.scheduleSubjectDates
                     .AsNoTracking()
-                    .Select(s => new {s.TimeInterval, s.date, s.Classroom, s.Group})
+                    .Include(s => s.TimeInterval)
+                    .Include(s => s.Classroom)
                     .AsEnumerable()
                     .Where(s =>
-                        TimeOnly.FromTimeSpan(s.TimeInterval.start) < settings!.TimeStart
-                        && settings!.TimeStart < TimeOnly.FromTimeSpan(s.TimeInterval.end)
+                        s.TimeInterval.start == settings.TimeStart
                         && tempDates.Contains(s.date))
                     .ToList();
 
@@ -546,13 +577,34 @@ public class HandleUpdateService
                         text: "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий.",
                         cancellationToken: CancellationToken.None
                     );
+                    return;
+                }
+                
+                if (settings!.Building != Buildings.All)
+                {
+                    schedules = schedules!.Where(schedule =>
+                            schedule.Classroom.building == Convert.ToString((int)settings.Building)
+                            && settings!.Audience.Contains(schedule.Classroom.name))
+                        .AsEnumerable()
+                        .OrderBy(schedule => schedule.Classroom.building)
+                        .ThenBy(schedule => schedule.Classroom.name)
+                        .ThenBy(schedule => schedule.date)
+                        .ToList();
+                }
+                else
+                {
+                    schedules = schedules!
+                        .OrderBy(schedule => schedule.Classroom.building)
+                        .ThenBy(schedule => schedule.Classroom.name)
+                        .ThenBy(schedule => schedule.date)
+                        .ToList();
                 }
 
                 var emptyClassrooms = db.classrooms
                     .AsNoTracking()
                     .AsEnumerable()
                     .Where(cr =>
-                        !schedules.Any(s => s.Classroom.name == cr.name && s.Classroom.building == cr.building)
+                        !schedules.Any(s => (settings.Mode != Modes.SpecificDaysAllAudiences || s.Classroom.name == cr.name) && s.Classroom.building == cr.building)
                         && settings!.Audience.Contains(cr.name))
                     .Select(cr => new {cr.building, cr.name})
                     .AsEnumerable()
@@ -560,12 +612,8 @@ public class HandleUpdateService
                     .ThenBy(cr => cr.name)
                     .ToList();
 
-                if (settings != null!)
-                    if (settings.Building != Buildings.All)
-                        emptyClassrooms = emptyClassrooms
-                            .Where(cr => cr.building == Convert.ToString((int) settings.Building)).ToList();
-                freeAudItems.AddRange(emptyClassrooms.Select(cr => (cr.name, cr.building)));
-                
+                freeAudItems.AddRange(Misc.SmashDates(schedules));
+
                 switch (freeAudItems.Count)
                 {
                     case 1:
@@ -586,19 +634,23 @@ public class HandleUpdateService
                         break;
                     default:
                         StringBuilder tableStringBuilder = new StringBuilder();
-                        using (var table = new Table(tableStringBuilder))
+                        using (var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable))
                         {
                             using var headerRow = table.AddHeaderRow();
                             headerRow.AddCell("Аудитория");
                             headerRow.AddCell("Здание");
+                            headerRow.AddCell("Даты");
+                            headerRow.AddCell("Время");
                             foreach (var classroom in freeAudItems)
                             {
                                 using var row = table.AddRow();
                                 row.AddCell(classroom.audience);
                                 row.AddCell(classroom.building);
-                            }        
+                                row.AddCell(classroom.date);
+                                row.AddCell(classroom.timeInterval);
+                            }
                         }
-                        
+
                         currentMessage = await _botClient.EditMessageTextAsync(
                             chatId: message.Chat.Id,
                             messageId: loadingMessage.MessageId,
@@ -607,8 +659,7 @@ public class HandleUpdateService
                         await _botClient.SendPhotoAsync(
                             chatId: message.Chat.Id,
                             photo: Misc.HtmlToImageStreamConverter(
-                                "<style>table, th, td { border: 1px solid black; margin: 0 auto; font-size: 36px; }</style>" +
-                                tableStringBuilder
+                                tableStringBuilder.ToString()
                             )!);
                         break;
                 }
@@ -724,182 +775,6 @@ public class HandleUpdateService
             cancellationToken: CancellationToken.None
         );
     }
-
-    /*private async Task<Message> GetFreeAudiences(Message message, ClientSettings settings)
-    {
-        List<string> freeAudItems = new List<string>()
-        {
-            "Аудитория;Здание"
-        };
-
-        var loadingTaskCts = new CancellationTokenSource();
-        var loadingTask = new Task(async () =>
-        {
-            while (!loadingTaskCts.Token.IsCancellationRequested)
-            {
-                for (int i = 1; i < 4; i++)
-                {
-                    if (loadingTaskCts.Token.IsCancellationRequested) return;
-                    await _botClient.EditMessageTextAsync(
-                        chatId: message.Chat.Id,
-                        messageId: message.MessageId,
-                        text: "Получение данных" + "...".Substring(0, i),
-                        cancellationToken: CancellationToken.None
-                    );
-                    Thread.Sleep(300);
-                }
-            }
-        }, loadingTaskCts.Token);
-
-        var dbTask = new Task(async () =>
-        {
-            await using var db = _services.GetService<SchDbContext>();
-            
-            DateTime current = DateTime.Now;
-
-            if (settings != null!)
-            {
-                if (settings.Mode == Modes.Auto)
-                {
-#if DEBUG
-                    current = new DateTime(2022, 05, 30, 9, 0, 0);
-#else
-                    current = DateTime.Now;
-#endif
-                }
-                else
-                {
-#if DEBUG
-                    current = new DateTime(
-                        DateTime.Now.Year,
-                        5,
-                        Misc.GetCurrentDay(DateTime.Now, settings.Parity)!.Value.Day,
-                        settings.TimeStart.Hour,
-                        settings.TimeStart.Minute,
-                        settings.TimeStart.Second);
-#else
-                    current = new DateTime(
-                        DateTime.Now.Year,
-                        DateTime.Now.Month,
-                        Misc.GetCurrentDay(DateTime.Now, settings.Parity)!.Value.Day,
-                        settings.TimeStart.Hour,
-                        settings.TimeStart.Minute,
-                        settings.TimeStart.Second);
-#endif
-                }
-            }
-
-            
-            var schedules = db!.scheduleSubjectDates
-                .AsNoTracking()
-                .Select(s => new {s.TimeInterval, s.date, s.Classroom, s.Group})
-                .AsEnumerable()
-                .Where(s =>
-                    s.TimeInterval.start < current.TimeOfDay
-                    && current.TimeOfDay < s.TimeInterval.end
-                    && s.date == DateOnly.FromDateTime(current.Date))
-                .ToList();
-
-            var emptyClassrooms = db.classrooms
-                .AsNoTracking()
-                .AsEnumerable()
-                .Where(cr =>
-                    !schedules.Any(s => s.Classroom.name == cr.name && s.Classroom.building == cr.building))
-                .Select(cr => new { cr.building, cr.name })
-                .AsEnumerable()
-                .OrderBy(cr => cr.building)
-                .ThenBy(cr => cr.name)
-                .ToList();
-            
-            if (schedules == null! || emptyClassrooms == null!)
-            {
-                freeAudItems = null!;
-                return;
-            }
-            
-            if (settings != null!) 
-                if (settings.Building != Buildings.All) 
-                    emptyClassrooms = emptyClassrooms.Where(cr => cr.building == Convert.ToString((int)settings.Building)).ToList();
-
-            foreach (var classroom in emptyClassrooms)
-            {
-                freeAudItems.Add($"{classroom.name};{classroom.building}");
-            }
-        });
-
-        try
-        {
-            loadingTask.Start();
-            dbTask.Start();
-            await Task.WhenAny(dbTask).ContinueWith(_ => { loadingTaskCts.Cancel(); });
-        }
-        catch (Exception e)
-        {
-            await HandleErrorAsync(e);
-        }
-        finally
-        {
-            loadingTask.Dispose();
-            dbTask.Dispose();
-        }
-
-        if (freeAudItems == null!)
-        {
-            return await _botClient.EditMessageTextAsync(
-                chatId: message.Chat.Id,
-                messageId: message.MessageId,
-                text: "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий.",
-                cancellationToken: CancellationToken.None
-            );
-        }
-
-        //Длина строки создаваемой таблицы = 99 символов
-        //tg позволяет отправлять сообщения длиной не более 4096 символов, следовательно количество строк в одном сообщении не должно превышать 40
-        const int maxRowCount = 40;
-        if (freeAudItems.Count > maxRowCount)
-        {
-            int i = maxRowCount;
-            do
-            {
-                var text = BuildTelegramTable(
-                    freeAudItems
-                        .Take(new Range(
-                            i,
-                            i += freeAudItems.Count - i < maxRowCount ? freeAudItems.Count - i : maxRowCount))
-                        .Prepend(freeAudItems[0]).ToList(), 
-                    fixedColumnWidth: true, maxColumnWidth: 14,
-                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1);
-                await _botClient.SendTextMessageAsync(
-                    chatId: message.Chat.Id,
-                    text: text,
-                    parseMode: ParseMode.Html,
-                    cancellationToken: CancellationToken.None
-                );
-            } while (i < freeAudItems.Count);
-            return await _botClient.EditMessageTextAsync(
-                chatId: message.Chat.Id,
-                messageId: message.MessageId,
-                text: "Таблица свободных аудиторий" + BuildTelegramTable(freeAudItems.Take(maxRowCount).ToList(),
-                    fixedColumnWidth: true, maxColumnWidth: 14,
-                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1),
-                parseMode: ParseMode.Html,
-                cancellationToken: CancellationToken.None
-            );
-        }
-        else
-        {
-            return await _botClient.EditMessageTextAsync(
-                chatId: message.Chat.Id,
-                messageId: message.MessageId,
-                text: "Таблица свободных аудиторий" + BuildTelegramTable(freeAudItems, 
-                    fixedColumnWidth: true, maxColumnWidth: 14,
-                    minimumColumnWidth: 14, columnPadLeft: 1, columnPadRight: 1),
-                parseMode: ParseMode.Html,
-                replyMarkup: Keyboard.Back,
-                cancellationToken: CancellationToken.None
-            );
-        }
-    }*/
 
     private async Task<Message> UnknownMessageAsync(Message message)
     {

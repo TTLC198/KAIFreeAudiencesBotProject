@@ -219,4 +219,36 @@ public static class Misc
         imageStream.Position = 0;
         return imageStream;
     }
+    
+    public static List<(string audience, string building, string date, string timeInterval)> SmashDates(
+        List<ScheduleSubjectDate> schedules)
+    {
+        var resultSchedule = new List<(string audience, string building, List<DateOnly> dates)> { };
+        foreach (var schedule in schedules)
+        {
+            if (!resultSchedule.Select(r => (r.building, r.audience))
+                    .Contains(new ValueTuple<string, string>(schedule.Classroom.building, schedule.Classroom.name)))
+            {
+                resultSchedule.Add(new ValueTuple<string, string, List<DateOnly>>(schedule.Classroom.name, schedule.Classroom.building,
+                    new List<DateOnly> { schedule.date, schedule.date }));
+                continue;
+            }
+
+            var lastSchedule = resultSchedule.LastOrDefault(
+                rs => 
+                    rs.audience == schedule.Classroom.name 
+                    && rs.building == schedule.Classroom.building);
+            if (lastSchedule.dates[1] == schedule.date.AddDays(schedule.date.DayOfWeek == DayOfWeek.Monday ? -2 : -1))
+            {
+                lastSchedule.dates[1] = schedule.date;
+            }
+            else
+            {
+                resultSchedule.Add(new ValueTuple<string, string, List<DateOnly>>(schedule.Classroom.name, schedule.Classroom.building,
+                    new List<DateOnly> { schedule.date, schedule.date }));
+            }
+        }
+
+        return resultSchedule.Select(rs => (rs.audience, rs.building, string.Join('-', rs.dates), schedules[0].TimeInterval.start.ToString("HH:mm"))).ToList();
+    }
 }
