@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
 namespace KAIFreeAudiencesBot.Models;
 
 [Table("class_types")]
@@ -81,16 +83,16 @@ public class TimeInterval
     [Column("ti_id")]
     public int id { get; set; }
     [Column("ti_start")]
-    public TimeSpan start { get; set; }
+    public TimeOnly start { get; init; }
     [Column("ti_end")]
-    public TimeSpan end { get; set; }
+    public TimeOnly end { get; init; }
 }
 
 [Table("default_values")]
 public class DefaultValues
 {
-    [Column("dv_value")]
-    public DateOnly value { get; set; }
     [Column("dv_id")]
     public int id { get; set; }
+    [Column("dv_value")]
+    public DateOnly value { get; }
 }

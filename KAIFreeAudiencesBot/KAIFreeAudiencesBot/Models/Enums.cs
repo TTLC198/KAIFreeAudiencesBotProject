@@ -10,7 +10,8 @@ public enum Modes
 {
     Default,
     SpecificDates,
-    SpecificDaysOfWeek
+    SpecificDaysOfWeek,
+    SpecificDaysAllAudiences,
 }
 
 public enum Buildings
