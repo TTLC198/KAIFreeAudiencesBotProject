@@ -616,33 +616,37 @@ public class HandleUpdateService
                         );
                         break;
                     default:
-                        StringBuilder tableStringBuilder = new StringBuilder();
-                        using (var table = new Table(tableStringBuilder))
-                        {
-                            using var headerRow = table.AddHeaderRow();
-                            headerRow.AddCell("Аудитория");
-                            headerRow.AddCell("Здание");
-                            headerRow.AddCell("Даты");
-                            headerRow.AddCell("Время");
-                            foreach (var classroom in freeAudItems)
-                            {
-                                using var row = table.AddRow();
-                                row.AddCell(classroom.audience);
-                                row.AddCell(classroom.building);
-                                row.AddCell(classroom.date);
-                                row.AddCell(classroom.timeInterval);
-                            }
-                        }
-
                         currentMessage = await _botClient.EditMessageTextAsync(
                             chatId: message.Chat.Id,
                             messageId: loadingMessage.MessageId,
                             text: "Таблица свободных аудиторий:"
                         );
-                        await _botClient.SendPhotoAsync(
-                            chatId: message.Chat.Id,
-                            photo: Misc.HtmlToImageStreamConverter(
-                                @"<style>
+                        var length = freeAudItems.Count;
+                        for (int i = 1; i <= length / 13 + 1; i++)
+                        {
+                            StringBuilder tableStringBuilder = new StringBuilder();
+                            using (var table = new Table(tableStringBuilder))
+                            {
+                                using var headerRow = table.AddHeaderRow();
+                                headerRow.AddCell("Аудитория");
+                                headerRow.AddCell("Здание");
+                                headerRow.AddCell("Даты");
+                                headerRow.AddCell("Время");
+                                var start = (i - 1) * 13;
+                                foreach (var classroom in freeAudItems.GetRange(start, Math.Min(13, length - start)))
+                                {
+                                    using var row = table.AddRow();
+                                    row.AddCell(classroom.audience);
+                                    row.AddCell(classroom.building);
+                                    row.AddCell(classroom.date);
+                                    row.AddCell(classroom.timeInterval);
+                                }
+                            }
+
+                            await _botClient.SendPhotoAsync(
+                                chatId: message.Chat.Id,
+                                photo: Misc.HtmlToImageStreamConverter(
+                                    @"<style>
                 table {
                     font-family: 'Lucida Sans Unicode', 'Lucida Grande', Sans-Serif;
                     border-collapse: collapse;
@@ -671,8 +675,10 @@ public class HandleUpdateService
                 tr:nth-child(even) {
                     background: #E8E6D1;
                 }</style>" +
-                                tableStringBuilder
-                            )!);
+                                    tableStringBuilder
+                                )!);
+                        }
+
                         break;
                 }
             }

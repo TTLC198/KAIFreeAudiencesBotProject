@@ -247,11 +247,14 @@ public static class Misc
             }
             else
             {
-                resultSchedule.Add(new ValueTuple<string, string, List<DateOnly>>(schedule.Classroom.name, schedule.Classroom.building,
-                    new List<DateOnly> { schedule.date, schedule.date }));
+                if (!lastSchedule.dates.Contains(schedule.date))
+                {
+                    resultSchedule.Add(new ValueTuple<string, string, List<DateOnly>>(schedule.Classroom.name, schedule.Classroom.building,
+                        new List<DateOnly> { schedule.date, schedule.date }));
+                }
             }
         }
 
-        return resultSchedule.Select(rs => (rs.audience, rs.building, string.Join('-', rs.dates), schedules[0].TimeInterval.start.ToString("HH:mm"))).ToList();
+        return resultSchedule.Select(rs => (rs.audience, rs.building, string.Join('-', rs.dates.Select(r => r.ToString(new CultureInfo("ru-RU")))), schedules[0].TimeInterval.start.ToString("HH:mm"))).ToList();
     }
 }
