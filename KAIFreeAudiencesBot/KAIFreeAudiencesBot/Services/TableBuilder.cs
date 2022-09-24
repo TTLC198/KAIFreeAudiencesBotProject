@@ -64,6 +64,16 @@ public class Row : IDisposable
         }
     }
 
+    public void CloseRow()
+    {
+        _sb.Append("\t</tr>\n");
+    }
+    public void CloseHeaderRow()
+    {
+        _sb.Append("\t</tr>\n");
+        _sb.Append("</thead>\n");
+    }
+
     public void AddCell(string innerText)
     {
         _sb.Append("\t\t<td>\n");

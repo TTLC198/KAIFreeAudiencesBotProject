@@ -232,14 +232,15 @@ public static class Misc
             if (!resultSchedule.Select(r => (r.building, r.audience))
                     .Contains(new ValueTuple<string, string>(schedule.Classroom.building, schedule.Classroom.name)))
             {
-                resultSchedule.Add(new ValueTuple<string, string, List<DateOnly>>(schedule.Classroom.name, schedule.Classroom.building,
+                resultSchedule.Add(new ValueTuple<string, string, List<DateOnly>>(schedule.Classroom.name,
+                    schedule.Classroom.building,
                     new List<DateOnly> { schedule.date, schedule.date }));
                 continue;
             }
 
             var lastSchedule = resultSchedule.LastOrDefault(
-                rs => 
-                    rs.audience == schedule.Classroom.name 
+                rs =>
+                    rs.audience == schedule.Classroom.name
                     && rs.building == schedule.Classroom.building);
             if (lastSchedule.dates[1] == schedule.date.AddDays(schedule.date.DayOfWeek == DayOfWeek.Monday ? -2 : -1))
             {
@@ -249,12 +250,17 @@ public static class Misc
             {
                 if (!lastSchedule.dates.Contains(schedule.date))
                 {
-                    resultSchedule.Add(new ValueTuple<string, string, List<DateOnly>>(schedule.Classroom.name, schedule.Classroom.building,
+                    resultSchedule.Add(new ValueTuple<string, string, List<DateOnly>>(schedule.Classroom.name,
+                        schedule.Classroom.building,
                         new List<DateOnly> { schedule.date, schedule.date }));
                 }
             }
         }
 
-        return resultSchedule.Select(rs => (rs.audience, rs.building, string.Join('-', rs.dates.Select(r => r.ToString(new CultureInfo("ru-RU")))), schedules[0].TimeInterval.start.ToString("HH:mm"))).ToList();
+        return resultSchedule.Select(rs => (rs.audience, rs.building,
+            rs.dates[0] != rs.dates[1]
+                ? string.Join('-', rs.dates.Select(r => r.ToString("m",new CultureInfo("ru-RU"))))
+                : rs.dates[0].ToString("m",new CultureInfo("ru-RU")),
+            schedules[0].TimeInterval.start.ToString("HH:mm"))).ToList();
     }
 }

@@ -141,7 +141,8 @@ public static class Keyboard
     
     public static InlineKeyboardMarkup Back = new(new[]
     {
-        InlineKeyboardButton.WithCallbackData(text: "Назад", callbackData: "b")
+        InlineKeyboardButton.WithCallbackData(text: "Назад", callbackData: "b"),
+        InlineKeyboardButton.WithCallbackData(text: "Изменить параметры", callbackData: "c")
     });
 
     public static ReplyKeyboardMarkup firstChoice = new(new[]

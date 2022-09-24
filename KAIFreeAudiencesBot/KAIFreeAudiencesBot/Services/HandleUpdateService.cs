@@ -88,6 +88,7 @@ public class HandleUpdateService
             Task<Message> action = callbackQuery.Data![0] switch
             {
                 'b' => OnRestart(callbackQuery.Message!, currentClient),
+                'c' => Change(callbackQuery.Message!, currentClient),
                 '0' => Call(() => callbackQuery.Data!.Split('_')[1] == "days"
                     ? ChooseParity(callbackQuery.Message!, currentClient)
                     : ErrorMessageAsync(callbackQuery.Message!)),
@@ -262,6 +263,24 @@ public class HandleUpdateService
             text: "Выбери дальнейшее действие!",
             cancellationToken: CancellationToken.None
         );
+    }
+
+    private async Task<Message> Change(Message message, Client client)
+    {
+        await using var scope = _services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
+        var db = scope.ServiceProvider.GetService<SchDbContext>();
+        var dates = string.Join(" - ", client.settings.DateStart != null
+            ? new List<string?> { client.settings.DateStart.ToString(), client.settings.DateStart.ToString() }!
+            : db!.defaultValues.AsNoTracking().ToList().Select(dv => dv.value.ToString(new CultureInfo("ru-RU"))));
+        return await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            text: "Ваши параметры:\n"+
+                  $"Четность: {string.Join(",  ", client.settings.Parity)}"+"\n"+
+                  $"Дни недели: {string.Join(",  ", client.settings.DaysOfWeek)}"+"\n"+
+                  $"Время урока: {client.settings.TimeStart.ToString(new CultureInfo("ru-RU"))}"+"\n"+
+                  $"Здание: {client.settings.Building}"+"\n"+
+                  $"Аудитории: {string.Join(",  ", client.settings.Audience)}"+"\n"+
+                  $"Интервал дат {dates}"+"\n");
     }
 
     private async Task<Message> NotRealized(Message message)
@@ -622,8 +641,9 @@ public class HandleUpdateService
                             text: "Таблица свободных аудиторий:"
                         );
                         var length = freeAudItems.Count;
-                        for (int i = 1; i <= length / 13 + 1; i++)
+                        for (int i = 1; i <= length / 17 + 1; i++)
                         {
+                            //ПРОБЛЕМА HTML в теории сам должен добавлять tbody, но он этого не делает, а у меня без этого стиль не работает
                             StringBuilder tableStringBuilder = new StringBuilder();
                             using (var table = new Table(tableStringBuilder))
                             {
@@ -632,8 +652,9 @@ public class HandleUpdateService
                                 headerRow.AddCell("Здание");
                                 headerRow.AddCell("Даты");
                                 headerRow.AddCell("Время");
-                                var start = (i - 1) * 13;
-                                foreach (var classroom in freeAudItems.GetRange(start, Math.Min(13, length - start)))
+                                headerRow.CloseHeaderRow();
+                                var start = (i - 1) * 17;
+                                foreach (var classroom in freeAudItems.GetRange(start, Math.Min(17, length - start)))
                                 {
                                     using var row = table.AddRow();
                                     row.AddCell(classroom.audience);
@@ -653,31 +674,32 @@ public class HandleUpdateService
                     color: #686461;
                     margin: 0 auto;
                 }
-                caption {
-                    padding: 10px;
-                    color: white;
-                    background: #8FD4C1;
-                    font-size: 18px;
-                    text-align: left;
-                    font-weight: bold;
-                }
-                th {
-                    border-bottom: 3px solid #B9B29F;
-                    padding: 10px;
-                    text-align: center;
-                }
-                td {
-                    padding: 10px;
-                }
-                tr:nth-child(odd) {
-                    background: white;
-                }
-                tr:nth-child(even) {
-                    background: #E8E6D1;
-                }</style>" +
+                thead {
+                      border-bottom: 3px solid #B9B29F;
+                      padding: 10px;
+                      text-align: center;
+                    }
+                    :not(thead) tr td {
+                      height: 50px;
+                    }
+                    td {
+                      padding: 10px;
+                    }
+                    tr:nth-child(odd) {
+                      background: white;
+                    }
+                    tr:nth-child(even) {
+                      background: #E8E6D1;
+                    }</style>" +
                                     tableStringBuilder
                                 )!);
                         }
+
+                        await _botClient.SendTextMessageAsync( //Затычка, хз пока как по другому
+                            chatId: message.Chat.Id,
+                            replyMarkup: Keyboard.Back,
+                            text: "Выберите дальнейшие действия"
+                        );
 
                         break;
                 }

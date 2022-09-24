@@ -11,7 +11,6 @@ public class ClientSettings
 {
     public List<string> Audience { get; set; } = new ();
     public List<Parity> Parity { get; set; } = new ();
-    
     public Buildings Building { get; set; }
     public List<DayOfWeek> DaysOfWeek { get; set; } = new ();
     public TimeOnly TimeStart { get; set; }
