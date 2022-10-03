@@ -15,6 +15,9 @@ create table classrooms
     cr_building INTEGER
 );
 
+create unique index classroom_idx
+    on classrooms (cr_name, cr_building);
+
 create table groups
 (
     g_id   INTEGER not null
@@ -22,6 +25,9 @@ create table groups
             primary key autoincrement,
     g_name TEXT    not null
 );
+
+create unique index group_idx
+    on groups (g_id, g_name);
 
 create table schedule_subject_dates
 (
@@ -40,6 +46,9 @@ create table schedule_subject_dates
     ssd_g_id  INTEGER
         references groups
 );
+
+create index ssd_idx
+    on schedule_subject_dates (ssd_cr_id);
 
 create table teachers
 (
@@ -65,6 +74,9 @@ create table time_intervals
     ti_start TEXT    not null,
     ti_end   TEXT    not null
 );
+
+create unique index time_interval_idx
+    on time_intervals (ti_start);
 
 INSERT INTO time_intervals (ti_id, ti_start, ti_end) VALUES (1, '08:15', '09:45');
 INSERT INTO time_intervals (ti_id, ti_start, ti_end) VALUES (2, '09:55', '11:25');
