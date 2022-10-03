@@ -21,7 +21,7 @@ public class HandleUpdateService
     private readonly IServiceProvider _services;
 
     private static List<Client> clients = new List<Client>();
-    
+
     TRes Call<TRes>(Func<TRes> f) => f(); // Для удобства
 
     public HandleUpdateService(ITelegramBotClient botClient, ILogger<HandleUpdateService> logger,
@@ -70,7 +70,7 @@ public class HandleUpdateService
         _logger.LogInformation("Receive callback query with data: {0}", callbackQuery.Data);
 
         long clientId = callbackQuery.From.Id;
-        Client currentClient = new Client() { id = clientId};
+        Client currentClient = new Client() {id = clientId};
         if (clients.Count(c => c.id == clientId) > 0)
         {
             currentClient = clients.Find(c => c.id == clientId)!;
@@ -82,7 +82,7 @@ public class HandleUpdateService
                 id = clientId
             });
         }
-            
+
         try
         {
             Task<Message> action = callbackQuery.Data![0] switch
@@ -170,38 +170,38 @@ public class HandleUpdateService
             });
             currentClient = clients.Find(c => c.id == clientId)!;
         }
-        
+
         try
         {
             Task<Message>? action;
             action = currentClient.step switch
             {
-                ClientSteps.ChooseAudience => 
-                     ParseAudience(message, currentClient),
-                
-                ClientSteps.ChooseTime => 
+                ClientSteps.ChooseAudience =>
+                    ParseAudience(message, currentClient),
+
+                ClientSteps.ChooseTime =>
                     ChooseTime(message, currentClient, null!),
-                
-                _ => 
+
+                _ =>
                     message.Text!.Split(' ')[0] switch
-                {
-                    "/start" => 
-                        OnStart(message, currentClient),
-                    var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F193) || s == "/free" => 
-                        ChooseMode(message), //Свободные аудитории
-                    var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4D1) || s == "/parity" => 
-                        GetWeekParity(message), //Четность недели
-                    var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F3EB) || s == "/audiences" =>
-                        GetAllAudiences(message), //Все аудитории
-                    var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4C5) || s == "/schedule" => 
-                        NotRealized(message), //Расписание
-                    _ => 
-                        UnknownMessageAsync(message)
-                }
+                    {
+                        "/start" =>
+                            OnStart(message, currentClient),
+                        var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F193) || s == "/free" =>
+                            ChooseMode(message), //Свободные аудитории
+                        var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4D1) || s == "/parity" =>
+                            GetWeekParity(message), //Четность недели
+                        var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F3EB) || s == "/audiences" =>
+                            GetAllAudiences(message), //Все аудитории
+                        var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4C5) || s == "/schedule" =>
+                            NotRealized(message), //Расписание
+                        _ =>
+                            UnknownMessageAsync(message)
+                    }
             };
             Message sentMessage = await action;
             clients[clients.FindIndex(c => c.id == clientId)] = currentClient;
-            
+
             _logger.LogInformation("The message was sent with id: {sentMessageId}", sentMessage.MessageId);
         }
         catch (Exception exception)
@@ -209,38 +209,37 @@ public class HandleUpdateService
             await HandleErrorAsync(exception);
         }
     }
-    
+
     private async Task<Message> SwitchKey(Message message, Client client, string args)
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         var keyboard = message.ReplyMarkup;
         var indexes = Misc.GetIndexes(keyboard!, args);
-        
+
         Misc.ChangeValue(
             clients[clientIndex].step,
             clients[clientIndex].settings,
             keyboard!.InlineKeyboard.ToList()[indexes[0]].ToList()[indexes[1]]);
-        
+
         keyboard = Misc.UpdateKeyboardMarkup(
             clients[clientIndex].step,
             clients[clientIndex].settings,
             keyboard);
-        
+
         return await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
             messageId: message.MessageId,
             replyMarkup: keyboard,
-            text: message.Text!,
-            cancellationToken: CancellationToken.None
+            text: message.Text!
         );
     }
-    
+
     private async Task<Message> OnStart(Message message, Client client)
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         clients[clientIndex].step = ClientSteps.Default;
         clients[clientIndex].settings = new ClientSettings();
-        
+
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             replyMarkup: Keyboard.firstChoice,
@@ -255,7 +254,7 @@ public class HandleUpdateService
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         clients[clientIndex].step = ClientSteps.Default;
         clients[clientIndex].settings = new ClientSettings();
-        
+
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             replyMarkup: Keyboard.firstChoice,
@@ -273,19 +272,19 @@ public class HandleUpdateService
             cancellationToken: CancellationToken.None
         );
     }
-    
+
     private async Task<Message> GetWeekParity(Message message)
     {
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            text: "Данная неделя " + 
+            text: "Данная неделя " +
                   (Misc.GetWeekParity(DateTime.Now) == Parity.NotEven ? "<i>нечетная</i>" : "<i>четная</i>") + ".",
             replyMarkup: Keyboard.Back,
             parseMode: ParseMode.Html,
             cancellationToken: CancellationToken.None
         );
     }
-    
+
     private async Task<Message> ChooseMode(Message message)
     {
         return await _botClient.SendTextMessageAsync(
@@ -298,7 +297,7 @@ public class HandleUpdateService
             cancellationToken: CancellationToken.None
         );
     }
-    
+
     private async Task<Message> ChooseParity(Message message, Client client)
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
@@ -318,7 +317,7 @@ public class HandleUpdateService
             cancellationToken: CancellationToken.None
         );
     }
-    
+
     private async Task<Message> ChooseDay(Message message, Client client, string[] args)
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
@@ -349,7 +348,7 @@ public class HandleUpdateService
             replyMarkup: Keyboard.inlineDayKeyboard
         );
     }
-    
+
     private async Task<Message> ChooseTime(Message message, Client client, string[] args)
     {
         if (client.step == ClientSteps.ChooseTime)
@@ -359,7 +358,7 @@ public class HandleUpdateService
             {
                 clients[clientIndex].step = ClientSteps.ChooseCorrectTime;
                 var choices = Keyboard.inlineTimeKeyboard.InlineKeyboard
-                    .Where(k => TimeOnly.ParseExact(k.First().CallbackData!.Split('_')[1], new[] { "HH:mm", "H:mm" })
+                    .Where(k => TimeOnly.ParseExact(k.First().CallbackData!.Split('_')[1], new[] {"HH:mm", "H:mm"})
                         .Hour == inputHour);
                 var enumerable = choices as IEnumerable<InlineKeyboardButton>[] ?? choices.ToArray();
                 if (!enumerable.Any())
@@ -421,7 +420,7 @@ public class HandleUpdateService
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
         clients[clientIndex].step = ClientSteps.ChooseBuilding;
         clients[clientIndex].settings.TimeStart =
-            TimeOnly.ParseExact(args[1], new[] { "HH:mm", "H:mm" }, new CultureInfo("ru-RU"));
+            TimeOnly.ParseExact(args[1], new[] {"HH:mm", "H:mm"}, new CultureInfo("ru-RU"));
 
         await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
@@ -460,7 +459,7 @@ public class HandleUpdateService
             replyMarkup: Keyboard.inlineAllAudiences
         );
     }
-    
+
     private async Task<Message> ParseAudience(Message message, Client client)
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
@@ -509,55 +508,39 @@ public class HandleUpdateService
     private async Task<Message> CheckAudience(Message message, ClientSettings settings)
     {
         var freeAudItems = new List<(string audience, string building, string date, string timeInterval)>();
-        
+
         var loadingMessage = await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Получение данных",
             cancellationToken: CancellationToken.None
         );
         var loadingTaskCts = new CancellationTokenSource();
-        var loadingTask = new Task(async () =>
-        {
-            while (!loadingTaskCts.Token.IsCancellationRequested)
-            {
-                for (int i = 1; i < 4; i++)
-                {
-                    if (loadingTaskCts.Token.IsCancellationRequested) return;
-                    await _botClient.EditMessageTextAsync(
-                        chatId: message.Chat.Id,
-                        messageId: loadingMessage.MessageId,
-                        text: "Получение данных" + "...".Substring(0, i),
-                        cancellationToken: CancellationToken.None
-                    );
-                    Thread.Sleep(300);
-                }
-            }
-        }, loadingTaskCts.Token);
+        var loadingTask = CreateLoadingTask(
+            loadingMessage,
+            loadingTaskCts,
+            message.Chat.Id,
+            loadingMessage.Text!);
 
         var currentMessage = new Message();
-        
+
         var dbTask = new Task(async () =>
         {
             await using (var scope = _services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope())
             {
                 var db = scope.ServiceProvider.GetService<SchDbContext>();
 
-                var tempDates = new List<DateOnly>();
-                if (settings != null!)
-                {
-                    tempDates = Misc.GetDates(
-                        settings.DaysOfWeek,
-                        settings.DateStart ?? db!.defaultValues
-                            .AsNoTracking()
-                            .ToList()[0]
-                            .value,
-                        settings.DateEnd ?? db!.defaultValues
-                            .AsNoTracking()
-                            .ToList()[1]
-                            .value,
-                        settings.Parity
-                        );
-                }
+                var tempDates = Misc.GetDates(
+                    settings!.DaysOfWeek,
+                    settings!.DateStart ?? db!.defaultValues
+                        .AsNoTracking()
+                        .ToList()[2]
+                        .value,
+                    settings!.DateEnd ?? db!.defaultValues
+                        .AsNoTracking()
+                        .ToList()[3]
+                        .value,
+                    settings.Parity
+                );
 
                 var schedules = db!.scheduleSubjectDates
                     .AsNoTracking()
@@ -565,58 +548,74 @@ public class HandleUpdateService
                     .Include(s => s.Classroom)
                     .AsEnumerable()
                     .Where(s =>
-                        s.TimeInterval.start == settings.TimeStart
-                        && tempDates.Contains(s.date))
+                        s.TimeInterval.start == settings.TimeStart &&
+                        s.Classroom.building == Convert.ToString((int) settings.Building) &&
+                        tempDates.Contains(s.date))
                     .ToList();
 
-                if (schedules == null!)
+                var allClassrooms = db!.classrooms
+                    .Where(c => c.building == Convert.ToString((int) settings.Building))
+                    .ToList();
+
+                if (schedules.Count == 0)
                 {
                     currentMessage = await _botClient.EditMessageTextAsync(
                         chatId: message.Chat.Id,
                         messageId: message.MessageId,
-                        text: "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий.",
+                        text:
+                        "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий.",
                         cancellationToken: CancellationToken.None
                     );
                     return;
                 }
-                
-                if (settings!.Building != Buildings.All)
+
+                /*if (settings!.Building != Buildings.All)
                 {
                     schedules = schedules!.Where(schedule =>
-                            schedule.Classroom.building == Convert.ToString((int)settings.Building)
-                            && settings!.Audience.Contains(schedule.Classroom.name))
+                            schedule.Classroom.building == Convert.ToString((int) settings.Building) &&
+                            settings!.Audience.Contains(schedule.Classroom.name))
                         .AsEnumerable()
-                        .OrderBy(schedule => schedule.Classroom.building)
-                        .ThenBy(schedule => schedule.Classroom.name)
-                        .ThenBy(schedule => schedule.date)
                         .ToList();
-                }
-                else
+                }*/
+                
+                /*if (settings!.Building != Buildings.All)
                 {
-                    schedules = schedules!
+                    schedules = schedules
+                        .Where(schedule =>
+                            schedule.Classroom.building == Convert.ToString((int) settings.Building) &&
+                            settings!.Audience.Contains(schedule.Classroom.name))
+                        .AsEnumerable()
+                        .ToList();
+                }*/
+
+                foreach (var classroom in settings.Audience)
+                {
+                    if (schedules.Exists(s => s.Classroom.name == classroom))
+                    {
+                        
+                    }
+                    else
+                    {
+                        freeAudItems.Add(new ValueTuple<string, string, string, string>
+                        (
+                            item1: classroom,
+                            item2: Convert.ToString((int) settings.Building),
+                            item3: settings.DateStart.ToString()!,
+                            item4: settings.TimeStart.ToString()!
+                        ));
+                    }
+                }
+                
+                /*freeAudItems.AddRange(Misc.SmashDates(
+                    schedules
                         .OrderBy(schedule => schedule.Classroom.building)
                         .ThenBy(schedule => schedule.Classroom.name)
                         .ThenBy(schedule => schedule.date)
-                        .ToList();
-                }
-
-                var emptyClassrooms = db.classrooms
-                    .AsNoTracking()
-                    .AsEnumerable()
-                    .Where(cr =>
-                        !schedules.Any(s => (settings.Mode != Modes.SpecificDaysAllAudiences || s.Classroom.name == cr.name) && s.Classroom.building == cr.building)
-                        && settings!.Audience.Contains(cr.name))
-                    .Select(cr => new {cr.building, cr.name})
-                    .AsEnumerable()
-                    .OrderBy(cr => cr.building)
-                    .ThenBy(cr => cr.name)
-                    .ToList();
-
-                freeAudItems.AddRange(Misc.SmashDates(schedules));
-
+                        .ToList()));*/
+                
                 switch (freeAudItems.Count)
                 {
-                    case 1:
+                    case 0:
                         currentMessage = await _botClient.EditMessageTextAsync(
                             chatId: message.Chat.Id,
                             messageId: loadingMessage.MessageId,
@@ -624,7 +623,7 @@ public class HandleUpdateService
                             text: char.ConvertFromUtf32(0x274c) + "Введенные аудитории заняты"
                         );
                         break;
-                    case 2:
+                    case 1:
                         currentMessage = await _botClient.EditMessageTextAsync(
                             chatId: message.Chat.Id,
                             messageId: loadingMessage.MessageId,
@@ -633,39 +632,48 @@ public class HandleUpdateService
                         );
                         break;
                     default:
-                        StringBuilder tableStringBuilder = new StringBuilder();
-                        using (var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable))
+                        var length = freeAudItems.Count;
+                        for (int i = 1; i <= length / 13 + 1; i++)
                         {
-                            using var headerRow = table.AddHeaderRow();
-                            headerRow.AddCell("Аудитория");
-                            headerRow.AddCell("Здание");
-                            headerRow.AddCell("Даты");
-                            headerRow.AddCell("Время");
-                            foreach (var classroom in freeAudItems)
+                            StringBuilder tableStringBuilder = new StringBuilder();
+                            using (var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable))
                             {
-                                using var row = table.AddRow();
-                                row.AddCell(classroom.audience);
-                                row.AddCell(classroom.building);
-                                row.AddCell(classroom.date);
-                                row.AddCell(classroom.timeInterval);
+                                using var headerRow = table.AddHeaderRow();
+                                headerRow.AddCell("Аудитория");
+                                headerRow.AddCell("Здание");
+                                headerRow.AddCell("Даты");
+                                headerRow.AddCell("Время");
+                                var start = (i - 1) * 13;
+                                foreach (var classroom in freeAudItems.GetRange(start, Math.Min(13, length - start)))
+                                {
+                                    using var row = table.AddRow();
+                                    row.AddCell(classroom.audience);
+                                    row.AddCell(classroom.building);
+                                    row.AddCell(classroom.date);
+                                    row.AddCell(classroom.timeInterval);
+                                }
+
+                                await _botClient.SendPhotoAsync(
+                                    chatId: message.Chat.Id,
+                                    caption: "Таблица свободных аудиторий:",
+                                    photo: Misc.HtmlToImageStreamConverter(
+                                        tableStringBuilder.ToString(),
+                                        new Size(460,
+                                            (freeAudItems.GetRange(start, Math.Min(13, length - start)).Count + 1) * 45)
+                                    )!);
                             }
                         }
 
-                        currentMessage = await _botClient.EditMessageTextAsync(
+                        await _botClient.DeleteMessageAsync(
                             chatId: message.Chat.Id,
-                            messageId: loadingMessage.MessageId,
-                            text: "Таблица свободных аудиторий:"
+                            messageId: loadingMessage.MessageId
                         );
-                        await _botClient.SendPhotoAsync(
-                            chatId: message.Chat.Id,
-                            photo: Misc.HtmlToImageStreamConverter(
-                                tableStringBuilder.ToString()
-                            )!);
+
                         break;
                 }
             }
         });
-        
+
         try
         {
             loadingTask.Start();
@@ -684,7 +692,7 @@ public class HandleUpdateService
 
         return currentMessage;
     }
-    
+
     private async Task<Message> GetAllAudiences(Message message)
     {
         Stream tableImageStream = new MemoryStream();
@@ -695,23 +703,12 @@ public class HandleUpdateService
             cancellationToken: CancellationToken.None
         );
         var loadingTaskCts = new CancellationTokenSource();
-        var loadingTask = new Task(async () =>
-        {
-            while (!loadingTaskCts.Token.IsCancellationRequested)
-            {
-                for (int i = 1; i < 4; i++)
-                {
-                    if (loadingTaskCts.Token.IsCancellationRequested) return;
-                    await _botClient.EditMessageTextAsync(
-                        chatId: message.Chat.Id,
-                        messageId: loadingMessage.MessageId,
-                        text: "Получение данных" + "...".Substring(0, i),
-                        cancellationToken: CancellationToken.None
-                    );
-                    Thread.Sleep(300);
-                }
-            }
-        }, loadingTaskCts.Token);
+        
+        var loadingTask = CreateLoadingTask(
+            loadingMessage,
+            loadingTaskCts,
+            message.Chat.Id,
+            loadingMessage.Text!);
 
         var dbTask = new Task(async () =>
         {
@@ -724,7 +721,7 @@ public class HandleUpdateService
                 .OrderBy(cr => cr.building)
                 .ThenBy(cr => cr.name)
                 .ToList();
-            
+
             using (var table = new Table(tableStringBuilder))
             {
                 using var headerRow = table.AddHeaderRow();
@@ -735,7 +732,7 @@ public class HandleUpdateService
                     using var row = table.AddRow();
                     row.AddCell(classroom.name);
                     row.AddCell(classroom.building);
-                }        
+                }
             }
 
             tableImageStream = Misc.HtmlToImageStreamConverter(
@@ -768,7 +765,7 @@ public class HandleUpdateService
         );
 
         return await _botClient.SendPhotoAsync(
-            chatId: message.Chat.Id, 
+            chatId: message.Chat.Id,
             photo: tableImageStream!,
             parseMode: ParseMode.Html,
             replyMarkup: Keyboard.Back,
@@ -788,5 +785,29 @@ public class HandleUpdateService
     {
         return await _botClient.SendTextMessageAsync(chatId: message.Chat.Id,
             text: char.ConvertFromUtf32(0x26A0) + " Произошла ошибка на стороне сервера");
+    }
+
+    private Task CreateLoadingTask(
+        Message loadingMessage,
+        CancellationTokenSource loadingTaskCtSource,
+        long chatId,
+        string text = "Получение данных",
+        int delay = 300)
+    {
+
+        return new Task(async () =>
+        {
+            for (int i = 1; i < 4; i++)
+            {
+                if (loadingTaskCtSource.Token.IsCancellationRequested) return;
+                await _botClient.EditMessageTextAsync(
+                    chatId: chatId,
+                    messageId: loadingMessage.MessageId,
+                    text: text + "...".Substring(0, i),
+                    cancellationToken: CancellationToken.None
+                );
+                Thread.Sleep(delay);
+            }
+        }, loadingTaskCtSource.Token);
     }
 }

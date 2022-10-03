@@ -9,9 +9,11 @@ public class Table : IDisposable
     public const string DefaultStyleTable = @"
         table {
             font-family: 'Lucida Sans Unicode', 'Lucida Grande', Sans-Serif;
+            table-layout: fixed;
             border-collapse: collapse;
             color: #686461;
             margin: 0 auto;
+            width: 460px;
         }
         caption {
             padding: 10px;
@@ -25,9 +27,11 @@ public class Table : IDisposable
             border-bottom: 3px solid #B9B29F;
             padding: 10px;
             text-align: center;
+            overflow: hidden;
         }
         td {
             padding: 10px;
+            overflow: hidden;
         }
         tr:nth-child(odd) {
             background: white;
