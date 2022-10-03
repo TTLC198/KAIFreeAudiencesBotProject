@@ -14,6 +14,11 @@ _Update all training sessions_
 python3 parser.py -l -c [Path/To/Your/SQLite.db]
 ```
 
+_Truncate all training sessions_
+```sh
+python3 parser.py -d -c [Path/To/Your/SQLite.db]
+```
+
 _With verbose logging_
 ```sh
 python3 parser.py -g -v -c [Path/To/Your/SQLite.db]

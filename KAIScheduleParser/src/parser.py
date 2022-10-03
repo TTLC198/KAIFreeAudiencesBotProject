@@ -32,6 +32,7 @@ def main():
     parser = argparse.ArgumentParser('KAI schedule parser')
     parser.add_argument('-g', default=False, action='store_true', help='refresh groups information')
     parser.add_argument('-l', default=False, action='store_true', help='add lessons')
+    parser.add_argument('-d', default=False, action='store_true', help='truncate lessons tables')
     parser.add_argument('-v', default=False, action='store_true', help='verbose logging')
     parser.add_argument('-c', default='/db/schedule.db', help='Path to SQLite DB')
 
@@ -44,15 +45,28 @@ def main():
             logging.basicConfig(level=logging.DEBUG)
 
         if args.g:
-            print('updating groups')
+            logging.debug('updating groups')
             try:
                 update_groups()
             except BaseException as error:
                 print(error)
             else:
                 sqlite_connection.commit()
+
+        if args.d:
+            logging.debug('truncating lessons')
+            try:
+                truncate_table("classrooms")
+                truncate_table("schedule_subject_dates")
+                truncate_table("teachers")
+                truncate_table("time_intervals")
+            except BaseException as error:
+                print(error)
+            else:
+                sqlite_connection.commit()
+
         if args.l:
-            print('updating lessons')
+            logging.debug('updating lessons')
             try:
                 update_lessons()
             except BaseException as error:
@@ -79,11 +93,11 @@ def normalize_string(string):
 
 
 def update_groups():
-    cursor.execute("delete from groups")
+    truncate_table("groups")
     groups = get_groups()
     for group in groups:
         cursor.execute("insert into groups values (?, ?)", (group, groups[group]))
-    print('groups is up-to-date')
+    logging.debug('groups is up-to-date')
 
 
 def get_groups():
@@ -178,6 +192,11 @@ def parse_date(time_for_parse: str, default_start: datetime, default_end: dateti
             return date_list
 
 
+def truncate_table(table: str):
+    cursor.execute(f"delete from {table}")
+    cursor.execute(f"update sqlite_sequence set seq = 0 where name = '{table}'")
+
+
 def update_lessons():
     cursor.execute("select * from groups")
     groups = cursor.fetchall()
@@ -258,12 +277,12 @@ def update_lessons():
                                        time_interval, groupId)
         task_time = round(time.time() - start_timestamp, 2)
         rps = round(N / task_time, 1)
-        print(
+        logging.debug(
             f"| Requests: {N}; Total time: {task_time} s; RPS: {rps}. |\n"
         )
 
-    print('lessons is up-to-date')
-    print('total time {} s'.format(round(time.time() - total_time, 2)))
+    logging.debug('lessons is up-to-date')
+    logging.debug('total time {} s'.format(round(time.time() - total_time, 2)))
 
 
 def create_lessons(dates: str, def_start: datetime, def_end: datetime, auditory: str, building: int, cls_type: str,
@@ -311,8 +330,8 @@ def create_lessons(dates: str, def_start: datetime, def_end: datetime, auditory:
                                                                                                       r"%d.%m.%Y"),
                                                                                                   group_id[0]))
     except BaseException as error:
-        print('group id = {}'.format(group_id[0]))
-        print(error)
+        logging.warning(f'group id = {group_id[0]}')
+        logging.warning(error)
 
 
 if __name__ == '__main__':
