@@ -204,7 +204,7 @@ def update_lessons():
     if not groups:
         raise Exception('argument error, please run update groups first with argument -g')
 
-    cursor.execute("select * from default_values")
+    cursor.execute("select dv_value from default_values")
     default = cursor.fetchall()
 
     cursor.execute("select cr_id from classrooms order by cr_id desc limit 1")
@@ -290,7 +290,6 @@ def create_lessons(dates: str, def_start: datetime, def_end: datetime, auditory:
                    begin_lesson: datetime, group_id):
     try:
         global aud_last_idx, clst_last_idx, teach_last_idx, begin_les_last_idx
-        dates = parse_date(dates, def_start, def_end)
         cursor.execute("select cr_id from classrooms where cr_name like ?", (auditory,))
         aud_id = cursor.fetchone()
         if aud_id is None:
@@ -321,6 +320,7 @@ def create_lessons(dates: str, def_start: datetime, def_end: datetime, auditory:
             begin_les_last_idx += 1
             time_int_id = (begin_les_last_idx,)
         time_int_id = int(time_int_id[0])
+        dates = parse_date(dates, def_start, def_end)
         for date in dates:
             cursor.execute("insert into schedule_subject_dates values (null, ?, ?, ?, ?, ?, ?)", (time_int_id,
                                                                                                   teacher_id,
@@ -330,8 +330,17 @@ def create_lessons(dates: str, def_start: datetime, def_end: datetime, auditory:
                                                                                                       r"%d.%m.%Y"),
                                                                                                   group_id[0]))
     except BaseException as error:
-        logging.warning(f'group id = {group_id[0]}')
+        logging.warning(f'Start error')
+        logging.warning(
+            "Properties: time_int_id: %s,\nteacher_id: %s,\naud_id: %s,\nclst_id: %s,\n dates: %s,\ngroup_id: %s;",
+            *[time_int_id,
+              teacher_id,
+              aud_id,
+              clst_id,
+              dates,
+              group_id[0]])
         logging.warning(error)
+        logging.warning("End error\n")
 
 
 if __name__ == '__main__':
