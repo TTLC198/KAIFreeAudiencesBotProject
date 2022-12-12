@@ -111,11 +111,15 @@ public class HandleUpdateService
                 }),
                 '6' => Call(() => //Все аудитории в виде таблицы
                 {
-                    if (currentClient.step == ClientSteps.ChooseAudience)
+                    if (currentClient.step == ClientSteps.ChooseBuildingAllAudiences)
                     {
-                        currentClient.step = ClientSteps.Default;
-                        return NotRealized(callbackQuery.Message!);
-                        //return GetFreeAudiences(callbackQuery.Message!, currentClient.settings);
+                        if (int.TryParse(callbackQuery.Data.Split('_')[1], out var buildingNumber))
+                        {
+                            foreach (Buildings building in Enum.GetValues(typeof(Buildings)))
+                                if (buildingNumber == (int) building)
+                                    currentClient.settings.Building = building;
+                            return GetAllAudiences(callbackQuery.Message!, currentClient.settings);
+                        }
                     }
 
                     return _botClient.EditMessageTextAsync(
@@ -192,7 +196,7 @@ public class HandleUpdateService
                         var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4D1) || s == "/parity" =>
                             GetWeekParity(message), //Четность недели
                         var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F3EB) || s == "/audiences" =>
-                            GetAllAudiences(message), //Все аудитории
+                            ChooseBuildingAllAudiences(message, currentClient), //Все аудитории
                         var s when s.Split(' ')[0] == char.ConvertFromUtf32(0x1F4C5) || s == "/schedule" =>
                             NotRealized(message), //Расписание
                         _ =>
@@ -437,6 +441,19 @@ public class HandleUpdateService
         );
     }
 
+    private async Task<Message> ChooseBuildingAllAudiences(Message message, Client client)
+    {
+        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
+        clients[clientIndex].step = ClientSteps.ChooseBuildingAllAudiences;
+
+        return await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            replyMarkup: Keyboard.inlineBuildingKeyboard,
+            text: "Выберите здание",
+            cancellationToken: CancellationToken.None
+        );
+    }
+
     private async Task<Message> ChooseAudience(Message message, Client client, string[] args)
     {
         var clientIndex = clients.FindIndex(cl => cl.id == client.id);
@@ -466,9 +483,8 @@ public class HandleUpdateService
         var audiences = message.Text!;
         if (Regex.IsMatch(audiences, "[A-z]", RegexOptions.IgnoreCase))
         {
-            return await _botClient.EditMessageTextAsync(
+            return await _botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                messageId: message.MessageId,
                 text: "Введена неправильная аудитория",
                 replyMarkup: new InlineKeyboardMarkup(new[]
                 {
@@ -491,9 +507,8 @@ public class HandleUpdateService
             if (notExistingAud.Count != 0)
             {
                 clients[clientIndex].settings.Audience = newAudience.Intersect(existingAudience).ToList();
-                return await _botClient.EditMessageTextAsync(
+                return await _botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    messageId: message.MessageId,
                     text: $"Аудитории {string.Join(", ", notExistingAud)} не существуют",
                     replyMarkup: Keyboard.InlineChangeAudKeyboard
                 );
@@ -507,13 +522,14 @@ public class HandleUpdateService
 
     private async Task<Message> CheckAudience(Message message, ClientSettings settings)
     {
-        var freeAudItems = new List<(string audience, string building, string date, string timeInterval)>();
+        var audienceTuples = new List<(string audience, string building, string date, string timeInterval)>();
 
-        var loadingMessage = await _botClient.SendTextMessageAsync(
+        var loadingMessage = _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Получение данных",
             cancellationToken: CancellationToken.None
-        );
+        ).Result;
+
         var loadingTaskCts = new CancellationTokenSource();
         var loadingTask = CreateLoadingTask(
             loadingMessage,
@@ -542,6 +558,16 @@ public class HandleUpdateService
                     settings.Parity
                 );
 
+                if (settings.Mode == Modes.SpecificDaysAllAudiences)
+                    settings.Audience = db!.classrooms
+                        .AsNoTracking()
+                        .AsEnumerable()
+                        .Where(c =>
+                            c.building == Convert.ToString((int) settings.Building))
+                        .Select(c =>
+                            c.name)
+                        .ToList();
+
                 var schedules = db!.scheduleSubjectDates
                     .AsNoTracking()
                     .Include(s => s.TimeInterval)
@@ -553,50 +579,25 @@ public class HandleUpdateService
                         tempDates.Contains(s.date))
                     .ToList();
 
-                var allClassrooms = db!.classrooms
-                    .Where(c => c.building == Convert.ToString((int) settings.Building))
-                    .ToList();
-
-                if (schedules.Count == 0)
+                if (!db.scheduleSubjectDates.Any())
                 {
-                    currentMessage = await _botClient.EditMessageTextAsync(
+                    currentMessage = await _botClient.SendTextMessageAsync(
                         chatId: message.Chat.Id,
-                        messageId: message.MessageId,
                         text:
-                        "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий.",
-                        cancellationToken: CancellationToken.None
+                        "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий."
+                    );
+                    await _botClient.DeleteMessageAsync(
+                        chatId: loadingMessage.Chat.Id,
+                        messageId: loadingMessage.MessageId
                     );
                     return;
                 }
 
-                /*if (settings!.Building != Buildings.All)
-                {
-                    schedules = schedules!.Where(schedule =>
-                            schedule.Classroom.building == Convert.ToString((int) settings.Building) &&
-                            settings!.Audience.Contains(schedule.Classroom.name))
-                        .AsEnumerable()
-                        .ToList();
-                }*/
-                
-                /*if (settings!.Building != Buildings.All)
-                {
-                    schedules = schedules
-                        .Where(schedule =>
-                            schedule.Classroom.building == Convert.ToString((int) settings.Building) &&
-                            settings!.Audience.Contains(schedule.Classroom.name))
-                        .AsEnumerable()
-                        .ToList();
-                }*/
-
                 foreach (var classroom in settings.Audience)
                 {
-                    if (schedules.Exists(s => s.Classroom.name == classroom))
+                    if (!schedules.Exists(s => s.Classroom.name == classroom))
                     {
-                        
-                    }
-                    else
-                    {
-                        freeAudItems.Add(new ValueTuple<string, string, string, string>
+                        audienceTuples.Add(new ValueTuple<string, string, string, string>
                         (
                             item1: classroom,
                             item2: Convert.ToString((int) settings.Building),
@@ -605,15 +606,8 @@ public class HandleUpdateService
                         ));
                     }
                 }
-                
-                /*freeAudItems.AddRange(Misc.SmashDates(
-                    schedules
-                        .OrderBy(schedule => schedule.Classroom.building)
-                        .ThenBy(schedule => schedule.Classroom.name)
-                        .ThenBy(schedule => schedule.date)
-                        .ToList()));*/
-                
-                switch (freeAudItems.Count)
+
+                switch (audienceTuples.Count)
                 {
                     case 0:
                         currentMessage = await _botClient.EditMessageTextAsync(
@@ -632,42 +626,63 @@ public class HandleUpdateService
                         );
                         break;
                     default:
-                        var length = freeAudItems.Count;
-                        for (int i = 1; i <= length / 13 + 1; i++)
+                        Task imgGenTask = null;
+                        try
                         {
-                            StringBuilder tableStringBuilder = new StringBuilder();
-                            using (var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable))
+                            imgGenTask = new Task(async () =>
                             {
-                                using var headerRow = table.AddHeaderRow();
-                                headerRow.AddCell("Аудитория");
-                                headerRow.AddCell("Здание");
-                                headerRow.AddCell("Даты");
-                                headerRow.AddCell("Время");
-                                var start = (i - 1) * 13;
-                                foreach (var classroom in freeAudItems.GetRange(start, Math.Min(13, length - start)))
+                                int length = audienceTuples.Count;
+                                for (int i = 1; i <= length / 13 + 1; i++)
                                 {
-                                    using var row = table.AddRow();
-                                    row.AddCell(classroom.audience);
-                                    row.AddCell(classroom.building);
-                                    row.AddCell(classroom.date);
-                                    row.AddCell(classroom.timeInterval);
+                                    StringBuilder tableStringBuilder = new StringBuilder();
+                                    using (var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable))
+                                    {
+                                        using var headerRow = table.AddHeaderRow();
+                                        headerRow.AddCell("Аудитория");
+                                        headerRow.AddCell("Здание");
+                                        headerRow.AddCell("Даты");
+                                        headerRow.AddCell("Время");
+                                        var start = (i - 1) * 13;
+                                        foreach (var classroom in audienceTuples.GetRange(start,
+                                                     Math.Min(13, length - start)))
+                                        {
+                                            using var row = table.AddRow();
+                                            row.AddCell(classroom.audience);
+                                            row.AddCell(classroom.building);
+                                            row.AddCell(classroom.date);
+                                            row.AddCell(classroom.timeInterval);
+                                        }
+
+                                        await _botClient.SendPhotoAsync(
+                                            chatId: message.Chat.Id,
+                                            caption: i < 2 ? "Таблица свободных аудиторий:" : String.Empty,
+                                            photo: Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
+                                                new Size(460,
+                                                    (audienceTuples.GetRange(start, Math.Min(13, length - start))
+                                                         .Count +
+                                                     1) * 45))!);
+                                    }
                                 }
+                            });
 
-                                await _botClient.SendPhotoAsync(
-                                    chatId: message.Chat.Id,
-                                    caption: "Таблица свободных аудиторий:",
-                                    photo: Misc.HtmlToImageStreamConverter(
-                                        tableStringBuilder.ToString(),
-                                        new Size(460,
-                                            (freeAudItems.GetRange(start, Math.Min(13, length - start)).Count + 1) * 45)
-                                    )!);
-                            }
+                            imgGenTask.Start();
+
+                            await Task.WhenAny(imgGenTask).ContinueWith(async _ =>
+                            {
+                                await _botClient.DeleteMessageAsync(
+                                    chatId: loadingMessage.Chat.Id,
+                                    messageId: loadingMessage.MessageId
+                                );
+                            });
                         }
-
-                        await _botClient.DeleteMessageAsync(
-                            chatId: message.Chat.Id,
-                            messageId: loadingMessage.MessageId
-                        );
+                        catch (Exception e)
+                        {
+                            HandleErrorAsync(e);
+                        }
+                        finally
+                        {
+                            imgGenTask.Dispose();
+                        }
 
                         break;
                 }
@@ -693,53 +708,115 @@ public class HandleUpdateService
         return currentMessage;
     }
 
-    private async Task<Message> GetAllAudiences(Message message)
+    private async Task<Message> GetAllAudiences(Message message, ClientSettings settings)
     {
-        Stream tableImageStream = new MemoryStream();
+        var audienceTuples = new List<(string audience, string building)>();
 
-        var loadingMessage = await _botClient.SendTextMessageAsync(
+        var loadingMessage = _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Получение данных",
             cancellationToken: CancellationToken.None
-        );
+        ).Result;
+
         var loadingTaskCts = new CancellationTokenSource();
-        
         var loadingTask = CreateLoadingTask(
             loadingMessage,
             loadingTaskCts,
             message.Chat.Id,
             loadingMessage.Text!);
 
+        var currentMessage = new Message();
+
         var dbTask = new Task(async () =>
         {
-            StringBuilder tableStringBuilder = new StringBuilder();
-            await using var db = _services.GetService<SchDbContext>();
-
-            var classrooms = db!.classrooms
-                .AsNoTracking()
-                .AsEnumerable()
-                .OrderBy(cr => cr.building)
-                .ThenBy(cr => cr.name)
-                .ToList();
-
-            using (var table = new Table(tableStringBuilder))
+            await using (var scope = _services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope())
             {
-                using var headerRow = table.AddHeaderRow();
-                headerRow.AddCell("Аудитория");
-                headerRow.AddCell("Здание");
-                foreach (var classroom in classrooms)
+                var db = scope.ServiceProvider.GetService<SchDbContext>();
+                var building = Convert.ToString((int) settings.Building);
+                var allClassrooms = db!.classrooms
+                    .Where(c => building == "0" || c.building == building)
+                    .ToList();
+
+                foreach (var classroom in allClassrooms)
                 {
-                    using var row = table.AddRow();
-                    row.AddCell(classroom.name);
-                    row.AddCell(classroom.building);
+                    audienceTuples.Add(new ValueTuple<string, string>
+                    (
+                        item1: classroom.name,
+                        item2: classroom.building
+                    ));
+                }
+
+                switch (audienceTuples.Count)
+                {
+                    case 0:
+                        currentMessage = await _botClient.SendTextMessageAsync(
+                            chatId: message.Chat.Id,
+                            text:
+                            "В данный момент невозможно определить наличие аудиторий, так как отсутвует расписание занятий."
+                        );
+                        await _botClient.DeleteMessageAsync(
+                            chatId: loadingMessage.Chat.Id,
+                            messageId: loadingMessage.MessageId
+                        );
+                        break;
+                    default:
+                        Task imgGenTask = null;
+                        try
+                        {
+                            imgGenTask = new Task(async () =>
+                            {
+                                int length = audienceTuples.Count;
+                                for (int i = 1; i <= length / 13 + 1; i++)
+                                {
+                                    StringBuilder tableStringBuilder = new StringBuilder();
+                                    using (var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable))
+                                    {
+                                        using var headerRow = table.AddHeaderRow();
+                                        headerRow.AddCell("Аудитория");
+                                        headerRow.AddCell("Здание");
+                                        var start = (i - 1) * 13;
+                                        foreach (var classroom in audienceTuples.GetRange(start,
+                                                     Math.Min(13, length - start)))
+                                        {
+                                            using var row = table.AddRow();
+                                            row.AddCell(classroom.audience);
+                                            row.AddCell(classroom.building);
+                                        }
+
+                                        await _botClient.SendPhotoAsync(
+                                            chatId: message.Chat.Id,
+                                            caption: i < 2 ? "Таблица свободных аудиторий:" : String.Empty,
+                                            photo: Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
+                                                new Size(460,
+                                                    (audienceTuples.GetRange(start, Math.Min(13, length - start))
+                                                         .Count +
+                                                     1) * 45))!);
+                                    }
+                                }
+                            });
+
+                            imgGenTask.Start();
+
+                            await Task.WhenAny(imgGenTask).ContinueWith(async _ =>
+                            {
+                                await _botClient.DeleteMessageAsync(
+                                    chatId: loadingMessage.Chat.Id,
+                                    messageId: loadingMessage.MessageId
+                                );
+                            });
+                        }
+                        catch (Exception e)
+                        {
+                            HandleErrorAsync(e);
+                        }
+                        finally
+                        {
+                            imgGenTask.Dispose();
+                        }
+
+                        break;
                 }
             }
-
-            tableImageStream = Misc.HtmlToImageStreamConverter(
-                "<style>table, th, td { border: 1px solid black; margin: 0 auto; font-size: 36px; }</style>" +
-                tableStringBuilder,
-                new Size()
-            )!;
         });
 
         try
@@ -758,19 +835,7 @@ public class HandleUpdateService
             dbTask.Dispose();
         }
 
-        await _botClient.EditMessageTextAsync(
-            chatId: message.Chat.Id,
-            messageId: loadingMessage.MessageId,
-            text: "Таблица аудиторий: "
-        );
-
-        return await _botClient.SendPhotoAsync(
-            chatId: message.Chat.Id,
-            photo: tableImageStream!,
-            parseMode: ParseMode.Html,
-            replyMarkup: Keyboard.Back,
-            cancellationToken: CancellationToken.None
-        );
+        return currentMessage;
     }
 
     private async Task<Message> UnknownMessageAsync(Message message)
@@ -794,7 +859,6 @@ public class HandleUpdateService
         string text = "Получение данных",
         int delay = 300)
     {
-
         return new Task(async () =>
         {
             for (int i = 1; i < 4; i++)

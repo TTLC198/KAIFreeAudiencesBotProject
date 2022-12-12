@@ -32,6 +32,7 @@ public enum ClientSteps
     Default,
     ChooseParity,
     ChooseBuilding,
+    ChooseBuildingAllAudiences,
     ChooseDay,
     ChooseTime,
     ChooseCorrectTime,

@@ -109,5 +109,5 @@ INSERT INTO class_types (ct_id, ct_name) VALUES (4, 'конс');
 
 INSERT INTO default_values (dv_value, dv_id) VALUES ('09.01.2022', 1);
 INSERT INTO default_values (dv_value, dv_id) VALUES ('30.06.2022', 2);
-INSERT INTO default_values (dv_value, dv_id) VALUES ('09.01.2022', 3);
-INSERT INTO default_values (dv_value, dv_id) VALUES ('16.01.2022', 4);
+INSERT INTO default_values (dv_value, dv_id) VALUES ('01.09.2022', 3);
+INSERT INTO default_values (dv_value, dv_id) VALUES ('31.12.2022', 4);

@@ -11,12 +11,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../DB/dump.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/dump.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../DB/schedule.db" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/schedule.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/TableBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/TableBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/KAIScheduleParser.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/.idea/KAIScheduleParser.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/src/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/src/parser.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,14 +105,7 @@
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Properties/launchSettings.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/Misc.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/Misc.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/TableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/yoreh/RiderProjects/KAIFreeAudiencesBotProject/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/TableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Startup.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -301,7 +297,15 @@
       <workItem from="1664614859894" duration="1688000" />
       <workItem from="1664699882698" duration="9362000" />
       <workItem from="1664728644120" duration="1650000" />
-      <workItem from="1664782830991" duration="820000" />
+      <workItem from="1664782830991" duration="1961000" />
+      <workItem from="1664897123393" duration="1027000" />
+      <workItem from="1665154544191" duration="595000" />
+      <workItem from="1665185317436" duration="3312000" />
+      <workItem from="1666106231428" duration="1825000" />
+      <workItem from="1666593143457" duration="905000" />
+      <workItem from="1666706901232" duration="1885000" />
+      <workItem from="1666850506786" duration="368000" />
+      <workItem from="1670847289223" duration="7510000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
@@ -394,7 +398,14 @@
       <option name="project" value="LOCAL" />
       <updated>1662823911992</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Add indexes to DB tables">
+      <created>1664784197545</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1664784197545</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -455,7 +466,8 @@
     <MESSAGE value="Reworked BuildTable method, add TableParser.cs" />
     <MESSAGE value="Change models, now currently using System.DayOfWeek enumeration" />
     <MESSAGE value="fixup! Alteration of the search algorithm for free audiences has begun, added auto-detection of the image size of the table of free audiences" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixup! Alteration of the search algorithm for free audiences has begun, added auto-detection of the image size of the table of free audiences" />
+    <MESSAGE value="Add indexes to DB tables" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add indexes to DB tables" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

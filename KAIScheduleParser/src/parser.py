@@ -1,3 +1,4 @@
+import calendar
 import re
 import time
 import logging
@@ -57,6 +58,7 @@ def main():
             logging.debug('truncating lessons')
             try:
                 truncate_table("classrooms")
+                truncate_table("class_types")
                 truncate_table("schedule_subject_dates")
                 truncate_table("teachers")
                 truncate_table("time_intervals")
@@ -118,7 +120,8 @@ def get_groups():
     return groups
 
 
-def get_group_schedule(groupId: int, session: requests.Session):
+def get_group_schedule(groupId: int,
+                       session: requests.Session):
     """
     get group schedule by group id from kai api
     :param groupId: input group id
@@ -134,7 +137,10 @@ def get_group_schedule(groupId: int, session: requests.Session):
     return response.json()
 
 
-def create_dates(interval: int, date_from: datetime, date_until: datetime, overall_number: int = -1) -> list:
+def create_dates(interval: int,
+                 date_from: datetime,
+                 date_until: datetime,
+                 overall_number: int = -1) -> list:
     date_list = list([date_from, ])
     if overall_number != -1:
         date_list.extend([date_from + timedelta(days=interval * idx) for idx in range(1, overall_number)])
@@ -147,7 +153,8 @@ def create_dates(interval: int, date_from: datetime, date_until: datetime, overa
     return date_list
 
 
-def date_from_string(input_str: str, default_year: str) -> datetime:
+def date_from_string(input_str: str,
+                     default_year: str) -> datetime:
     input_str = re.search(r"\d\d[.]*(?:\d\d[.]*)+", input_str)[0]
     if re.fullmatch(r"\d\d[.]\d\d[.]\d{4}", input_str) is None:
         if re.fullmatch(r"\d\d[.]\d\d[.]", input_str) is not None:
@@ -157,9 +164,11 @@ def date_from_string(input_str: str, default_year: str) -> datetime:
     return datetime.strptime(input_str, r"%d.%m.%Y")
 
 
-def parse_date(time_for_parse: str, default_start: datetime, default_end: datetime) -> list:
-    if re.search(r"неч|чет|ежен", time_for_parse) and not (
-            not re.search(r"с|до", time_for_parse) and re.search(r"\d\d[.-]*(?:\d\d[.-]*)+", time_for_parse)):
+def parse_date(time_for_parse: str,
+               default_start: datetime,
+               default_end: datetime) -> list:
+    if re.search(r"неч|чет|ежен", time_for_parse) \
+            and not (not re.search(r"с|до", time_for_parse) and re.search(r"\d\d[.-]*(?:\d\d[.-]*)+", time_for_parse)):
         if re.search(r"\(\d+\)", time_for_parse):
             if re.search(r"/", time_for_parse) or re.search(r"ежен", time_for_parse):
                 return list(create_dates(7, default_start, default_end, int(re.search(r"\d+", time_for_parse)[0])))
@@ -176,7 +185,7 @@ def parse_date(time_for_parse: str, default_start: datetime, default_end: dateti
                 until_date = default_end
             else:
                 until_date = date_from_string(until_date[0], str(default_start.year))
-            if re.search(r"/", time_for_parse) or re.search(r"ежен", time_for_parse):
+            if re.search(r"[Нн]еч/[Чч]ет", time_for_parse) or re.search(r"ежен", time_for_parse) or re.search(r"\s*", time_for_parse):
                 return create_dates(7, from_date, until_date)
             else:
                 return list(create_dates(14, from_date, until_date))
@@ -192,6 +201,24 @@ def parse_date(time_for_parse: str, default_start: datetime, default_end: dateti
             return date_list
 
 
+def get_week_date(is_even: bool,
+                  is_end: bool,
+                  date: datetime = datetime.now()):
+    if 1 <= date.month <= 6:
+        initial_date = datetime(year=date.year, month=1, day=1).date()
+        end_date = datetime(year=date.year, month=6, day=30).date()
+    else:
+        initial_date = datetime(year=date.year, month=9, day=1).date()
+        end_date = datetime(year=date.year, month=12, day=31).date()
+    if is_end:
+        return end_date
+    else:
+        if initial_date.isocalendar().week % 2 != is_even:
+            return initial_date - timedelta(days=initial_date.isocalendar().weekday)
+        else:
+            return initial_date + timedelta(days=(8 - initial_date.isocalendar().weekday))
+
+
 def truncate_table(table: str):
     cursor.execute(f"delete from {table}")
     cursor.execute(f"update sqlite_sequence set seq = 0 where name = '{table}'")
@@ -203,9 +230,6 @@ def update_lessons():
 
     if not groups:
         raise Exception('argument error, please run update groups first with argument -g')
-
-    cursor.execute("select dv_value from default_values")
-    default = cursor.fetchall()
 
     cursor.execute("select cr_id from classrooms order by cr_id desc limit 1")
     aud = cursor.fetchone()
@@ -232,7 +256,6 @@ def update_lessons():
     total_time = time.time()
 
     for groupId in groups:
-
         start_timestamp = time.time()
         schedule = get_group_schedule(groupId[0], session)
 
@@ -242,25 +265,23 @@ def update_lessons():
                     day_number = normalize_string(lesson['dayNum'])
                     dates = normalize_string(lesson['dayDate'])
                     if re.search(r"[Нн]еч", dates) is not None:
-                        start_date = datetime.strptime(default[3][0],
-                                                       r"%d.%m.%Y") + timedelta(days=int(day_number))
+                        start_date = get_week_date(is_even=False, is_end=False) + timedelta(days=int(day_number) - 1)
                     elif re.search(r"[Чч]ет", dates) is not None:
-                        start_date = datetime.strptime(default[2][0],
-                                                       r"%d.%m.%Y") + timedelta(days=int(day_number))
+                        start_date = get_week_date(is_even=True, is_end=False) + timedelta(days=int(day_number) - 1)
                     else:
-                        start_date = datetime.strptime(default[0][0],
-                                                       r"%d.%m.%Y") + timedelta(days=int(day_number))
+                        start_date = get_week_date(is_even=False, is_end=False) + timedelta(days=int(day_number) - 1)
 
-                    default_end = datetime.strptime(default[1][0], r"%d.%m.%Y")
+                    default_end = get_week_date(is_even=False, is_end=True)
                     auditory = normalize_string(lesson["audNum"])
-
-                    if "---" in auditory:
-                        continue
+                    # print(f'{lesson["audNum"]}, {lesson["buildNum"]}')
+                    # TODO костыль
+                    # if "---" in auditory:
+                    #    continue
 
                     building = normalize_string(lesson["buildNum"])
-
-                    if not building.isdigit():
-                        continue
+                    # TODO костыль
+                    # if not building.isdigit():
+                    #    continue
 
                     class_type = normalize_string(lesson["disciplType"])
                     teacher = " ".join([parte.capitalize() for parte in
@@ -275,6 +296,14 @@ def update_lessons():
                     else:
                         create_lessons(dates, start_date, default_end, auditory, building, class_type, teacher,
                                        time_interval, groupId)
+
+                if auditory == '125' and building == '7':
+                    temp = groupId[0]
+                    temp = 1
+
+                if groupId[0] == 23498:
+                    temp = groupId[0]
+                    temp = 1
         task_time = round(time.time() - start_timestamp, 2)
         rps = round(N / task_time, 1)
         logging.debug(
@@ -285,12 +314,18 @@ def update_lessons():
     logging.debug('total time {} s'.format(round(time.time() - total_time, 2)))
 
 
-def create_lessons(dates: str, def_start: datetime, def_end: datetime, auditory: str, building: int, cls_type: str,
+def create_lessons(dates: str,
+                   def_start: datetime,
+                   def_end: datetime,
+                   auditory: str,
+                   building: int,
+                   cls_type: str,
                    teacher: str,
-                   begin_lesson: datetime, group_id):
+                   begin_lesson: datetime,
+                   group_id):
     try:
         global aud_last_idx, clst_last_idx, teach_last_idx, begin_les_last_idx
-        cursor.execute("select cr_id from classrooms where cr_name like ?", (auditory,))
+        cursor.execute("select cr_id from classrooms where cr_name = ? and cr_building = ?", (auditory, building))
         aud_id = cursor.fetchone()
         if aud_id is None:
             cursor.execute("insert into classrooms values (null, ?, ?)", (auditory, building))
@@ -322,13 +357,13 @@ def create_lessons(dates: str, def_start: datetime, def_end: datetime, auditory:
         time_int_id = int(time_int_id[0])
         dates = parse_date(dates, def_start, def_end)
         for date in dates:
-            cursor.execute("insert into schedule_subject_dates values (null, ?, ?, ?, ?, ?, ?)", (time_int_id,
-                                                                                                  teacher_id,
-                                                                                                  aud_id,
-                                                                                                  clst_id,
-                                                                                                  date.strftime(
-                                                                                                      r"%d.%m.%Y"),
-                                                                                                  group_id[0]))
+            cursor.execute("insert into schedule_subject_dates values (null, ?, ?, ?, ?, ?, ?)",
+                           (time_int_id,
+                            teacher_id,
+                            aud_id,
+                            clst_id,
+                            date.strftime(r"%d.%m.%Y"),
+                            group_id[0]))
     except BaseException as error:
         logging.warning(f'Start error')
         logging.warning(

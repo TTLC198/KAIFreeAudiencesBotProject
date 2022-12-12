@@ -76,20 +76,21 @@ public static class Keyboard
     {
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "1", callbackData: "5_1"),
-            InlineKeyboardButton.WithCallbackData(text: "2", callbackData: "5_2"),
-            InlineKeyboardButton.WithCallbackData(text: "3", callbackData: "5_3"),
+            InlineKeyboardButton.WithCallbackData(text: "1", callbackData: "6_1"),
+            InlineKeyboardButton.WithCallbackData(text: "2", callbackData: "6_2"),
+            InlineKeyboardButton.WithCallbackData(text: "3", callbackData: "6_3"),
         },
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "4", callbackData: "5_4"),
-            InlineKeyboardButton.WithCallbackData(text: "5", callbackData: "5_5"),
-            InlineKeyboardButton.WithCallbackData(text: "6", callbackData: "5_6"),
+            InlineKeyboardButton.WithCallbackData(text: "4", callbackData: "6_4"),
+            InlineKeyboardButton.WithCallbackData(text: "5", callbackData: "6_5"),
+            InlineKeyboardButton.WithCallbackData(text: "6", callbackData: "6_6"),
         },
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "7", callbackData: "5_7"),
-            InlineKeyboardButton.WithCallbackData(text: "8", callbackData: "5_8"),
+            InlineKeyboardButton.WithCallbackData(text: "7", callbackData: "6_7"),
+            InlineKeyboardButton.WithCallbackData(text: "8", callbackData: "6_8"),
+            InlineKeyboardButton.WithCallbackData(text: "Все", callbackData: "6_all"),
         }
     });
 
@@ -115,7 +116,7 @@ public static class Keyboard
                 InlineKeyboardButton.WithCallbackData(text: "Все", callbackData: "5_all"),
             }
         });
-    
+
     public static InlineKeyboardMarkup inlineAllAudiences = new(new[]
     {
         new[]
