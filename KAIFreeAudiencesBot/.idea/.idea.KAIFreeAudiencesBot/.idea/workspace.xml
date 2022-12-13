@@ -11,15 +11,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../DB/dump.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/dump.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DB/schedule.db" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/schedule.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/KAIScheduleParser.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/.idea/KAIScheduleParser.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/parser.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/src/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/src/parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-compose.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,22 +118,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.3923611&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;CodeLensConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "XThreadsFramesViewSplitterKey": "0.3923611",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ssh.settings",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;sqlite&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlite"
     ]
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.KAIFreeAudiencesBot: Local-Development">
     <configuration name="KAIFreeAudiencesBot" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" />
@@ -239,6 +240,23 @@
         <option name="Build" />
       </method>
     </configuration>
+    <configuration name="ngrok.exe" type="RunExe" factoryName=".NET Executable" temporary="true">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../ngrok.exe" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.." />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="RUNTIME_ARGUMENTS" value="" />
+      <method v="2">
+        <option name="Build Solution" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue=".NET Executable.ngrok.exe" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -305,7 +323,9 @@
       <workItem from="1666593143457" duration="905000" />
       <workItem from="1666706901232" duration="1885000" />
       <workItem from="1666850506786" duration="368000" />
-      <workItem from="1670847289223" duration="7510000" />
+      <workItem from="1670847289223" duration="13484000" />
+      <workItem from="1670953326452" duration="914000" />
+      <workItem from="1670963693455" duration="3098000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
@@ -405,7 +425,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664784197545</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="The mechanism for parsing audiences into the parser.py has been repaired, now all audiences are stored in the database, and the mode for displaying free audiences has been completed. View mode for all audiences by buildings has been added.">
+      <created>1670872169649</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1670872169649</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -467,7 +494,8 @@
     <MESSAGE value="Change models, now currently using System.DayOfWeek enumeration" />
     <MESSAGE value="fixup! Alteration of the search algorithm for free audiences has begun, added auto-detection of the image size of the table of free audiences" />
     <MESSAGE value="Add indexes to DB tables" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add indexes to DB tables" />
+    <MESSAGE value="The mechanism for parsing audiences into the parser.py has been repaired, now all audiences are stored in the database, and the mode for displaying free audiences has been completed. View mode for all audiences by buildings has been added." />
+    <option name="LAST_COMMIT_MESSAGE" value="The mechanism for parsing audiences into the parser.py has been repaired, now all audiences are stored in the database, and the mode for displaying free audiences has been completed. View mode for all audiences by buildings has been added." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

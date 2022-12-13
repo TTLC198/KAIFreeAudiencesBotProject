@@ -2,7 +2,12 @@
 
 ### Usage
 This parser will allow you to get the entire schedule through the kai website, getting information about all classrooms and teachers.
-You must be sure you are using the database as in the [project](https://github.com/TTLC198/KAIFreeAudiencesBotProject/blob/master/DB/schedule.db). 
+You must be sure you are using the database as in the [project](https://github.com/TTLC198/KAIFreeAudiencesBotProject/blob/master/DB/schedule.db).
+
+_Run parser from docker-compose_
+```sh
+docker compose run parser bash
+```
 
 _Group table update_
 ```sh

@@ -54,7 +54,7 @@ services:
     tty: true
     volumes:
       - db-data:/db
-    command: python ./parser.py -g -l -c /db/schedule.db
+    command: python3 parser.py -g -l
     depends_on:
       db:
         condition: service_started

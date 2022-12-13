@@ -541,151 +541,143 @@ public class HandleUpdateService
 
         var dbTask = new Task(async () =>
         {
-            await using (var scope = _services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope())
-            {
-                var db = scope.ServiceProvider.GetService<SchDbContext>();
+            await using var scope = _services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
+            var db = scope.ServiceProvider.GetService<SchDbContext>();
 
-                var tempDates = Misc.GetDates(
-                    settings!.DaysOfWeek,
-                    settings!.DateStart ?? db!.defaultValues
-                        .AsNoTracking()
-                        .ToList()[2]
-                        .value,
-                    settings!.DateEnd ?? db!.defaultValues
-                        .AsNoTracking()
-                        .ToList()[3]
-                        .value,
-                    settings.Parity
-                );
+            var tempDates = Misc.GetDates(
+                settings!.DaysOfWeek,
+                settings!.DateStart ?? Misc.GetDefaultValues(settings.Parity, false, null),
+                settings!.DateEnd ?? Misc.GetDefaultValues(null, true, null),
+                settings.Parity
+            );
 
-                if (settings.Mode == Modes.SpecificDaysAllAudiences)
-                    settings.Audience = db!.classrooms
-                        .AsNoTracking()
-                        .AsEnumerable()
-                        .Where(c =>
-                            c.building == Convert.ToString((int) settings.Building))
-                        .Select(c =>
-                            c.name)
-                        .ToList();
-
-                var schedules = db!.scheduleSubjectDates
+            if (settings.Mode == Modes.SpecificDaysAllAudiences)
+                settings.Audience = db!.classrooms
                     .AsNoTracking()
-                    .Include(s => s.TimeInterval)
-                    .Include(s => s.Classroom)
                     .AsEnumerable()
-                    .Where(s =>
-                        s.TimeInterval.start == settings.TimeStart &&
-                        s.Classroom.building == Convert.ToString((int) settings.Building) &&
-                        tempDates.Contains(s.date))
+                    .Where(c =>
+                        c.building == Convert.ToString((int) settings.Building))
+                    .Select(c =>
+                        c.name)
                     .ToList();
 
-                if (!db.scheduleSubjectDates.Any())
+            var schedules = db!.scheduleSubjectDates
+                .AsNoTracking()
+                .Include(s => s.TimeInterval)
+                .Include(s => s.Classroom)
+                .AsEnumerable()
+                .Where(s =>
+                    s.TimeInterval.start == settings.TimeStart &&
+                    s.Classroom.building == Convert.ToString((int) settings.Building) &&
+                    tempDates.Contains(s.date))
+                .ToList();
+
+            if (!db.scheduleSubjectDates.Any())
+            {
+                currentMessage = await _botClient.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text:
+                    "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий."
+                );
+                await _botClient.DeleteMessageAsync(
+                    chatId: loadingMessage.Chat.Id,
+                    messageId: loadingMessage.MessageId
+                );
+                return;
+            }
+
+            foreach (var classroom in settings.Audience)
+            {
+                if (!schedules.Exists(s => s.Classroom.name == classroom))
                 {
-                    currentMessage = await _botClient.SendTextMessageAsync(
+                    audienceTuples.Add(new ValueTuple<string, string, string, string>
+                    (
+                        item1: classroom,
+                        item2: Convert.ToString((int) settings.Building),
+                        item3: settings.DateStart.ToString()!,
+                        item4: settings.TimeStart.ToString()!
+                    ));
+                }
+            }
+
+            switch (audienceTuples.Count)
+            {
+                case 0:
+                    currentMessage = await _botClient.EditMessageTextAsync(
                         chatId: message.Chat.Id,
-                        text:
-                        "В данный момент невозможно определить наличие свободных аудиторий, так как отсутвует расписание занятий."
+                        messageId: loadingMessage.MessageId,
+                        replyMarkup: Keyboard.Back,
+                        text: char.ConvertFromUtf32(0x274c) + "Введенные аудитории заняты"
                     );
-                    await _botClient.DeleteMessageAsync(
-                        chatId: loadingMessage.Chat.Id,
-                        messageId: loadingMessage.MessageId
+                    break;
+                case 1:
+                    currentMessage = await _botClient.EditMessageTextAsync(
+                        chatId: message.Chat.Id,
+                        messageId: loadingMessage.MessageId,
+                        replyMarkup: Keyboard.Back,
+                        text: char.ConvertFromUtf32(0x2714) + "Введенная аудитория свободна"
                     );
-                    return;
-                }
-
-                foreach (var classroom in settings.Audience)
-                {
-                    if (!schedules.Exists(s => s.Classroom.name == classroom))
+                    break;
+                default:
+                    Task imgGenTask = null;
+                    try
                     {
-                        audienceTuples.Add(new ValueTuple<string, string, string, string>
-                        (
-                            item1: classroom,
-                            item2: Convert.ToString((int) settings.Building),
-                            item3: settings.DateStart.ToString()!,
-                            item4: settings.TimeStart.ToString()!
-                        ));
-                    }
-                }
-
-                switch (audienceTuples.Count)
-                {
-                    case 0:
-                        currentMessage = await _botClient.EditMessageTextAsync(
-                            chatId: message.Chat.Id,
-                            messageId: loadingMessage.MessageId,
-                            replyMarkup: Keyboard.Back,
-                            text: char.ConvertFromUtf32(0x274c) + "Введенные аудитории заняты"
-                        );
-                        break;
-                    case 1:
-                        currentMessage = await _botClient.EditMessageTextAsync(
-                            chatId: message.Chat.Id,
-                            messageId: loadingMessage.MessageId,
-                            replyMarkup: Keyboard.Back,
-                            text: char.ConvertFromUtf32(0x2714) + "Введенная аудитория свободна"
-                        );
-                        break;
-                    default:
-                        Task imgGenTask = null;
-                        try
+                        imgGenTask = new Task(async () =>
                         {
-                            imgGenTask = new Task(async () =>
+                            int length = audienceTuples.Count;
+                            for (int i = 1; i <= length / 13 + 1; i++)
                             {
-                                int length = audienceTuples.Count;
-                                for (int i = 1; i <= length / 13 + 1; i++)
+                                StringBuilder tableStringBuilder = new StringBuilder();
+                                using (var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable))
                                 {
-                                    StringBuilder tableStringBuilder = new StringBuilder();
-                                    using (var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable))
+                                    using var headerRow = table.AddHeaderRow();
+                                    headerRow.AddCell("Аудитория");
+                                    headerRow.AddCell("Здание");
+                                    headerRow.AddCell("Даты");
+                                    headerRow.AddCell("Время");
+                                    var start = (i - 1) * 13;
+                                    foreach (var classroom in audienceTuples.GetRange(start,
+                                                 Math.Min(13, length - start)))
                                     {
-                                        using var headerRow = table.AddHeaderRow();
-                                        headerRow.AddCell("Аудитория");
-                                        headerRow.AddCell("Здание");
-                                        headerRow.AddCell("Даты");
-                                        headerRow.AddCell("Время");
-                                        var start = (i - 1) * 13;
-                                        foreach (var classroom in audienceTuples.GetRange(start,
-                                                     Math.Min(13, length - start)))
-                                        {
-                                            using var row = table.AddRow();
-                                            row.AddCell(classroom.audience);
-                                            row.AddCell(classroom.building);
-                                            row.AddCell(classroom.date);
-                                            row.AddCell(classroom.timeInterval);
-                                        }
-
-                                        await _botClient.SendPhotoAsync(
-                                            chatId: message.Chat.Id,
-                                            caption: i < 2 ? "Таблица свободных аудиторий:" : String.Empty,
-                                            photo: Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
-                                                new Size(460,
-                                                    (audienceTuples.GetRange(start, Math.Min(13, length - start))
-                                                         .Count +
-                                                     1) * 45))!);
+                                        using var row = table.AddRow();
+                                        row.AddCell(classroom.audience);
+                                        row.AddCell(classroom.building);
+                                        row.AddCell(classroom.date);
+                                        row.AddCell(classroom.timeInterval);
                                     }
+
+                                    await _botClient.SendPhotoAsync(
+                                        chatId: message.Chat.Id,
+                                        caption: i < 2 ? "Таблица свободных аудиторий:" : String.Empty,
+                                        photo: Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
+                                            new Size(460,
+                                                (audienceTuples.GetRange(start, Math.Min(13, length - start))
+                                                     .Count +
+                                                 1) * 45))!);
                                 }
-                            });
+                            }
+                        });
 
-                            imgGenTask.Start();
+                        imgGenTask.Start();
 
-                            await Task.WhenAny(imgGenTask).ContinueWith(async _ =>
-                            {
-                                await _botClient.DeleteMessageAsync(
-                                    chatId: loadingMessage.Chat.Id,
-                                    messageId: loadingMessage.MessageId
-                                );
-                            });
-                        }
-                        catch (Exception e)
+                        await Task.WhenAny(imgGenTask).ContinueWith(async _ =>
                         {
-                            HandleErrorAsync(e);
-                        }
-                        finally
-                        {
-                            imgGenTask.Dispose();
-                        }
+                            await _botClient.DeleteMessageAsync(
+                                chatId: loadingMessage.Chat.Id,
+                                messageId: loadingMessage.MessageId
+                            );
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        HandleErrorAsync(e);
+                    }
+                    finally
+                    {
+                        imgGenTask.Dispose();
+                    }
 
-                        break;
-                }
+                    break;
             }
         });
 
@@ -785,7 +777,7 @@ public class HandleUpdateService
 
                                         await _botClient.SendPhotoAsync(
                                             chatId: message.Chat.Id,
-                                            caption: i < 2 ? "Таблица свободных аудиторий:" : String.Empty,
+                                            caption: i < 2 ? "Таблица аудиторий:" : String.Empty,
                                             photo: Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
                                                 new Size(460,
                                                     (audienceTuples.GetRange(start, Math.Min(13, length - start))
@@ -861,16 +853,19 @@ public class HandleUpdateService
     {
         return new Task(async () =>
         {
-            for (int i = 1; i < 4; i++)
+            while (true)
             {
-                if (loadingTaskCtSource.Token.IsCancellationRequested) return;
-                await _botClient.EditMessageTextAsync(
-                    chatId: chatId,
-                    messageId: loadingMessage.MessageId,
-                    text: text + "...".Substring(0, i),
-                    cancellationToken: CancellationToken.None
-                );
-                Thread.Sleep(delay);
+                for (int i = 1; i < 4; i++)
+                {
+                    if (loadingTaskCtSource.Token.IsCancellationRequested) return;
+                    await _botClient.EditMessageTextAsync(
+                        chatId: chatId,
+                        messageId: loadingMessage.MessageId,
+                        text: text + "...".Substring(0, i),
+                        cancellationToken: CancellationToken.None
+                    );
+                    Thread.Sleep(delay);
+                }
             }
         }, loadingTaskCtSource.Token);
     }

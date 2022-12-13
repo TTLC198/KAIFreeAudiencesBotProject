@@ -201,7 +201,7 @@ def parse_date(time_for_parse: str,
             return date_list
 
 
-def get_week_date(is_even: bool,
+def get_defaults_values(is_even: bool,
                   is_end: bool,
                   date: datetime = datetime.now()):
     if 1 <= date.month <= 6:
@@ -265,23 +265,14 @@ def update_lessons():
                     day_number = normalize_string(lesson['dayNum'])
                     dates = normalize_string(lesson['dayDate'])
                     if re.search(r"[Нн]еч", dates) is not None:
-                        start_date = get_week_date(is_even=False, is_end=False) + timedelta(days=int(day_number) - 1)
+                        start_date = get_defaults_values(is_even=False, is_end=False) + timedelta(days=int(day_number) - 1)
                     elif re.search(r"[Чч]ет", dates) is not None:
-                        start_date = get_week_date(is_even=True, is_end=False) + timedelta(days=int(day_number) - 1)
+                        start_date = get_defaults_values(is_even=True, is_end=False) + timedelta(days=int(day_number) - 1)
                     else:
-                        start_date = get_week_date(is_even=False, is_end=False) + timedelta(days=int(day_number) - 1)
+                        start_date = get_defaults_values(is_even=False, is_end=False) + timedelta(days=int(day_number) - 1)
 
-                    default_end = get_week_date(is_even=False, is_end=True)
+                    default_end = get_defaults_values(is_even=False, is_end=True)
                     auditory = normalize_string(lesson["audNum"])
-                    # print(f'{lesson["audNum"]}, {lesson["buildNum"]}')
-                    # TODO костыль
-                    # if "---" in auditory:
-                    #    continue
-
-                    building = normalize_string(lesson["buildNum"])
-                    # TODO костыль
-                    # if not building.isdigit():
-                    #    continue
 
                     class_type = normalize_string(lesson["disciplType"])
                     teacher = " ".join([parte.capitalize() for parte in
@@ -296,14 +287,6 @@ def update_lessons():
                     else:
                         create_lessons(dates, start_date, default_end, auditory, building, class_type, teacher,
                                        time_interval, groupId)
-
-                if auditory == '125' and building == '7':
-                    temp = groupId[0]
-                    temp = 1
-
-                if groupId[0] == 23498:
-                    temp = groupId[0]
-                    temp = 1
         task_time = round(time.time() - start_timestamp, 2)
         rps = round(N / task_time, 1)
         logging.debug(

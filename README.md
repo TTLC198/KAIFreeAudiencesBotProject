@@ -19,6 +19,38 @@
 echo ngrokAuthToken="your-auth-token" > .env 
 ```
 
+### Change appsettings.json file
+#### Generate json file from example
+```sh
+cp KAIFreeAudiencesBot/KAIFreeAudiencesBot/appsettings.example KAIFreeAudiencesBot/KAIFreeAudiencesBot/appsettings.json
+```
+
+```sh
+nano KAIFreeAudiencesBot/KAIFreeAudiencesBot/appsettings.json
+```
+#### Change values in json file
+
+You need to replace the values in BotConfiguration: HostAddress and BotApiKey.\
+Leave value in HostAddress **blank** for auto detection when using ngrok.
+
+```json
+{
+  "ConnectionStrings": {
+    "ScheduleConnectionSqlite": "Data Source=//db//schedule.db"
+  },
+  "BotConfiguration": {
+    "HostAddress": "https://host.address",
+    "BotApiKey": "bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
+```
+
 ### Building
 ```sh
 docker compose build 

@@ -18,6 +18,26 @@ public static class Misc
             : Parity.NotEven;
     }
     
+    public static DateOnly GetDefaultValues(List<Parity>? parities, bool? isEnd, DateOnly? dateOnly)
+    {
+        dateOnly ??= DateOnly.FromDateTime(DateTime.Now);
+        var initialDate = dateOnly.Value.Month is >= 1 and <= 6 
+            ? new DateTime(dateOnly.Value.Year, 1, 1) 
+            : new DateTime(dateOnly.Value.Year, 9, 1);
+        if (isEnd is true)
+            return dateOnly.Value.Month is >= 1 and <= 6 
+                ? new DateOnly(dateOnly.Value.Year, 6, 30) 
+                : new DateOnly(dateOnly.Value.Year, 12, 31);
+
+        if (parities is not null)
+            return parities.Any(p => p == GetWeekParity(initialDate)) 
+                ? DateOnly.FromDateTime(initialDate - new TimeSpan(days: (int) initialDate.DayOfWeek, 0, 0, 0)) 
+                : DateOnly.FromDateTime(initialDate + new TimeSpan(days: 8 - (int) initialDate.DayOfWeek, 0, 0, 0));
+
+        return DateOnly.FromDateTime(initialDate);
+
+    }
+    
     public static List<DateOnly> GetDates(List<DayOfWeek> daysOfWeeks, DateOnly? starts, DateOnly? ends, List<Parity> parities)
     {
         var dates = new List<DateOnly>();
