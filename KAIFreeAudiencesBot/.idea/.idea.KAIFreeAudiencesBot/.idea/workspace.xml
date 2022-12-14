@@ -11,16 +11,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/indexLayout.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/sqldialects.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../DB/dump.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/dump.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../DB/schedule.db" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/schedule.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/parser.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/src/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/src/parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-compose.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +98,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ce719136c12653cd464ae0b247771f618b92f8beec14c1010b5278a7d0fd1f/DbContextServices.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d2bc5a7ce9a5fc6f18c2bef1444e092e0496246f8a755bce46494f429fb86a9/DateTimeParse.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d6b4aefcd8a1389eac53f90b24090dea8ea6b3b6c8594585fbd790a8651ebd/Update.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/dbb9b76d07e4477885c165cd6116d8cca23898/_dd720/DayOfWeek.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/dbb9b76d07e4477885c165cd6116d8cca23898/_dd720/DayOfWeek.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e0b1a6d8edffe3d1c23bdcf77ea3b29dbe71c12dde7bd03a7fd516a2c94a82/ServiceProviderServiceExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/eec384c316ffd282b857f1fa5d5240aee4d304d9c1f3877b0db16c522f3/TimeOnly.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f4708639776589f5ac2739f6fcbfc67343b1f9dac51cc1dbfdb003eef77cc1c/Monitor.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
@@ -123,9 +123,9 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "XThreadsFramesViewSplitterKey": "0.3923611",
+    "XThreadsFramesViewSplitterKey": "0.38793105",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "ssh.settings",
+    "settings.editor.selected.configurable": "ReSpellerSettingsId",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -325,7 +325,9 @@
       <workItem from="1666850506786" duration="368000" />
       <workItem from="1670847289223" duration="13484000" />
       <workItem from="1670953326452" duration="914000" />
-      <workItem from="1670963693455" duration="3098000" />
+      <workItem from="1670963693455" duration="4888000" />
+      <workItem from="1670968640314" duration="4742000" />
+      <workItem from="1671014631305" duration="15513000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
@@ -432,7 +434,14 @@
       <option name="project" value="LOCAL" />
       <updated>1670872169649</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="The documentation has been rewritten. Settings have been changed to run correctly in a Debian container. Minor bug with loading has been fixed.">
+      <created>1670967070423</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1670967070423</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -495,7 +504,8 @@
     <MESSAGE value="fixup! Alteration of the search algorithm for free audiences has begun, added auto-detection of the image size of the table of free audiences" />
     <MESSAGE value="Add indexes to DB tables" />
     <MESSAGE value="The mechanism for parsing audiences into the parser.py has been repaired, now all audiences are stored in the database, and the mode for displaying free audiences has been completed. View mode for all audiences by buildings has been added." />
-    <option name="LAST_COMMIT_MESSAGE" value="The mechanism for parsing audiences into the parser.py has been repaired, now all audiences are stored in the database, and the mode for displaying free audiences has been completed. View mode for all audiences by buildings has been added." />
+    <MESSAGE value="The documentation has been rewritten. Settings have been changed to run correctly in a Debian container. Minor bug with loading has been fixed." />
+    <option name="LAST_COMMIT_MESSAGE" value="The documentation has been rewritten. Settings have been changed to run correctly in a Debian container. Minor bug with loading has been fixed." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -514,6 +524,11 @@
         <PinnedItemInfo parentTag="Type#KAIFreeAudiencesBot.Controllers.WebhookController" memberName="_tasks" />
       </pinned-members>
     </pin-to-top-manager>
+    <watches-manager>
+      <configuration name="LaunchSettings">
+        <watch expression="markup" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

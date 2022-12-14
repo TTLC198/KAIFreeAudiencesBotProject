@@ -1,9 +1,11 @@
 ﻿using System.Drawing;
 using System.Globalization;
+using System.Reflection;
 using GrapeCity.Documents.Html;
 using KAIFreeAudiencesBot.Models;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using Color = System.Drawing.Color;
 
 namespace KAIFreeAudiencesBot.Services;
 
@@ -38,14 +40,26 @@ public static class Misc
 
     }
     
-    public static List<DateOnly> GetDates(List<DayOfWeek> daysOfWeeks, DateOnly? starts, DateOnly? ends, List<Parity> parities)
+    public static string GetDescription(this Enum genericEnum)
+    {
+        var genericEnumType = genericEnum.GetType();
+        if (genericEnumType.GetMember(genericEnum.ToString()) is not {Length: > 0} memberInfo)
+            return genericEnum.ToString();
+        if ((memberInfo[0].GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false) is { } attribs && attribs.Any()))
+        {
+            return ((System.ComponentModel.DescriptionAttribute)attribs.ElementAt(0)).Description;
+        }
+        return genericEnum.ToString();
+    }
+    
+    public static List<DateOnly> GetDates(List<DayOfWeekCustom> daysOfWeeks, DateOnly? starts, DateOnly? ends, List<Parity> parities)
     {
         var dates = new List<DateOnly>();
         var start = starts ?? DateOnly.MaxValue;// HEEEELP
         var end = ends ?? DateOnly.MaxValue;// HEEEELP
         foreach (var parity in parities)
         {
-            while ((DayOfWeek)(Enum.Parse(typeof(DayOfWeek), start.DayOfWeek.ToString())) != daysOfWeeks[0] ||
+            while ((DayOfWeekCustom)(Enum.Parse(typeof(DayOfWeekCustom), start.DayOfWeek.ToString())) != daysOfWeeks[0] ||
                    GetWeekParity(start.ToDateTime(TimeOnly.MinValue)) != parity)
             {
                 var temp = (DayOfWeek) (Enum.Parse(typeof(DayOfWeek), start.DayOfWeek.ToString()));
@@ -59,7 +73,7 @@ public static class Misc
         var resultDates = new List<DateOnly>();
         while (start <= end)
         {
-            if (daysOfWeeks.Contains((DayOfWeek)(Enum.Parse(typeof(DayOfWeek), start.DayOfWeek.ToString()))) &&
+            if (daysOfWeeks.Contains((DayOfWeekCustom)(Enum.Parse(typeof(DayOfWeekCustom), start.DayOfWeek.ToString()))) &&
                 parities.Contains(GetWeekParity(start.ToDateTime(TimeOnly.MinValue))))
             {
                 resultDates.Add(start);
@@ -145,9 +159,9 @@ public static class Misc
                 }
 
                 break;
-            case ClientSteps.ChooseDay:
+            case ClientSteps.ChooseDayOfWeek:
                 var dayOfWeek =
-                    Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().ToList()[
+                    Enum.GetValues(typeof(DayOfWeekCustom)).Cast<DayOfWeekCustom>().ToList()[
                         int.Parse(button.CallbackData!.Split('_')[1])];
                 if (clientSettings.DaysOfWeek.IndexOf(dayOfWeek) == -1)
                 {
@@ -189,8 +203,8 @@ public static class Misc
                         ? keyboard.InlineKeyboard.ToArray()[0].ToArray()[1].Text.Replace("☑", "✅")
                         : keyboard.InlineKeyboard.ToArray()[0].ToArray()[1].Text.Replace("✅", "☑");
                 break;
-            case ClientSteps.ChooseDay:
-                var days = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().ToList();
+            case ClientSteps.ChooseDayOfWeek:
+                var days = Enum.GetValues(typeof(DayOfWeekCustom)).Cast<DayOfWeekCustom>().ToList();
                 var buttons = keyboard.InlineKeyboard!.ToArray();
                 for (var i = 0; i < buttons.Length - 1; i++)
                 {
@@ -231,7 +245,7 @@ public static class Misc
         using (var re1 = new GcHtmlRenderer(html))
         {
             PngSettings imageSettings = new PngSettings();
-            imageSettings.DefaultBackgroundColor = Color.Transparent;
+            imageSettings.DefaultBackgroundColor =  Color.Transparent;
             imageSettings.WindowSize = imageSize;
             imageSettings.FullPage = false;
             re1.RenderToPng(imageStream, imageSettings);

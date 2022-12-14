@@ -20,7 +20,7 @@ public class HandleUpdateService
     private readonly ILogger<HandleUpdateService> _logger;
     private readonly IServiceProvider _services;
 
-    private static List<Client> clients = new List<Client>();
+    private static readonly List<Client> Clients = new List<Client>();
 
     TRes Call<TRes>(Func<TRes> f) => f(); // Для удобства
 
@@ -71,13 +71,13 @@ public class HandleUpdateService
 
         long clientId = callbackQuery.From.Id;
         Client currentClient = new Client() {id = clientId};
-        if (clients.Count(c => c.id == clientId) > 0)
+        if (Clients.Count(c => c.id == clientId) > 0)
         {
-            currentClient = clients.Find(c => c.id == clientId)!;
+            currentClient = Clients.Find(c => c.id == clientId)!;
         }
         else
         {
-            clients.Add(new Client()
+            Clients.Add(new Client()
             {
                 id = clientId
             });
@@ -88,20 +88,27 @@ public class HandleUpdateService
             Task<Message> action = callbackQuery.Data![0] switch
             {
                 'b' => OnRestart(callbackQuery.Message!, currentClient),
-                '0' => Call(() => callbackQuery.Data!.Split('_')[1] == "days"
-                    ? ChooseParity(callbackQuery.Message!, currentClient)
-                    : ErrorMessageAsync(callbackQuery.Message!)),
+                '0' => Call(() => callbackQuery.Data.Split('_')[1] switch
+                {
+                    "days" => ChooseParity(callbackQuery.Message!, currentClient),
+                    "dates" => ChooseDates(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
+                    _ => ErrorMessageAsync(callbackQuery.Message!)
+                }),
                 '1' => SwitchKey(callbackQuery.Message!, currentClient, callbackQuery.Data),
-                '2' => ChooseDay(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
-                '3' => ChooseTime(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
-                '4' => ChooseBuilding(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
-                '5' => Call(() => //Выбор аудитории
+                '2' => ChooseDates(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
+                '3' => ChooseDay(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
+                '4' => ChooseTime(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
+                '5' => ChooseBuilding(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
+                '6' => Call(() => //Выбор аудитории
                 {
                     var args = callbackQuery.Data.Split('_');
                     if (args[1] == "all")
                     {
                         currentClient.step = ClientSteps.Default;
-                        currentClient.settings.Mode = Modes.SpecificDaysAllAudiences;
+                        currentClient.settings.Mode = 
+                            currentClient.settings.Mode == Modes.SpecificDates 
+                            ? Modes.SpecificDatesAllAudiences
+                            : Modes.SpecificDaysAllAudiences;
                         return CheckAudience(callbackQuery.Message!, currentClient.settings);
                     }
                     else
@@ -109,7 +116,7 @@ public class HandleUpdateService
                         return ChooseAudience(callbackQuery.Message!, currentClient, args);
                     }
                 }),
-                '6' => Call(() => //Все аудитории в виде таблицы
+                '7' => Call(() => //Все аудитории в виде таблицы
                 {
                     if (currentClient.step == ClientSteps.ChooseBuildingAllAudiences)
                     {
@@ -131,13 +138,13 @@ public class HandleUpdateService
                         cancellationToken: CancellationToken.None
                     );
                 }),
-                '7' => callbackQuery.Data.Split('_')[1] switch // Повтор при неудачном вводе времени
+                '8' => callbackQuery.Data.Split('_')[1] switch // Повтор при неудачном вводе времени
                 {
                     "y" => ChooseTime(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
                     "n" => OnStart(callbackQuery.Message!, currentClient),
                     _ => ErrorMessageAsync(callbackQuery.Message!)
                 },
-                '8' => callbackQuery.Data.Split('_')[1] switch
+                '9' => callbackQuery.Data.Split('_')[1] switch
                 {
                     "continue" => CheckAudience(callbackQuery.Message!, currentClient.settings),
                     "change" => ChooseAudience(callbackQuery.Message!, currentClient, callbackQuery.Data.Split('_')),
@@ -146,7 +153,7 @@ public class HandleUpdateService
                 _ => ErrorMessageAsync(callbackQuery.Message!)
             };
             Message sentMessage = await action;
-            clients[clients.FindIndex(c => c.id == clientId)] = currentClient;
+            Clients[Clients.FindIndex(c => c.id == clientId)] = currentClient;
 
             _logger.LogInformation("The message was sent with id: {sentMessageId}", sentMessage.MessageId);
         }
@@ -162,23 +169,22 @@ public class HandleUpdateService
 
         long clientId = message.From!.Id;
         Client currentClient;
-        if (clients.Count(c => c.id == clientId) > 0)
+        if (Clients.Count(c => c.id == clientId) > 0)
         {
-            currentClient = clients.Find(c => c.id == clientId)!;
+            currentClient = Clients.Find(c => c.id == clientId)!;
         }
         else
         {
-            clients.Add(new Client()
+            Clients.Add(new Client()
             {
                 id = clientId
             });
-            currentClient = clients.Find(c => c.id == clientId)!;
+            currentClient = Clients.Find(c => c.id == clientId)!;
         }
 
         try
         {
-            Task<Message>? action;
-            action = currentClient.step switch
+            var action = currentClient.step switch
             {
                 ClientSteps.ChooseAudience =>
                     ParseAudience(message, currentClient),
@@ -204,7 +210,7 @@ public class HandleUpdateService
                     }
             };
             Message sentMessage = await action;
-            clients[clients.FindIndex(c => c.id == clientId)] = currentClient;
+            Clients[Clients.FindIndex(c => c.id == clientId)] = currentClient;
 
             _logger.LogInformation("The message was sent with id: {sentMessageId}", sentMessage.MessageId);
         }
@@ -216,18 +222,18 @@ public class HandleUpdateService
 
     private async Task<Message> SwitchKey(Message message, Client client, string args)
     {
-        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
+        var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
         var keyboard = message.ReplyMarkup;
         var indexes = Misc.GetIndexes(keyboard!, args);
 
         Misc.ChangeValue(
-            clients[clientIndex].step,
-            clients[clientIndex].settings,
+            Clients[clientIndex].step,
+            Clients[clientIndex].settings,
             keyboard!.InlineKeyboard.ToList()[indexes[0]].ToList()[indexes[1]]);
 
         keyboard = Misc.UpdateKeyboardMarkup(
-            clients[clientIndex].step,
-            clients[clientIndex].settings,
+            Clients[clientIndex].step,
+            Clients[clientIndex].settings,
             keyboard);
 
         return await _botClient.EditMessageTextAsync(
@@ -240,13 +246,13 @@ public class HandleUpdateService
 
     private async Task<Message> OnStart(Message message, Client client)
     {
-        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
-        clients[clientIndex].step = ClientSteps.Default;
-        clients[clientIndex].settings = new ClientSettings();
+        var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
+        Clients[clientIndex].step = ClientSteps.Default;
+        Clients[clientIndex].settings = new ClientSettings();
 
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            replyMarkup: Keyboard.firstChoice,
+            replyMarkup: Keyboard.FirstChoice,
             text:
             "Привет пользователь! Я бот помощник, помогу найти тебе свободную аудиторию! Выбери дальнейшее действие!",
             cancellationToken: CancellationToken.None
@@ -255,13 +261,13 @@ public class HandleUpdateService
 
     private async Task<Message> OnRestart(Message message, Client client)
     {
-        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
-        clients[clientIndex].step = ClientSteps.Default;
-        clients[clientIndex].settings = new ClientSettings();
+        var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
+        Clients[clientIndex].step = ClientSteps.Default;
+        Clients[clientIndex].settings = new ClientSettings();
 
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            replyMarkup: Keyboard.firstChoice,
+            replyMarkup: Keyboard.FirstChoice,
             text: "Выбери дальнейшее действие!",
             cancellationToken: CancellationToken.None
         );
@@ -293,63 +299,92 @@ public class HandleUpdateService
     {
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            replyMarkup: Keyboard.inlineModeKeyboard,
+            replyMarkup: Keyboard.InlineModeKeyboard,
             text:
             "Окей, поняли. Теперь необходимо определить режим работы!\n" +
-            "Автоматический ввод - я выдам все свободные аудитории в данный момент, автоматически определив время и дату,\n" +
-            "Ручной ввод - я задам у тебя пару вопросов, чтобы точно определить что тебе необходимо!",
+            "<b>Дни недели</b> - просмотр свободных аудиторий по недельному расписанию в определенное время,\n" +
+            "<b>По датам</b> - проверка занятости кабинета в определенную дату и время.",
+            parseMode: ParseMode.Html,
             cancellationToken: CancellationToken.None
         );
     }
 
     private async Task<Message> ChooseParity(Message message, Client client)
     {
-        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
-        clients[clientIndex].step = ClientSteps.ChooseParity;
-        clients[clientIndex].settings.Mode = Modes.SpecificDaysOfWeek;
+        var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
+        Clients[clientIndex].step = ClientSteps.ChooseParity;
+        Clients[clientIndex].settings.Mode = Modes.SpecificDaysOfWeek;
 
         await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
             messageId: message.MessageId,
-            text: "Выбран режим " + clients[clientIndex].settings.Mode
+            text: "Выбран режим:\n" + Clients[clientIndex].settings.Mode.GetDescription()
         );
 
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            replyMarkup: Keyboard.inlineWeekKeyboard,
+            replyMarkup: Keyboard.InlineWeekKeyboard,
             text: "Выберите чётность недели",
+            cancellationToken: CancellationToken.None
+        );
+    }
+    
+    private async Task<Message> ChooseDates(Message message, Client client, string[] args)
+    {
+        var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
+        Clients[clientIndex].step = ClientSteps.ChooseDates;
+        Clients[clientIndex].settings.Mode = Modes.SpecificDates;
+
+        if (args[1] is "r" or "l" or "null" or "month" || args[1].Length == 3)
+            return await _botClient.EditMessageTextAsync(
+                chatId: message.Chat.Id, 
+                messageId: message.MessageId,
+                replyMarkup: Keyboard.BuildCalendar(args),
+                text: "Выберите даты для поиска",
+                cancellationToken: CancellationToken.None
+            );
+        await _botClient.EditMessageTextAsync(
+            chatId: message.Chat.Id,
+            messageId: message.MessageId,
+            text: "Выбран режим:\n" + Clients[clientIndex].settings.Mode.GetDescription()
+        );
+        return await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id, 
+            replyMarkup: Keyboard.BuildCalendar(args),
+            text: "Выберите даты для поиска",
+            parseMode: ParseMode.Html,
             cancellationToken: CancellationToken.None
         );
     }
 
     private async Task<Message> ChooseDay(Message message, Client client, string[] args)
     {
-        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
-        if (clients[clientIndex].settings.Parity.Count == 0)
+        var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
+        if (Clients[clientIndex].settings.Parity.Count == 0)
         {
             return await _botClient.EditMessageTextAsync(
                 chatId: message.Chat.Id,
                 messageId: message.MessageId,
                 text: "Вы не выбрали четность недели" + '\n' +
                       "Выберите четность недели",
-                replyMarkup: Keyboard.inlineWeekKeyboard
+                replyMarkup: Keyboard.InlineWeekKeyboard
             );
         }
 
-        clients[clientIndex].step = ClientSteps.ChooseDay;
-        clients[clientIndex].settings.Parity = clients[clientIndex].settings.Parity
+        Clients[clientIndex].step = ClientSteps.ChooseDayOfWeek;
+        Clients[clientIndex].settings.Parity = Clients[clientIndex].settings.Parity
             .OrderBy(parity => int.Parse(Enum.Format(typeof(Parity), parity, "d"))).ToList();
 
         await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
             messageId: message.MessageId,
-            text: "Выбранные четности: " + string.Join(' ', clients[clientIndex].settings.Parity)
+            text: "Выбранные недели:\n" + string.Join(' ', Clients[clientIndex].settings.Parity.Select(p => p.GetDescription()))
         );
 
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Выберите день недели",
-            replyMarkup: Keyboard.inlineDayKeyboard
+            replyMarkup: Keyboard.InlineDayKeyboard
         );
     }
 
@@ -357,11 +392,11 @@ public class HandleUpdateService
     {
         if (client.step == ClientSteps.ChooseTime)
         {
-            var clientIndex = clients.FindIndex(cl => cl.id == client.id);
+            var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
             if (int.TryParse(message.Text, out var inputHour))
             {
-                clients[clientIndex].step = ClientSteps.ChooseCorrectTime;
-                var choices = Keyboard.inlineTimeKeyboard.InlineKeyboard
+                Clients[clientIndex].step = ClientSteps.ChooseCorrectTime;
+                var choices = Keyboard.InlineTimeKeyboard.InlineKeyboard
                     .Where(k => TimeOnly.ParseExact(k.First().CallbackData!.Split('_')[1], new[] {"HH:mm", "H:mm"})
                         .Hour == inputHour);
                 var enumerable = choices as IEnumerable<InlineKeyboardButton>[] ?? choices.ToArray();
@@ -369,7 +404,7 @@ public class HandleUpdateService
                     return await _botClient.SendTextMessageAsync(
                         chatId: message.Chat.Id,
                         text: "Введенного временого промежутка не существует!",
-                        replyMarkup: Keyboard.inlineRestartKeyboard
+                        replyMarkup: Keyboard.InlineRestartKeyboard
                     );
                 else
                     return await _botClient.SendTextMessageAsync(
@@ -380,37 +415,50 @@ public class HandleUpdateService
             }
             else
             {
-                clients[clientIndex].step = ClientSteps.ChooseDay;
+                Clients[clientIndex].step = ClientSteps.ChooseDayOfWeek;
                 return await _botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
                     text: "Вы ввели некоректное значение!",
-                    replyMarkup: Keyboard.inlineRestartKeyboard
+                    replyMarkup: Keyboard.InlineRestartKeyboard
                 );
             }
         }
         else
         {
-            var clientIndex = clients.FindIndex(cl => cl.id == client.id);
-            if (clients[clientIndex].settings.DaysOfWeek.Count == 0)
+            var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
+            if (Clients[clientIndex].step == ClientSteps.ChooseDayOfWeek)
             {
-                return await _botClient.EditMessageTextAsync(
+                if (Clients[clientIndex].settings.DaysOfWeek.Count == 0)
+                {
+                    return await _botClient.EditMessageTextAsync(
+                        chatId: message.Chat.Id,
+                        messageId: message.MessageId,
+                        text: "Вы не выбрали дни недели" + '\n' +
+                              "Выберите дни недели",
+                        replyMarkup: Keyboard.InlineDayKeyboard
+                    );
+                }
+                
+                await _botClient.EditMessageTextAsync(
                     chatId: message.Chat.Id,
                     messageId: message.MessageId,
-                    text: "Вы не выбрали дни недели" + '\n' +
-                          "Выберите дни недели",
-                    replyMarkup: Keyboard.inlineDayKeyboard
+                    text: "Выбранные дни недели:\n" + string.Join(' ', Clients[clientIndex].settings.DaysOfWeek.Select(d => d.GetDescription()))
                 );
+                Clients[clientIndex].settings.DaysOfWeek = Clients[clientIndex].settings.DaysOfWeek
+                    .OrderBy(day => int.Parse(Enum.Format(typeof(DayOfWeekCustom), day, "d"))).ToList();
             }
-
-            clients[clientIndex].step = ClientSteps.ChooseTime;
-            clients[clientIndex].settings.DaysOfWeek = clients[clientIndex].settings.DaysOfWeek
-                .OrderBy(day => int.Parse(Enum.Format(typeof(DayOfWeek), day, "d"))).ToList();
-
-            await _botClient.EditMessageTextAsync(
-                chatId: message.Chat.Id,
-                messageId: message.MessageId,
-                text: "Выбранные дни недели: " + string.Join(' ', clients[clientIndex].settings.DaysOfWeek)
-            );
+            else if (Clients[clientIndex].step == ClientSteps.ChooseDates)
+            {
+                await _botClient.EditMessageTextAsync(
+                    chatId: message.Chat.Id,
+                    messageId: message.MessageId,
+                    text: "Выбранная дата:\n" + args[1]
+                );
+                Clients[clientIndex].settings.SpecificDate = DateOnly.ParseExact(args[1], "dd.MM.yy", CultureInfo.CreateSpecificCulture("ru"));
+            }
+            
+            Clients[clientIndex].step = ClientSteps.ChooseTime;
+            
 
             return await _botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
@@ -421,21 +469,21 @@ public class HandleUpdateService
 
     private async Task<Message> ChooseBuilding(Message message, Client client, string[] args)
     {
-        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
-        clients[clientIndex].step = ClientSteps.ChooseBuilding;
-        clients[clientIndex].settings.TimeStart =
+        var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
+        Clients[clientIndex].step = ClientSteps.ChooseBuilding;
+        Clients[clientIndex].settings.TimeStart =
             TimeOnly.ParseExact(args[1], new[] {"HH:mm", "H:mm"}, new CultureInfo("ru-RU"));
 
         await _botClient.EditMessageTextAsync(
             chatId: message.Chat.Id,
             messageId: message.MessageId,
-            text: "Вы выбрали временной промежуток: " + clients[clientIndex].settings.TimeStart + "-" +
-                  clients[clientIndex].settings.TimeStart.AddMinutes(90).ToString()
+            text: "Вы выбрали временной промежуток: " + Clients[clientIndex].settings.TimeStart + "-" +
+                  Clients[clientIndex].settings.TimeStart.AddMinutes(90).ToString()
         );
 
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            replyMarkup: Keyboard.inlineAutoBuildingKeyboard,
+            replyMarkup: Keyboard.InlineAutoBuildingKeyboard,
             text: "Выберите здание",
             cancellationToken: CancellationToken.None
         );
@@ -443,12 +491,12 @@ public class HandleUpdateService
 
     private async Task<Message> ChooseBuildingAllAudiences(Message message, Client client)
     {
-        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
-        clients[clientIndex].step = ClientSteps.ChooseBuildingAllAudiences;
+        var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
+        Clients[clientIndex].step = ClientSteps.ChooseBuildingAllAudiences;
 
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            replyMarkup: Keyboard.inlineBuildingKeyboard,
+            replyMarkup: Keyboard.InlineBuildingKeyboard,
             text: "Выберите здание",
             cancellationToken: CancellationToken.None
         );
@@ -456,30 +504,30 @@ public class HandleUpdateService
 
     private async Task<Message> ChooseAudience(Message message, Client client, string[] args)
     {
-        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
-        if (clients[clientIndex].step == ClientSteps.ChooseBuilding)
+        var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
+        if (Clients[clientIndex].step == ClientSteps.ChooseBuilding)
         {
-            clients[clientIndex].settings.Building = args[1] != "all"
+            Clients[clientIndex].settings.Building = args[1] != "all"
                 ? Enum.GetValues(typeof(Buildings)).Cast<Buildings>().ToList()[int.Parse(args[1])]
                 : Buildings.All;
             await _botClient.EditMessageTextAsync(
                 chatId: message.Chat.Id,
                 messageId: message.MessageId,
-                text: "Вы выбрали здания: " + clients[clientIndex].settings.Building
+                text: "Выбранное здание:\n" + Clients[clientIndex].settings.Building.GetDescription()
             );
         }
 
-        clients[clientIndex].step = ClientSteps.ChooseAudience;
+        Clients[clientIndex].step = ClientSteps.ChooseAudience;
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Отправьте номера аудитории через запятую для проверки их занятости",
-            replyMarkup: Keyboard.inlineAllAudiences
+            replyMarkup: Keyboard.InlineAllAudiences
         );
     }
 
     private async Task<Message> ParseAudience(Message message, Client client)
     {
-        var clientIndex = clients.FindIndex(cl => cl.id == client.id);
+        var clientIndex = Clients.FindIndex(cl => cl.id == client.id);
         var audiences = message.Text!;
         if (Regex.IsMatch(audiences, "[A-z]", RegexOptions.IgnoreCase))
         {
@@ -498,7 +546,7 @@ public class HandleUpdateService
         await using (var scope = _services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope())
         {
             var db = scope.ServiceProvider.GetService<SchDbContext>();
-            var building = Enum.Format(typeof(Buildings), clients[clientIndex].settings.Building, "d");
+            var building = Enum.Format(typeof(Buildings), Clients[clientIndex].settings.Building, "d");
             var existingAudience =
                 db!.classrooms
                     .Where(classroom => newAudience.Contains(classroom.name) && classroom.building == building)
@@ -506,18 +554,18 @@ public class HandleUpdateService
             var notExistingAud = newAudience.Except(existingAudience).ToList();
             if (notExistingAud.Count != 0)
             {
-                clients[clientIndex].settings.Audience = newAudience.Intersect(existingAudience).ToList();
+                Clients[clientIndex].settings.Audience = newAudience.Intersect(existingAudience).ToList();
                 return await _botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
                     text: $"Аудитории {string.Join(", ", notExistingAud)} не существуют",
                     replyMarkup: Keyboard.InlineChangeAudKeyboard
                 );
             }
-            else clients[clientIndex].step = ClientSteps.Default;
+            else Clients[clientIndex].step = ClientSteps.Default;
         }
 
-        clients[clientIndex].settings.Audience = newAudience;
-        return await CheckAudience(message, clients[clientIndex].settings);
+        Clients[clientIndex].settings.Audience = newAudience;
+        return await CheckAudience(message, Clients[clientIndex].settings);
     }
 
     private async Task<Message> CheckAudience(Message message, ClientSettings settings)
@@ -544,14 +592,21 @@ public class HandleUpdateService
             await using var scope = _services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
             var db = scope.ServiceProvider.GetService<SchDbContext>();
 
-            var tempDates = Misc.GetDates(
-                settings!.DaysOfWeek,
-                settings!.DateStart ?? Misc.GetDefaultValues(settings.Parity, false, null),
-                settings!.DateEnd ?? Misc.GetDefaultValues(null, true, null),
-                settings.Parity
-            );
+            var tempDates =
+                settings.Mode is Modes.SpecificDates or Modes.SpecificDatesAllAudiences
+                    ? new List<DateOnly>()
+                    {
+                        settings.SpecificDate!.Value
+                    } 
+                    : Misc.GetDates(
+                        settings!.DaysOfWeek, 
+                        settings!.DateStart ?? Misc.GetDefaultValues(settings.Parity, false, null),
+                        settings!.DateEnd ?? Misc.GetDefaultValues(null, true, null),
+                        settings.Parity
+                    );
 
-            if (settings.Mode == Modes.SpecificDaysAllAudiences)
+            if (settings.Mode is Modes.SpecificDaysAllAudiences or Modes.SpecificDatesAllAudiences)
+            {
                 settings.Audience = db!.classrooms
                     .AsNoTracking()
                     .AsEnumerable()
@@ -560,17 +615,22 @@ public class HandleUpdateService
                     .Select(c =>
                         c.name)
                     .ToList();
+            }
+                
 
             var schedules = db!.scheduleSubjectDates
                 .AsNoTracking()
                 .Include(s => s.TimeInterval)
                 .Include(s => s.Classroom)
+                .Include(s => s.Group)
                 .AsEnumerable()
                 .Where(s =>
                     s.TimeInterval.start == settings.TimeStart &&
                     s.Classroom.building == Convert.ToString((int) settings.Building) &&
                     tempDates.Contains(s.date))
                 .ToList();
+
+            var groups = new List<string>();
 
             if (!db.scheduleSubjectDates.Any())
             {
@@ -586,7 +646,7 @@ public class HandleUpdateService
                 return;
             }
 
-            foreach (var classroom in settings.Audience)
+            foreach (var classroom in settings.Audience.OrderBy(a => a))
             {
                 if (!schedules.Exists(s => s.Classroom.name == classroom))
                 {
@@ -598,6 +658,10 @@ public class HandleUpdateService
                         item4: settings.TimeStart.ToString()!
                     ));
                 }
+                else
+                {
+                    groups.AddRange(schedules.Where(s => s.Classroom.name == classroom).Select(schedule => schedule.Group.name));
+                }
             }
 
             switch (audienceTuples.Count)
@@ -607,7 +671,7 @@ public class HandleUpdateService
                         chatId: message.Chat.Id,
                         messageId: loadingMessage.MessageId,
                         replyMarkup: Keyboard.Back,
-                        text: char.ConvertFromUtf32(0x274c) + "Введенные аудитории заняты"
+                        text: char.ConvertFromUtf32(0x274c) + "Введенные аудитории заняты группами\n" + string.Join(", ", groups)
                     );
                     break;
                 case 1:
@@ -619,7 +683,7 @@ public class HandleUpdateService
                     );
                     break;
                 default:
-                    Task imgGenTask = null;
+                    Task imgGenTask = null!;
                     try
                     {
                         imgGenTask = new Task(async () =>
@@ -628,32 +692,37 @@ public class HandleUpdateService
                             for (int i = 1; i <= length / 13 + 1; i++)
                             {
                                 StringBuilder tableStringBuilder = new StringBuilder();
-                                using (var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable))
+                                using var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable);
+                                using var headerRow = table.AddHeaderRow();
+                                headerRow.AddCell("Аудитория");
+                                headerRow.AddCell("Здание");
+                                headerRow.AddCell("Даты");
+                                headerRow.AddCell("Время");
+                                var start = (i - 1) * 13;
+                                foreach (var classroom in audienceTuples.GetRange(start,
+                                             Math.Min(13, length - start)))
                                 {
-                                    using var headerRow = table.AddHeaderRow();
-                                    headerRow.AddCell("Аудитория");
-                                    headerRow.AddCell("Здание");
-                                    headerRow.AddCell("Даты");
-                                    headerRow.AddCell("Время");
-                                    var start = (i - 1) * 13;
-                                    foreach (var classroom in audienceTuples.GetRange(start,
-                                                 Math.Min(13, length - start)))
-                                    {
-                                        using var row = table.AddRow();
-                                        row.AddCell(classroom.audience);
-                                        row.AddCell(classroom.building);
-                                        row.AddCell(classroom.date);
-                                        row.AddCell(classroom.timeInterval);
-                                    }
+                                    using var row = table.AddRow();
+                                    row.AddCell(classroom.audience);
+                                    row.AddCell(classroom.building);
+                                    row.AddCell(classroom.date);
+                                    row.AddCell(classroom.timeInterval);
+                                }
 
+                                try
+                                {
                                     await _botClient.SendPhotoAsync(
                                         chatId: message.Chat.Id,
                                         caption: i < 2 ? "Таблица свободных аудиторий:" : String.Empty,
-                                        photo: Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
+                                        photo: new InputFile(Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
                                             new Size(460,
                                                 (audienceTuples.GetRange(start, Math.Min(13, length - start))
                                                      .Count +
-                                                 1) * 45))!);
+                                                 1) * 45))!));
+                                }
+                                catch (Exception e)
+                                {
+                                    await HandleErrorAsync(e);
                                 }
                             }
                         });
@@ -670,11 +739,11 @@ public class HandleUpdateService
                     }
                     catch (Exception e)
                     {
-                        HandleErrorAsync(e);
+                        await HandleErrorAsync(e);
                     }
                     finally
                     {
-                        imgGenTask.Dispose();
+                        imgGenTask!.Dispose();
                     }
 
                     break;
@@ -721,93 +790,98 @@ public class HandleUpdateService
 
         var dbTask = new Task(async () =>
         {
-            await using (var scope = _services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope())
+            await using var scope = _services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
+            var db = scope.ServiceProvider.GetService<SchDbContext>();
+            var building = Convert.ToString((int) settings.Building);
+            var allClassrooms = db!.classrooms
+                .Where(c => building == "0" || c.building == building)
+                .OrderBy(cr => cr.building)
+                .ThenBy(cr => cr.name)
+                .ToList();
+
+            foreach (var classroom in allClassrooms)
             {
-                var db = scope.ServiceProvider.GetService<SchDbContext>();
-                var building = Convert.ToString((int) settings.Building);
-                var allClassrooms = db!.classrooms
-                    .Where(c => building == "0" || c.building == building)
-                    .ToList();
+                audienceTuples.Add(new ValueTuple<string, string>
+                (
+                    item1: classroom.name,
+                    item2: classroom.building
+                ));
+            }
 
-                foreach (var classroom in allClassrooms)
-                {
-                    audienceTuples.Add(new ValueTuple<string, string>
-                    (
-                        item1: classroom.name,
-                        item2: classroom.building
-                    ));
-                }
-
-                switch (audienceTuples.Count)
-                {
-                    case 0:
-                        currentMessage = await _botClient.SendTextMessageAsync(
-                            chatId: message.Chat.Id,
-                            text:
-                            "В данный момент невозможно определить наличие аудиторий, так как отсутвует расписание занятий."
-                        );
-                        await _botClient.DeleteMessageAsync(
-                            chatId: loadingMessage.Chat.Id,
-                            messageId: loadingMessage.MessageId
-                        );
-                        break;
-                    default:
-                        Task imgGenTask = null;
-                        try
+            switch (audienceTuples.Count)
+            {
+                case 0:
+                    currentMessage = await _botClient.SendTextMessageAsync(
+                        chatId: message.Chat.Id,
+                        text:
+                        "В данный момент невозможно определить наличие аудиторий, так как отсутвует расписание занятий."
+                    );
+                    await _botClient.DeleteMessageAsync(
+                        chatId: loadingMessage.Chat.Id,
+                        messageId: loadingMessage.MessageId
+                    );
+                    break;
+                default:
+                    Task imgGenTask = null!;
+                    try
+                    {
+                        imgGenTask = new Task(async () =>
                         {
-                            imgGenTask = new Task(async () =>
+                            int length = audienceTuples.Count;
+                            for (int i = 1; i <= length / 13 + 1; i++)
                             {
-                                int length = audienceTuples.Count;
-                                for (int i = 1; i <= length / 13 + 1; i++)
+                                StringBuilder tableStringBuilder = new StringBuilder();
+                                using var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable);
+                                using var headerRow = table.AddHeaderRow();
+                                headerRow.AddCell("Аудитория");
+                                headerRow.AddCell("Здание");
+                                var start = (i - 1) * 13;
+                                foreach (var classroom in audienceTuples.GetRange(start,
+                                             Math.Min(13, length - start)))
                                 {
-                                    StringBuilder tableStringBuilder = new StringBuilder();
-                                    using (var table = new Table(tableStringBuilder, style: Table.DefaultStyleTable))
-                                    {
-                                        using var headerRow = table.AddHeaderRow();
-                                        headerRow.AddCell("Аудитория");
-                                        headerRow.AddCell("Здание");
-                                        var start = (i - 1) * 13;
-                                        foreach (var classroom in audienceTuples.GetRange(start,
-                                                     Math.Min(13, length - start)))
-                                        {
-                                            using var row = table.AddRow();
-                                            row.AddCell(classroom.audience);
-                                            row.AddCell(classroom.building);
-                                        }
-
-                                        await _botClient.SendPhotoAsync(
-                                            chatId: message.Chat.Id,
-                                            caption: i < 2 ? "Таблица аудиторий:" : String.Empty,
-                                            photo: Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
-                                                new Size(460,
-                                                    (audienceTuples.GetRange(start, Math.Min(13, length - start))
-                                                         .Count +
-                                                     1) * 45))!);
-                                    }
+                                    using var row = table.AddRow();
+                                    row.AddCell(classroom.audience);
+                                    row.AddCell(classroom.building);
                                 }
-                            });
 
-                            imgGenTask.Start();
+                                try
+                                {
+                                    await _botClient.SendPhotoAsync(
+                                        chatId: message.Chat.Id,
+                                        caption: i < 2 ? "Таблица аудиторий:" : String.Empty,
+                                        photo: new InputFile(Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
+                                            new Size(460,
+                                                (audienceTuples.GetRange(start, Math.Min(13, length - start))
+                                                     .Count +
+                                                 1) * 45))!));
+                                }
+                                catch (Exception e)
+                                {
+                                    await HandleErrorAsync(e);
+                                }
+                            }
+                        });
 
-                            await Task.WhenAny(imgGenTask).ContinueWith(async _ =>
-                            {
-                                await _botClient.DeleteMessageAsync(
-                                    chatId: loadingMessage.Chat.Id,
-                                    messageId: loadingMessage.MessageId
-                                );
-                            });
-                        }
-                        catch (Exception e)
+                        imgGenTask.Start();
+
+                        await Task.WhenAny(imgGenTask).ContinueWith(async _ =>
                         {
-                            HandleErrorAsync(e);
-                        }
-                        finally
-                        {
-                            imgGenTask.Dispose();
-                        }
+                            await _botClient.DeleteMessageAsync(
+                                chatId: loadingMessage.Chat.Id,
+                                messageId: loadingMessage.MessageId
+                            );
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        await HandleErrorAsync(e);
+                    }
+                    finally
+                    {
+                        imgGenTask!.Dispose();
+                    }
 
-                        break;
-                }
+                    break;
             }
         });
 
