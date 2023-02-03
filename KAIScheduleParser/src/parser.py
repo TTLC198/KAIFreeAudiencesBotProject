@@ -16,6 +16,8 @@ teach_last_idx = 0
 begin_les_last_idx = 0
 cursor = None
 
+custom_date_formats = ['%d.%m.%Y', '%d%m.%Y', '%d.%m', '%d.%m.  .  .%Y', '%d.%m.  .  ']
+
 proxies = {
     # custom proxies list
 }
@@ -28,13 +30,14 @@ headers = {
 
 
 def main():
-    global aud_last_idx, clst_last_idx, teach_last_idx, begin_les_last_idx, cursor
+    global aud_last_idx, clst_last_idx, teach_last_idx, begin_les_last_idx, cursor, custom_date_formats
 
     parser = argparse.ArgumentParser('KAI schedule parser')
     parser.add_argument('-g', default=False, action='store_true', help='refresh groups information')
     parser.add_argument('-l', default=False, action='store_true', help='add lessons')
     parser.add_argument('-d', default=False, action='store_true', help='truncate lessons tables')
     parser.add_argument('-v', default=False, action='store_true', help='verbose logging')
+    parser.add_argument('-f', '--date-formats-list', default=custom_date_formats,  nargs='+', help='custom date formats like this: '.join(custom_date_formats))
     parser.add_argument('-c', default='/db/schedule.db', help='Path to SQLite DB')
 
     try:
@@ -75,6 +78,10 @@ def main():
                 print(error)
             else:
                 sqlite_connection.commit()
+
+        if args.f is not None:
+            custom_date_formats = args.f
+
     except BaseException as error:
         print(error)
     else:
@@ -138,8 +145,8 @@ def get_group_schedule(groupId: int,
 
 
 def create_dates(interval: int,
-                 date_from: datetime,
-                 date_until: datetime,
+                 date_from: datetime.date,
+                 date_until: datetime.date,
                  overall_number: int = -1) -> list:
     date_list = list([date_from, ])
     if overall_number != -1:
@@ -154,20 +161,26 @@ def create_dates(interval: int,
 
 
 def date_from_string(input_str: str,
-                     default_year: str) -> datetime:
+                     default_year: str) -> datetime.date:
     input_str = re.search(r"\d\d[.]*(?:\d\d[.]*)+", input_str)[0]
     if re.fullmatch(r"\d\d[.]\d\d[.]\d{4}", input_str) is None:
         if re.fullmatch(r"\d\d[.]\d\d[.]", input_str) is not None:
             input_str += default_year
         else:
             input_str += "." + default_year
-    return datetime.strptime(input_str, r"%d.%m.%Y")
+
+    for fmt in custom_date_formats:
+        try:
+            return datetime.date(datetime.strptime(input_str, fmt))
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found')
 
 
 def parse_date(time_for_parse: str,
-               default_start: datetime,
-               default_end: datetime) -> list:
-    if re.search(r"неч|чет|ежен", time_for_parse) \
+               default_start: datetime.date,
+               default_end: datetime.date) -> list:
+    if re.search(r"неч|чет|ежен|\s*", time_for_parse) \
             and not (not re.search(r"с|до", time_for_parse) and re.search(r"\d\d[.-]*(?:\d\d[.-]*)+", time_for_parse)):
         if re.search(r"\(\d+\)", time_for_parse):
             if re.search(r"/", time_for_parse) or re.search(r"ежен", time_for_parse):
@@ -190,7 +203,7 @@ def parse_date(time_for_parse: str,
             else:
                 return list(create_dates(14, from_date, until_date))
     else:
-        if re.search(r"-", time_for_parse):
+        if re.search(r"\d-\d", time_for_parse):
             from_date, until_date = time_for_parse.split("-")
             return create_dates(7, date_from_string(from_date, str(default_start.year)),
                                 date_from_string(until_date, str(default_start.year)))
@@ -203,7 +216,7 @@ def parse_date(time_for_parse: str,
 
 def get_defaults_values(is_even: bool,
                   is_end: bool,
-                  date: datetime = datetime.now()):
+                  date: datetime.date = datetime.date(datetime.now())):
     if 1 <= date.month <= 6:
         initial_date = datetime(year=date.year, month=1, day=1).date()
         end_date = datetime(year=date.year, month=6, day=30).date()
@@ -263,29 +276,34 @@ def update_lessons():
             for day in schedule.values():
                 for lesson in day:
                     day_number = normalize_string(lesson['dayNum'])
-                    dates = normalize_string(lesson['dayDate'])
-                    if re.search(r"[Нн]еч", dates) is not None:
+                    dates_string = normalize_string(lesson['dayDate'])
+                    if re.search(r"[Нн]еч", dates_string) is not None:
                         start_date = get_defaults_values(is_even=False, is_end=False) + timedelta(days=int(day_number) - 1)
-                    elif re.search(r"[Чч]ет", dates) is not None:
+                    elif re.search(r"[Чч]ет", dates_string) is not None:
                         start_date = get_defaults_values(is_even=True, is_end=False) + timedelta(days=int(day_number) - 1)
                     else:
                         start_date = get_defaults_values(is_even=False, is_end=False) + timedelta(days=int(day_number) - 1)
-
                     default_end = get_defaults_values(is_even=False, is_end=True)
+
                     auditory = normalize_string(lesson["audNum"])
 
+                    if "---" in auditory:
+                        continue
+
+                    building = normalize_string(lesson["buildNum"])
                     class_type = normalize_string(lesson["disciplType"])
+
                     teacher = " ".join([parte.capitalize() for parte in
                                         normalize_string(lesson["prepodName"]).split()])
                     time_interval = datetime.strptime(normalize_string(lesson["dayTime"]), "%H:%M")
                     if re.search(r"л.*р.*", class_type) is not None:
-                        create_lessons(dates, start_date, default_end, auditory, building, class_type, teacher,
+                        create_lessons(dates_string, start_date, default_end, auditory, building, class_type, teacher,
                                        time_interval, groupId)
-                        time_interval += timedelta(hours=1, minutes=40)
-                        create_lessons(dates, start_date, default_end, auditory, building, class_type, teacher,
+                        time_interval += timedelta(hours=1, minutes=40) #TODO Сделать обработку лаб с 11:20
+                        create_lessons(dates_string, start_date, default_end, auditory, building, class_type, teacher,
                                        time_interval, groupId)
                     else:
-                        create_lessons(dates, start_date, default_end, auditory, building, class_type, teacher,
+                        create_lessons(dates_string, start_date, default_end, auditory, building, class_type, teacher,
                                        time_interval, groupId)
         task_time = round(time.time() - start_timestamp, 2)
         rps = round(N / task_time, 1)
@@ -297,15 +315,16 @@ def update_lessons():
     logging.debug('total time {} s'.format(round(time.time() - total_time, 2)))
 
 
-def create_lessons(dates: str,
+def create_lessons(dates_string: str,
                    def_start: datetime,
                    def_end: datetime,
                    auditory: str,
                    building: int,
                    cls_type: str,
                    teacher: str,
-                   begin_lesson: datetime,
+                   begin_time: datetime.time,
                    group_id):
+
     try:
         global aud_last_idx, clst_last_idx, teach_last_idx, begin_les_last_idx
         cursor.execute("select cr_id from classrooms where cr_name = ? and cr_building = ?", (auditory, building))
@@ -329,16 +348,21 @@ def create_lessons(dates: str,
             teach_last_idx += 1
             teacher_id = (teach_last_idx,)
         teacher_id = int(teacher_id[0])
-        cursor.execute("select ti_id from time_intervals where ti_start = ?", (begin_lesson.strftime(r"%H:%M"),))
+        cursor.execute("select ti_id from time_intervals where ti_start = ?", (begin_time.strftime(r"%H:%M"),))
         time_int_id = cursor.fetchone()
         if time_int_id is None:
-            end_time = begin_lesson + timedelta(hours=1, minutes=30)
-            cursor.execute("insert into time_intervals values (null, ?, ?)", (begin_lesson.strftime(r"%H:%M"),
+            end_time = begin_time + timedelta(hours=1, minutes=30)
+            cursor.execute("insert into time_intervals values (null, ?, ?)", (begin_time.strftime(r"%H:%M"),
                                                                               end_time.strftime(r"%H:%M")))
             begin_les_last_idx += 1
             time_int_id = (begin_les_last_idx,)
         time_int_id = int(time_int_id[0])
-        dates = parse_date(dates, def_start, def_end)
+
+        if "20.01,03.02,17.02,03.03,17.03,14.04 неч (2-ая подгруппа)" in dates_string:
+            temp = 123
+
+        dates = parse_date(dates_string, def_start, def_end)
+
         for date in dates:
             cursor.execute("insert into schedule_subject_dates values (null, ?, ?, ?, ?, ?, ?)",
                            (time_int_id,
@@ -355,7 +379,7 @@ def create_lessons(dates: str,
               teacher_id,
               aud_id,
               clst_id,
-              dates,
+              dates_string,
               group_id[0]])
         logging.warning(error)
         logging.warning("End error\n")
