@@ -380,7 +380,7 @@ public class HandleUpdateService
             messageId: message.MessageId,
             text: "Выбранные недели:\n" + string.Join(' ', Clients[clientIndex].settings.Parity.Select(p => p.GetDescription()))
         );
-
+        var temp = Clients[clientIndex].settings.Parity.Select(p => p.GetDescription());
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Выберите день недели",
@@ -671,7 +671,7 @@ public class HandleUpdateService
                         chatId: message.Chat.Id,
                         messageId: loadingMessage.MessageId,
                         replyMarkup: Keyboard.Back,
-                        text: char.ConvertFromUtf32(0x274c) + "Введенные аудитории заняты группами\n" + string.Join(", ", groups)
+                        text: char.ConvertFromUtf32(0x274c) + "Введенные аудитории заняты группами\n" + string.Join(", ", groups.Distinct())
                     );
                     break;
                 case 1:

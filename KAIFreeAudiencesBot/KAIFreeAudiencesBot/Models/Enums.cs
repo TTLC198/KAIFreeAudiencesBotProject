@@ -6,7 +6,7 @@ public enum Parity
 {
     [Description("Четная неделя")]
     Even,
-    [Description("Четная неделя")]
+    [Description("Нечетная неделя")]
     NotEven,
 }
 

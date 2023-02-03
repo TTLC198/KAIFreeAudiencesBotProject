@@ -25,7 +25,7 @@ public static class Keyboard
         },
         new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "Текущая четность", callbackData: $"3_{(Misc.GetWeekParity(DateTime.Today) == Parity.Even ? 'e' : 'n')}"),
+            InlineKeyboardButton.WithCallbackData(text: "Текущая четность", callbackData: $"1_{(Misc.GetWeekParity(DateTime.Today) == Parity.Even ? 'e' : 'n')}"),
         },
         new [] {
             InlineKeyboardButton.WithCallbackData(text: "Подтвердить", callbackData: "3_submit")

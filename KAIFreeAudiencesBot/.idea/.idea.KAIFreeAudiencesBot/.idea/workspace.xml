@@ -14,13 +14,10 @@
       <change beforePath="$PROJECT_DIR$/../DB/dump.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/dump.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../DB/schedule.db" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/schedule.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Client.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Misc.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/src/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/src/parser.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,22 +115,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "XThreadsFramesViewSplitterKey": "0.38793105",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "ReSpellerSettingsId",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.38793105&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.KAIFreeAudiencesBot: Local-Development">
     <configuration name="KAIFreeAudiencesBot" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" />
@@ -327,7 +324,12 @@
       <workItem from="1670953326452" duration="914000" />
       <workItem from="1670963693455" duration="4888000" />
       <workItem from="1670968640314" duration="4742000" />
-      <workItem from="1671014631305" duration="15513000" />
+      <workItem from="1671014631305" duration="22330000" />
+      <workItem from="1671097974180" duration="1431000" />
+      <workItem from="1671115062579" duration="3670000" />
+      <workItem from="1672145670019" duration="1218000" />
+      <workItem from="1672157887243" duration="1259000" />
+      <workItem from="1672482029741" duration="4000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
@@ -441,7 +443,14 @@
       <option name="project" value="LOCAL" />
       <updated>1670967070423</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="The translation of the selected operating modes was added, the menu text was updated, the operating mode with default dates was reorganized, and the table with these data in the database was deleted. Update Telegram.Bot to version 19.0.0">
+      <created>1671036225661</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1671036225661</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -505,7 +514,8 @@
     <MESSAGE value="Add indexes to DB tables" />
     <MESSAGE value="The mechanism for parsing audiences into the parser.py has been repaired, now all audiences are stored in the database, and the mode for displaying free audiences has been completed. View mode for all audiences by buildings has been added." />
     <MESSAGE value="The documentation has been rewritten. Settings have been changed to run correctly in a Debian container. Minor bug with loading has been fixed." />
-    <option name="LAST_COMMIT_MESSAGE" value="The documentation has been rewritten. Settings have been changed to run correctly in a Debian container. Minor bug with loading has been fixed." />
+    <MESSAGE value="The translation of the selected operating modes was added, the menu text was updated, the operating mode with default dates was reorganized, and the table with these data in the database was deleted. Update Telegram.Bot to version 19.0.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="The translation of the selected operating modes was added, the menu text was updated, the operating mode with default dates was reorganized, and the table with these data in the database was deleted. Update Telegram.Bot to version 19.0.0" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
