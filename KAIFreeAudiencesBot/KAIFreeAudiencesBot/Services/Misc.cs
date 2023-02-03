@@ -1,11 +1,9 @@
 ﻿using System.Drawing;
 using System.Globalization;
-using System.Reflection;
-using GrapeCity.Documents.Html;
 using KAIFreeAudiencesBot.Models;
-using Telegram.Bot.Types;
+using PuppeteerSharp;
+using PuppeteerSharp.Media;
 using Telegram.Bot.Types.ReplyMarkups;
-using Color = System.Drawing.Color;
 
 namespace KAIFreeAudiencesBot.Services;
 
@@ -233,26 +231,27 @@ public static class Misc
         return keyboard;
     }
 
-    public static Stream? HtmlToImageStreamConverter(string html)
+    public static async Task<Stream?> HtmlToImageStreamConverter(string html, Size imageSize)
     {
-        return HtmlToImageStreamConverter(html, new Size(460, 1000));
-    }
-    
-    public static Stream? HtmlToImageStreamConverter(string html, Size imageSize)
-    {
-        Stream? imageStream = new MemoryStream();
-        
-        using (var re1 = new GcHtmlRenderer(html))
+        using var browserFetcher = new BrowserFetcher();
+        await browserFetcher.DownloadAsync();
+        await using var browser = await Puppeteer.LaunchAsync(
+            new LaunchOptions { Headless = true});
+        await using var page = await browser.NewPageAsync();
+        await page.SetContentAsync(html);
+        await page.SetViewportAsync(new ViewPortOptions
         {
-            PngSettings imageSettings = new PngSettings();
-            imageSettings.DefaultBackgroundColor =  Color.Transparent;
-            imageSettings.WindowSize = imageSize;
-            imageSettings.FullPage = false;
-            re1.RenderToPng(imageStream, imageSettings);
-        }
-
-        imageStream.Position = 0;
-        return imageStream;
+            Height = imageSize.Height,
+            Width = imageSize.Width
+        });
+        return await page.ScreenshotStreamAsync(new ScreenshotOptions
+        {
+            Clip = new Clip
+            {
+                Height = imageSize.Height,
+                Width = imageSize.Width
+            }
+        });
     }
     
     public static List<(string audience, string building, string date, string timeInterval)> SmashDates(

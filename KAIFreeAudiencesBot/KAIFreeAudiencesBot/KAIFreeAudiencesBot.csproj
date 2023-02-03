@@ -8,14 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="GrapeCity.Documents.Html" Version="5.2.0.801" />
-      <PackageReference Include="GrapeCity.Documents.Html.Linux.X64" Version="5.2.0.801" />
-      <PackageReference Include="GrapeCity.Documents.Html.Windows.X64" Version="5.2.0.801" />
-      <PackageReference Include="GrapeCity.Documents.Imaging" Version="5.2.0.801" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.6" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0-preview.5.22302.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0-preview.5.22302.2" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta1" />
+      <PackageReference Include="PuppeteerSharp" Version="9.0.2" />
       <PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />
       <PackageReference Include="System.Text.Json" Version="7.0.0-preview.5.22301.12" />
       <PackageReference Include="Telegram.Bot" Version="19.0.0-preview.1" />

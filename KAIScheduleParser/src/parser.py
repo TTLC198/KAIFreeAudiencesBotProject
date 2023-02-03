@@ -180,8 +180,7 @@ def date_from_string(input_str: str,
 def parse_date(time_for_parse: str,
                default_start: datetime.date,
                default_end: datetime.date) -> list:
-    if re.search(r"неч|чет|ежен|\s*", time_for_parse) \
-            and not (not re.search(r"с|до", time_for_parse) and re.search(r"\d\d[.-]*(?:\d\d[.-]*)+", time_for_parse)):
+    if re.search(r"неч|чет|ежен|\s*", time_for_parse) and re.search(r"с|до", time_for_parse) and re.search(r"\d\d[.-]*(?:\d\d[.-]*)+", time_for_parse):
         if re.search(r"\(\d+\)", time_for_parse):
             if re.search(r"/", time_for_parse) or re.search(r"ежен", time_for_parse):
                 return list(create_dates(7, default_start, default_end, int(re.search(r"\d+", time_for_parse)[0])))

@@ -714,11 +714,11 @@ public class HandleUpdateService
                                     await _botClient.SendPhotoAsync(
                                         chatId: message.Chat.Id,
                                         caption: i < 2 ? "Таблица свободных аудиторий:" : String.Empty,
-                                        photo: new InputFile(Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
+                                        photo: new InputFile(await Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
                                             new Size(460,
                                                 (audienceTuples.GetRange(start, Math.Min(13, length - start))
                                                      .Count +
-                                                 1) * 45))!));
+                                                 1) * 45))! ?? throw new InvalidOperationException()));
                                 }
                                 catch (Exception e)
                                 {
@@ -849,11 +849,11 @@ public class HandleUpdateService
                                     await _botClient.SendPhotoAsync(
                                         chatId: message.Chat.Id,
                                         caption: i < 2 ? "Таблица аудиторий:" : String.Empty,
-                                        photo: new InputFile(Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
+                                        photo: new InputFile(await Misc.HtmlToImageStreamConverter(tableStringBuilder.ToString(),
                                             new Size(460,
                                                 (audienceTuples.GetRange(start, Math.Min(13, length - start))
                                                      .Count +
-                                                 1) * 45))!));
+                                                 1) * 45)) ?? throw new InvalidOperationException()));
                                 }
                                 catch (Exception e)
                                 {
