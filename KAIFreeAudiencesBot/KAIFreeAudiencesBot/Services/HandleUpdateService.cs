@@ -799,14 +799,7 @@ public class HandleUpdateService
                 .ThenBy(cr => cr.name)
                 .ToList();
 
-            foreach (var classroom in allClassrooms)
-            {
-                audienceTuples.Add(new ValueTuple<string, string>
-                (
-                    item1: classroom.name,
-                    item2: classroom.building
-                ));
-            }
+            audienceTuples.AddRange(allClassrooms.Select(classroom => new ValueTuple<string, string>(item1: classroom.name, item2: classroom.building)));
 
             switch (audienceTuples.Count)
             {
@@ -935,7 +928,7 @@ public class HandleUpdateService
                     await _botClient.EditMessageTextAsync(
                         chatId: chatId,
                         messageId: loadingMessage.MessageId,
-                        text: text + "...".Substring(0, i),
+                        text: text + "..."[..i],
                         cancellationToken: CancellationToken.None
                     );
                     Thread.Sleep(delay);

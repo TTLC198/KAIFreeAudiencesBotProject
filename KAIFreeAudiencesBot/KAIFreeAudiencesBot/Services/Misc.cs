@@ -22,7 +22,7 @@ public static class Misc
     {
         dateOnly ??= DateOnly.FromDateTime(DateTime.Now);
         var initialDate = dateOnly.Value.Month is >= 1 and <= 6 
-            ? new DateTime(dateOnly.Value.Year, 1, 1) 
+            ? new DateTime(dateOnly.Value.Year, 1, 8) 
             : new DateTime(dateOnly.Value.Year, 9, 1);
         if (isEnd is true)
             return dateOnly.Value.Month is >= 1 and <= 6 
@@ -236,7 +236,12 @@ public static class Misc
         using var browserFetcher = new BrowserFetcher();
         await browserFetcher.DownloadAsync();
         await using var browser = await Puppeteer.LaunchAsync(
-            new LaunchOptions { Headless = true});
+            new LaunchOptions { Headless = true,
+                Args = new [] {
+                    "--disable-gpu",
+                    "--disable-dev-shm-usage",
+                    "--disable-setuid-sandbox",
+                    "--no-sandbox"}});
         await using var page = await browser.NewPageAsync();
         await page.SetContentAsync(html);
         await page.SetViewportAsync(new ViewPortOptions
