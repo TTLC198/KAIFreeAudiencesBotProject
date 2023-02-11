@@ -10,8 +10,8 @@ services:
       - db-data:/db
         
   ngrok:
-    image: ngrok/ngrok:alpine
     container_name: ngrok
+    image: ngrok/ngrok:alpine 
     command: 'http --authtoken ${ngrokAuthToken} host.docker.internal:5000'
     restart: on-failure
     ports:
@@ -21,12 +21,31 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     network_mode: "host"
+    profiles: ["debug"]
     healthcheck:
       test: curl -sS http://host.docker.internal:4040 || echo 1
       interval: 3s
       timeout: 5s
       retries: 30
       start_period: 60s
+      
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    restart: on-failure
+    network_mode: "host"
+    profiles: [ "prod" ]
+    volumes:
+      - ./Nginx/nginx.conf:/etc/nginx/templates/default.conf.template
+      - ./Nginx/certs/key.pem:/root/ssl/key.pem
+      - ./Nginx/certs/cert.pem:/root/ssl/cert.pem
+    ports:
+      - '443:443'
+    expose:
+      - '443'
+    environment:
+      - NGINX_HOST=your_host_address.com #set your host address 
+      - NGINX_PORT=443                   #set your port (80, 88, 443, 8443)
 
   web:
     build: KAIFreeAudiencesBot
@@ -42,8 +61,11 @@ services:
       - "host.docker.internal:host-gateway"
     network_mode: "host"
     depends_on:
-      ngrok:
-        condition: service_healthy
+      #You need to manually include these lines when using ngrok
+      #ngrok:
+      #  condition: service_healthy
+      nginx:
+        condition: service_started
       db:
         condition: service_started
       
@@ -62,5 +84,3 @@ services:
 volumes:
   db-data:
     name: db-data
-    
-    
