@@ -32,7 +32,7 @@ public class ConfigureWebhook  : IHostedService
         var webhookAddress = @$"{hostAddress}/bot/{_botConfig.BotApiKey}";
         _logger.LogInformation("Setting webhook: {webhookAddress}", webhookAddress);
         await botClient.SetWebhookAsync(
-            url: webhookAddress, 
+            url: webhookAddress,
             //certificate: new InputFile(new FileStream("//cert//cert.pem", FileMode.Open), "cert.pem"),
             allowedUpdates: Array.Empty<UpdateType>(),
             cancellationToken: cancellationToken);

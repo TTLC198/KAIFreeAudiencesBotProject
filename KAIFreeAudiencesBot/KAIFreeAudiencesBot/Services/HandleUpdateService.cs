@@ -265,6 +265,11 @@ public class HandleUpdateService
         Clients[clientIndex].step = ClientSteps.Default;
         Clients[clientIndex].settings = new ClientSettings();
 
+        await _botClient.DeleteMessageAsync(
+            chatId: message.Chat.Id,
+            messageId: message.MessageId
+        );
+        
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             replyMarkup: Keyboard.FirstChoice,
