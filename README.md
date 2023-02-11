@@ -14,10 +14,6 @@
 
 <img src=".assets/preview.png" align="left" width="1100"/>
 
-## Preview
-
-![Preview GIF](.assets/preview.gif)
-
 ## Docs
 
 - [Deployment instructions](docs/deployment.md)
