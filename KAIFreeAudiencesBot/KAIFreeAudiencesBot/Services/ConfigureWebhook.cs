@@ -1,6 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using KAIFreeAudiencesBot.Models;
+using Telegram.Bot.Types;
 
 namespace KAIFreeAudiencesBot.Services;
 
@@ -32,6 +33,7 @@ public class ConfigureWebhook  : IHostedService
         _logger.LogInformation("Setting webhook: {webhookAddress}", webhookAddress);
         await botClient.SetWebhookAsync(
             url: webhookAddress,
+            //certificate: new InputFile(new FileStream("//cert//cert.pem", FileMode.Open), "cert.pem"),
             allowedUpdates: Array.Empty<UpdateType>(),
             cancellationToken: cancellationToken);
     }

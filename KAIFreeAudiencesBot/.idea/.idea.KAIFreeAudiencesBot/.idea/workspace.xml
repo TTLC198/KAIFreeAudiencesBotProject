@@ -11,14 +11,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="97640d50-9e5b-4bf5-bb03-8ee767d04d84" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../DB/ScheduleDB.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DB/ScheduleDB.db;" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../DB/sqlite_python.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../DB/dump.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/dump.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../DB/schedule.db" beforeDir="false" afterPath="$PROJECT_DIR$/../DB/schedule.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.KAIFreeAudiencesBot/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Enums.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Models/Keyboard.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../KAIScheduleParser/src/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/../KAIScheduleParser/src/parser.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +32,39 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <excluded-from-favorite>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$/.." source="master" />
+              </list>
+            </value>
+          </entry>
+          <entry type="REMOTE">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$/.." source="origin/master" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </excluded-from-favorite>
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$/.." source="development" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
     <option name="PUSH_TAGS">
       <GitPushTagMode>
         <option name="argument" value="--follow-tags" />
@@ -41,7 +73,7 @@
     </option>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$/.." value="development" />
+        <entry key="$PROJECT_DIR$/.." value="8e764aa177f40dc53d90b8589fadd74ea0e324a3" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -57,11 +89,13 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/de87d0d6e60b4760b508cb761cdad0ba91db78/45/dcf0cccb/TaskCanceledException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1d1825edaa32eae8f34c0d4c1d7339da76b49bd313d63412aa44d18fcd5a4/MessageEntity.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/575c31ecc35a636b6f962cb71d53992552941a18982aae1c8e6c16305cc3761b/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5df7d5d8e6f2e03621186ae5a075dd9e99bebdc0e45bfc6a1948a5a677263b59/DebugProvider.Windows.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6baa723996371c059e7bc78969f2f20741024ce6de0f080dcc5964225c3303a/ServiceProvider.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c269bd4a989dea031277e5b6c4c53a6d2c1889fcf9883a7a5a1754033a57/EntityFrameworkServiceCollectionExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ce719136c12653cd464ae0b247771f618b92f8beec14c1010b5278a7d0fd1f/DbContextServices.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d2bc5a7ce9a5fc6f18c2bef1444e092e0496246f8a755bce46494f429fb86a9/DateTimeParse.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d6b4aefcd8a1389eac53f90b24090dea8ea6b3b6c8594585fbd790a8651ebd/Update.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/dbb9b76d07e4477885c165cd6116d8cca23898/_dd720/DayOfWeek.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e0b1a6d8edffe3d1c23bdcf77ea3b29dbe71c12dde7bd03a7fd516a2c94a82/ServiceProviderServiceExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/eec384c316ffd282b857f1fa5d5240aee4d304d9c1f3877b0db16c522f3/TimeOnly.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f4708639776589f5ac2739f6fcbfc67343b1f9dac51cc1dbfdb003eef77cc1c/Monitor.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
@@ -71,7 +105,6 @@
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/Database/SchDbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/HandleUpdateService.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/Startup.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/KAIFreeAudiencesBot/appsettings.Development.json" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -87,8 +120,9 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.38793105&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.gutterIcons&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -97,7 +131,7 @@
     ]
   }
 }</component>
-  <component name="RunManager" selected=".NET Launch Settings Profile.KAIFreeAudiencesBot">
+  <component name="RunManager" selected=".NET Launch Settings Profile.KAIFreeAudiencesBot: Local-Development">
     <configuration name="KAIFreeAudiencesBot" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/KAIFreeAudiencesBot/KAIFreeAudiencesBot.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net6.0" />
@@ -203,6 +237,23 @@
         <option name="Build" />
       </method>
     </configuration>
+    <configuration name="ngrok.exe" type="RunExe" factoryName=".NET Executable" temporary="true">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../ngrok.exe" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.." />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="RUNTIME_ARGUMENTS" value="" />
+      <method v="2">
+        <option name="Build Solution" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue=".NET Executable.ngrok.exe" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -242,6 +293,43 @@
       <workItem from="1661321522053" duration="1648000" />
       <workItem from="1661501546438" duration="1763000" />
       <workItem from="1661506174266" duration="1919000" />
+      <workItem from="1662380782588" duration="3284000" />
+      <workItem from="1662429804371" duration="666000" />
+      <workItem from="1662474471151" duration="3858000" />
+      <workItem from="1662487498435" duration="9376000" />
+      <workItem from="1662564165218" duration="7881000" />
+      <workItem from="1662708337735" duration="5941000" />
+      <workItem from="1662786709829" duration="4899000" />
+      <workItem from="1663792919077" duration="309000" />
+      <workItem from="1663799861226" duration="8660000" />
+      <workItem from="1663869892850" duration="1748000" />
+      <workItem from="1663917106131" duration="651000" />
+      <workItem from="1663968687824" duration="309000" />
+      <workItem from="1664090258245" duration="616000" />
+      <workItem from="1664133050965" duration="3227000" />
+      <workItem from="1664204896918" duration="7470000" />
+      <workItem from="1664553906785" duration="3497000" />
+      <workItem from="1664614859894" duration="1688000" />
+      <workItem from="1664699882698" duration="9362000" />
+      <workItem from="1664728644120" duration="1650000" />
+      <workItem from="1664782830991" duration="1961000" />
+      <workItem from="1664897123393" duration="1027000" />
+      <workItem from="1665154544191" duration="595000" />
+      <workItem from="1665185317436" duration="3312000" />
+      <workItem from="1666106231428" duration="1825000" />
+      <workItem from="1666593143457" duration="905000" />
+      <workItem from="1666706901232" duration="1885000" />
+      <workItem from="1666850506786" duration="368000" />
+      <workItem from="1670847289223" duration="13484000" />
+      <workItem from="1670953326452" duration="914000" />
+      <workItem from="1670963693455" duration="4888000" />
+      <workItem from="1670968640314" duration="4742000" />
+      <workItem from="1671014631305" duration="22330000" />
+      <workItem from="1671097974180" duration="1431000" />
+      <workItem from="1671115062579" duration="3670000" />
+      <workItem from="1672145670019" duration="1218000" />
+      <workItem from="1672157887243" duration="1259000" />
+      <workItem from="1672482029741" duration="4000" />
     </task>
     <task id="LOCAL-00001" summary="Added appsettings.example.json">
       <created>1659347509862</created>
@@ -320,7 +408,49 @@
       <option name="project" value="LOCAL" />
       <updated>1661070270790</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Reworked BuildTable method, add TableParser.cs">
+      <created>1662429872390</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1662429872390</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Change models, now currently using System.DayOfWeek enumeration">
+      <created>1662823911992</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1662823911992</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Add indexes to DB tables">
+      <created>1664784197545</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1664784197545</updated>
+    </task>
+    <task id="LOCAL-00015" summary="The mechanism for parsing audiences into the parser.py has been repaired, now all audiences are stored in the database, and the mode for displaying free audiences has been completed. View mode for all audiences by buildings has been added.">
+      <created>1670872169649</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1670872169649</updated>
+    </task>
+    <task id="LOCAL-00016" summary="The documentation has been rewritten. Settings have been changed to run correctly in a Debian container. Minor bug with loading has been fixed.">
+      <created>1670967070423</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1670967070423</updated>
+    </task>
+    <task id="LOCAL-00017" summary="The translation of the selected operating modes was added, the menu text was updated, the operating mode with default dates was reorganized, and the table with these data in the database was deleted. Update Telegram.Bot to version 19.0.0">
+      <created>1671036225661</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1671036225661</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -333,7 +463,34 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/development" />
+                </option>
+              </RecentGroup>
+            </list>
           </value>
         </entry>
       </map>
@@ -351,13 +508,20 @@
     <MESSAGE value="docker-compose support added" />
     <MESSAGE value="dpcker-compose support added" />
     <MESSAGE value="Update README.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update README.md" />
+    <MESSAGE value="Reworked BuildTable method, add TableParser.cs" />
+    <MESSAGE value="Change models, now currently using System.DayOfWeek enumeration" />
+    <MESSAGE value="fixup! Alteration of the search algorithm for free audiences has begun, added auto-detection of the image size of the table of free audiences" />
+    <MESSAGE value="Add indexes to DB tables" />
+    <MESSAGE value="The mechanism for parsing audiences into the parser.py has been repaired, now all audiences are stored in the database, and the mode for displaying free audiences has been completed. View mode for all audiences by buildings has been added." />
+    <MESSAGE value="The documentation has been rewritten. Settings have been changed to run correctly in a Debian container. Minor bug with loading has been fixed." />
+    <MESSAGE value="The translation of the selected operating modes was added, the menu text was updated, the operating mode with default dates was reorganized, and the table with these data in the database was deleted. Update Telegram.Bot to version 19.0.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="The translation of the selected operating modes was added, the menu text was updated, the operating mode with default dates was reorganized, and the table with these data in the database was deleted. Update Telegram.Bot to version 19.0.0" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/KAIFreeAudiencesBot/Services/ScheduleParser.cs</url>
+          <url>file://$PROJECT_DIR$/../../KAIFreeAudiencesBotProject-Development/KAIFreeAudiencesBot/KAIFreeAudiencesBot/Services/ScheduleParser.cs</url>
           <line>53</line>
           <properties documentPath="C:\Users\yoreh\RiderProjects\KAIFreeAudiencesBotProject\KAIFreeAudiencesBot\KAIFreeAudiencesBot\Services\ScheduleParser.cs" initialLine="51" containingFunctionPresentation="method 'GetGroupsIdAsync'" />
           <option name="timeStamp" value="1" />
@@ -370,6 +534,11 @@
         <PinnedItemInfo parentTag="Type#KAIFreeAudiencesBot.Controllers.WebhookController" memberName="_tasks" />
       </pinned-members>
     </pin-to-top-manager>
+    <watches-manager>
+      <configuration name="LaunchSettings">
+        <watch expression="markup" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

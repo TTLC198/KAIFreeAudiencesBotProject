@@ -1,11 +1,13 @@
-bin/
-obj/
+KAIFreeAudiencesBot/KAIFreeAudiencesBot/bin/
+KAIFreeAudiencesBot/KAIFreeAudiencesBot/obj/
 **/appsettings.json
 **/appsettings.Development.json
 Web.config
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
-/KAIFreeAudiencesBot/.vs
-/KAIScheduleParser/.idea
+KAIFreeAudiencesBot/.vs
+KAIScheduleParser/.idea
+KAIScheduleParser/venv
+KAIFreeAudiencesBot/.idea
 /Secrets/

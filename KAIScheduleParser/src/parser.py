@@ -2,6 +2,8 @@ import re
 import time
 import logging
 from datetime import timedelta, datetime
+import dateparser
+from dateparser.search import search_dates
 import argparse
 import requests
 from requests.adapters import HTTPAdapter, Retry
@@ -15,6 +17,8 @@ teach_last_idx = 0
 begin_les_last_idx = 0
 cursor = None
 
+custom_date_formats = ['%d.%m.%Y', '%d%m.%Y', '%d  %m', '%d.%m', '%d.%m       %Y', '%d.%m      ']
+
 proxies = {
     # custom proxies list
 }
@@ -27,12 +31,14 @@ headers = {
 
 
 def main():
-    global aud_last_idx, clst_last_idx, teach_last_idx, begin_les_last_idx, cursor
+    global aud_last_idx, clst_last_idx, teach_last_idx, begin_les_last_idx, cursor, custom_date_formats
 
     parser = argparse.ArgumentParser('KAI schedule parser')
     parser.add_argument('-g', default=False, action='store_true', help='refresh groups information')
     parser.add_argument('-l', default=False, action='store_true', help='add lessons')
+    parser.add_argument('-d', default=False, action='store_true', help='truncate lessons tables')
     parser.add_argument('-v', default=False, action='store_true', help='verbose logging')
+    parser.add_argument('-f', default=custom_date_formats,  nargs='+', help='custom date formats like this: '.join(custom_date_formats))
     parser.add_argument('-c', default='/db/schedule.db', help='Path to SQLite DB')
 
     try:
@@ -40,25 +46,43 @@ def main():
         sqlite_connection = sqlite3.connect(args.c)
         cursor = sqlite_connection.cursor()
 
+        if args.f:
+            custom_date_formats = args.f
+
         if args.v:
             logging.basicConfig(level=logging.DEBUG)
 
         if args.g:
-            print('updating groups')
+            logging.debug('updating groups')
             try:
                 update_groups()
             except BaseException as error:
                 print(error)
             else:
                 sqlite_connection.commit()
+
+        if args.d:
+            logging.debug('truncating lessons')
+            try:
+                truncate_table("classrooms")
+                truncate_table("class_types")
+                truncate_table("schedule_subject_dates")
+                truncate_table("teachers")
+                truncate_table("time_intervals")
+            except BaseException as error:
+                print(error)
+            else:
+                sqlite_connection.commit()
+
         if args.l:
-            print('updating lessons')
+            logging.debug('updating lessons')
             try:
                 update_lessons()
             except BaseException as error:
                 print(error)
             else:
                 sqlite_connection.commit()
+
     except BaseException as error:
         print(error)
     else:
@@ -79,11 +103,11 @@ def normalize_string(string):
 
 
 def update_groups():
-    cursor.execute("delete from groups")
+    truncate_table("groups")
     groups = get_groups()
     for group in groups:
         cursor.execute("insert into groups values (?, ?)", (group, groups[group]))
-    print('groups is up-to-date')
+    logging.debug('groups is up-to-date')
 
 
 def get_groups():
@@ -104,7 +128,8 @@ def get_groups():
     return groups
 
 
-def get_group_schedule(groupId: int, session: requests.Session):
+def get_group_schedule(groupId: int,
+                       session: requests.Session):
     """
     get group schedule by group id from kai api
     :param groupId: input group id
@@ -120,7 +145,10 @@ def get_group_schedule(groupId: int, session: requests.Session):
     return response.json()
 
 
-def create_dates(interval: int, date_from: datetime, date_until: datetime, overall_number: int = -1) -> list:
+def create_dates(interval: int,
+                 date_from: datetime.date,
+                 date_until: datetime.date,
+                 overall_number: int = -1) -> list:
     date_list = list([date_from, ])
     if overall_number != -1:
         date_list.extend([date_from + timedelta(days=interval * idx) for idx in range(1, overall_number)])
@@ -133,49 +161,83 @@ def create_dates(interval: int, date_from: datetime, date_until: datetime, overa
     return date_list
 
 
-def date_from_string(input_str: str, default_year: str) -> datetime:
-    input_str = re.search(r"\d\d[.]*(?:\d\d[.]*)+", input_str)[0]
-    if re.fullmatch(r"\d\d[.]\d\d[.]\d{4}", input_str) is None:
-        if re.fullmatch(r"\d\d[.]\d\d[.]", input_str) is not None:
-            input_str += default_year
+def date_from_string(input_str: str) -> datetime.date:
+    input_str = re.search(r"\d+[. ]*(?:\d+[.]*)+", input_str)[0].replace(" ", "")
+    return dateparser.parse(
+        input_str,
+        settings={'DATE_ORDER': 'DMY', 'PARSERS': [ 'custom-formats', 'no-spaces-time' ], 'TIMEZONE': 'Europe/Moscow', 'NORMALIZE': True},
+        languages = ['ru'],
+        date_formats=custom_date_formats).date()
+
+
+def parse_date(time_for_parse: str,
+               default_start: datetime.date,
+               default_end: datetime.date) -> list:
+    if re.search(r"с|до", time_for_parse) and re.search(r"\d+[. ]*(?:\d+[.]*)+", time_for_parse):
+        from_date = re.search(r"с\s*\d+[. ]*(?:\d+[.]*)+", time_for_parse)
+        until_date = re.search(r"(?:по|до)\s*\d+[. ]*(?:\d+[.]*)+", time_for_parse)
+        if from_date is None:
+            from_date = default_start
         else:
-            input_str += "." + default_year
-    return datetime.strptime(input_str, r"%d.%m.%Y")
-
-
-def parse_date(time_for_parse: str, default_start: datetime, default_end: datetime) -> list:
-    if re.search(r"неч|чет|ежен", time_for_parse) and not (
-            not re.search(r"с|до", time_for_parse) and re.search(r"\d\d[.-]*(?:\d\d[.-]*)+", time_for_parse)):
-        if re.search(r"\(\d+\)", time_for_parse):
-            if re.search(r"/", time_for_parse) or re.search(r"ежен", time_for_parse):
+            from_date = date_from_string(from_date[0])
+        if until_date is None:
+            until_date = default_end
+        else:
+            until_date = date_from_string(until_date[0])
+        if re.search(r"[Нн]еч/[Чч]ет|[Чч]ет/[Нн]еч|ежен", time_for_parse):
+            return create_dates(7, from_date, until_date)
+        else:
+            return list(create_dates(14, from_date, until_date))
+    else:
+        if re.search(r"\d-\d", time_for_parse):
+            from_date, until_date = time_for_parse.split("-")
+            return create_dates(7, date_from_string(from_date),
+                                date_from_string(until_date))
+        elif re.search(r"\(\d+\)", time_for_parse):
+            if re.search(r"[Нн]еч\s*/\s*[Чч]ет|[Чч]ет\s*/\s*[Нн]еч|\s*ежен\s*", time_for_parse):
                 return list(create_dates(7, default_start, default_end, int(re.search(r"\d+", time_for_parse)[0])))
             else:
                 return create_dates(14, default_start, default_end, int(re.search(r"\d+", time_for_parse)[0]))
+        elif len(time_for_parse) == 0 or re.search(r"[Нн]еч\s*/\s*[Чч]ет|[Чч]ет\s*/\s*[Нн]еч|ежен", time_for_parse):
+            return create_dates(7, default_start, default_end)
         else:
-            from_date = re.search(r"с \d\d[.-]*(?:\d\d[.-]*)+", time_for_parse)
-            until_date = re.search(r"(?:по|до) \d\d[.-]*(?:\d\d[.-]*)+", time_for_parse)
-            if from_date is None:
-                from_date = default_start
+            if re.search(r"\d+[. ]*(?:\d+[.]*)+", time_for_parse):
+                date_list = list()
+                for date in re.findall(r"\d+[. ]*(?:\d+[.]*)+", time_for_parse):
+                    if date_from_string(date) is not None:
+                        date_list.append(date_from_string(date))
+                return date_list
+            elif re.search(r"[Чч]е", time_for_parse):
+                return create_dates(14, default_start, default_end)
+            elif re.search(r"[Нн]е", time_for_parse):
+                return create_dates(14, default_start, default_end)
             else:
-                from_date = date_from_string(from_date[0], str(default_start.year))
-            if until_date is None:
-                until_date = default_end
-            else:
-                until_date = date_from_string(until_date[0], str(default_start.year))
-            if re.search(r"/", time_for_parse) or re.search(r"ежен", time_for_parse):
-                return create_dates(7, from_date, until_date)
-            else:
-                return list(create_dates(14, from_date, until_date))
+                raise Exception("прикол")
+
+
+def get_defaults_values(is_even: bool,
+                  is_end: bool,
+                  date: datetime.date = datetime.date(datetime.now())):
+    if 1 <= date.month <= 6:
+        initial_date = datetime(year=date.year, month=1, day=8).date()
+        end_date = datetime(year=date.year, month=6, day=30).date()
     else:
-        if re.search(r"-", time_for_parse):
-            from_date, until_date = time_for_parse.split("-")
-            return create_dates(7, date_from_string(from_date, str(default_start.year)),
-                                date_from_string(until_date, str(default_start.year)))
+        initial_date = datetime(year=date.year, month=9, day=1).date()
+        end_date = datetime(year=date.year, month=12, day=31).date()
+    if is_end:
+        return end_date
+    else:
+        if is_even is None:
+            return initial_date
+        elif initial_date.isocalendar().week % 2 != is_even:
+            return initial_date - timedelta(days=initial_date.isocalendar().weekday)
         else:
-            date_list = list()
-            for date in re.findall(r"\d\d[.]*(?:\d\d[.]*)+", time_for_parse):
-                date_list.append(date_from_string(date, str(default_start.year)))
-            return date_list
+            return initial_date + timedelta(days=(8 - initial_date.isocalendar().weekday))
+
+
+def truncate_table(table: str):
+    cursor.execute(f"delete from {table}")
+    cursor.execute(f"update sqlite_sequence set seq = 0 where name = '{table}'")
 
 
 def update_lessons():
@@ -184,9 +246,6 @@ def update_lessons():
 
     if not groups:
         raise Exception('argument error, please run update groups first with argument -g')
-
-    cursor.execute("select * from default_values")
-    default = cursor.fetchall()
 
     cursor.execute("select cr_id from classrooms order by cr_id desc limit 1")
     aud = cursor.fetchone()
@@ -213,7 +272,6 @@ def update_lessons():
     total_time = time.time()
 
     for groupId in groups:
-
         start_timestamp = time.time()
         schedule = get_group_schedule(groupId[0], session)
 
@@ -221,58 +279,58 @@ def update_lessons():
             for day in schedule.values():
                 for lesson in day:
                     day_number = normalize_string(lesson['dayNum'])
-                    dates = normalize_string(lesson['dayDate'])
-                    if re.search(r"[Нн]еч", dates) is not None:
-                        start_date = datetime.strptime(default[3][0],
-                                                       r"%d.%m.%Y") + timedelta(days=int(day_number))
-                    elif re.search(r"[Чч]ет", dates) is not None:
-                        start_date = datetime.strptime(default[2][0],
-                                                       r"%d.%m.%Y") + timedelta(days=int(day_number))
+                    dates_string = normalize_string(lesson['dayDate'])
+                    if re.search(r"[Нн]еч", dates_string) and not re.search(r"ежен", dates_string):
+                        start_date = get_defaults_values(is_even=False, is_end=False) + timedelta(days=int(day_number) - 1)
+                    elif re.search(r"[Чч]ет", dates_string) and not re.search(r"ежен", dates_string):
+                        start_date = get_defaults_values(is_even=True, is_end=False) + timedelta(days=int(day_number) - 1)
                     else:
-                        start_date = datetime.strptime(default[0][0],
-                                                       r"%d.%m.%Y") + timedelta(days=int(day_number))
+                        start_date = get_defaults_values(is_even=True, is_end=False) + timedelta(days=int(day_number) - 1)
+                    default_end = get_defaults_values(is_even=None, is_end=True)
 
-                    default_end = datetime.strptime(default[1][0], r"%d.%m.%Y")
                     auditory = normalize_string(lesson["audNum"])
 
-                    if "---" in auditory:
-                        continue
-
                     building = normalize_string(lesson["buildNum"])
-
-                    if not building.isdigit():
-                        continue
-
                     class_type = normalize_string(lesson["disciplType"])
+
                     teacher = " ".join([parte.capitalize() for parte in
                                         normalize_string(lesson["prepodName"]).split()])
                     time_interval = datetime.strptime(normalize_string(lesson["dayTime"]), "%H:%M")
                     if re.search(r"л.*р.*", class_type) is not None:
-                        create_lessons(dates, start_date, default_end, auditory, building, class_type, teacher,
+                        create_lessons(dates_string, start_date, default_end, auditory, building, class_type, teacher,
                                        time_interval, groupId)
-                        time_interval += timedelta(hours=1, minutes=40)
-                        create_lessons(dates, start_date, default_end, auditory, building, class_type, teacher,
+                        if timedelta(hours=time_interval.hour, minutes=time_interval.minute) == timedelta(hours=11, minutes=20):
+                            time_interval += timedelta(hours=2, minutes=10)
+                        else:
+                            time_interval += timedelta(hours=1, minutes=40)
+                        create_lessons(dates_string, start_date, default_end, auditory, building, class_type, teacher,
                                        time_interval, groupId)
                     else:
-                        create_lessons(dates, start_date, default_end, auditory, building, class_type, teacher,
+                        create_lessons(dates_string, start_date, default_end, auditory, building, class_type, teacher,
                                        time_interval, groupId)
         task_time = round(time.time() - start_timestamp, 2)
         rps = round(N / task_time, 1)
-        print(
+        logging.debug(
             f"| Requests: {N}; Total time: {task_time} s; RPS: {rps}. |\n"
         )
 
-    print('lessons is up-to-date')
-    print('total time {} s'.format(round(time.time() - total_time, 2)))
+    logging.debug('lessons is up-to-date')
+    logging.debug('total time {} s'.format(round(time.time() - total_time, 2)))
 
 
-def create_lessons(dates: str, def_start: datetime, def_end: datetime, auditory: str, building: int, cls_type: str,
+def create_lessons(dates_string: str,
+                   def_start: datetime,
+                   def_end: datetime,
+                   auditory: str,
+                   building: int,
+                   cls_type: str,
                    teacher: str,
-                   begin_lesson: datetime, group_id):
+                   begin_time: datetime.time,
+                   group_id):
+
     try:
         global aud_last_idx, clst_last_idx, teach_last_idx, begin_les_last_idx
-        dates = parse_date(dates, def_start, def_end)
-        cursor.execute("select cr_id from classrooms where cr_name like ?", (auditory,))
+        cursor.execute("select cr_id from classrooms where cr_name = ? and cr_building = ?", (auditory, building))
         aud_id = cursor.fetchone()
         if aud_id is None:
             cursor.execute("insert into classrooms values (null, ?, ?)", (auditory, building))
@@ -286,33 +344,45 @@ def create_lessons(dates: str, def_start: datetime, def_end: datetime, auditory:
             clst_last_idx += 1
             clst_id = (clst_last_idx,)
         clst_id = int(clst_id[0])
-        cursor.execute("select t_id from teachers where t_name like ?", (teacher,))
+        cursor.execute("select t_id from teachers where t_name = ?", (teacher,))
         teacher_id = cursor.fetchone()
         if teacher_id is None:
             cursor.execute("insert into teachers values (null, ?)", (teacher,))
             teach_last_idx += 1
             teacher_id = (teach_last_idx,)
         teacher_id = int(teacher_id[0])
-        cursor.execute("select ti_id from time_intervals where ti_start = ?", (begin_lesson.strftime(r"%H:%M"),))
+        cursor.execute("select ti_id from time_intervals where ti_start = ?", (begin_time.strftime(r"%H:%M"),))
         time_int_id = cursor.fetchone()
         if time_int_id is None:
-            end_time = begin_lesson + timedelta(hours=1, minutes=30)
-            cursor.execute("insert into time_intervals values (null, ?, ?)", (begin_lesson.strftime(r"%H:%M"),
+            end_time = begin_time + timedelta(hours=1, minutes=30)
+            cursor.execute("insert into time_intervals values (null, ?, ?)", (begin_time.strftime(r"%H:%M"),
                                                                               end_time.strftime(r"%H:%M")))
             begin_les_last_idx += 1
             time_int_id = (begin_les_last_idx,)
         time_int_id = int(time_int_id[0])
-        for date in dates:
-            cursor.execute("insert into schedule_subject_dates values (null, ?, ?, ?, ?, ?, ?)", (time_int_id,
-                                                                                                  teacher_id,
-                                                                                                  aud_id,
-                                                                                                  clst_id,
-                                                                                                  date.strftime(
-                                                                                                      r"%d.%m.%Y"),
-                                                                                                  group_id[0]))
+
+        lesson_dates = parse_date(dates_string, def_start, def_end)
+
+        for lesson_date in lesson_dates:
+            cursor.execute("insert into schedule_subject_dates values (null, ?, ?, ?, ?, ?, ?)",
+                           (time_int_id,
+                            teacher_id,
+                            aud_id,
+                            clst_id,
+                            lesson_date.strftime(r"%d.%m.%Y"),
+                            group_id[0]))
     except BaseException as error:
-        print('group id = {}'.format(group_id[0]))
-        print(error)
+        logging.warning(f'Start error')
+        logging.warning(
+            "Properties: time_int_id: %s,\nteacher_id: %s,\naud_id: %s,\nclst_id: %s,\n dates: %s,\ngroup_id: %s;",
+            *[time_int_id,
+              teacher_id,
+              aud_id,
+              clst_id,
+              dates_string,
+              group_id[0]])
+        logging.warning(error)
+        logging.warning("End error\n")
 
 
 if __name__ == '__main__':
