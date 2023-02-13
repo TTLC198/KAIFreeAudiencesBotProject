@@ -219,20 +219,15 @@ def get_defaults_values(is_even: bool,
                   is_end: bool,
                   date: datetime.date = datetime.date(datetime.now())):
     if 1 <= date.month <= 6:
-        initial_date = datetime(year=date.year, month=1, day=8).date()
+        initial_date = datetime(year=date.year, month=1, day=9).date() if is_even else datetime(year=date.year, month=1, day=2).date()
         end_date = datetime(year=date.year, month=6, day=30).date()
     else:
-        initial_date = datetime(year=date.year, month=9, day=1).date()
+        initial_date = datetime(year=date.year, month=9, day=1).date() if is_even else datetime(year=date.year, month=9, day=18).date()
         end_date = datetime(year=date.year, month=12, day=31).date()
     if is_end:
         return end_date
     else:
-        if is_even is None:
-            return initial_date
-        elif initial_date.isocalendar().week % 2 != is_even:
-            return initial_date - timedelta(days=initial_date.isocalendar().weekday)
-        else:
-            return initial_date + timedelta(days=(8 - initial_date.isocalendar().weekday))
+        return initial_date
 
 
 def truncate_table(table: str):
